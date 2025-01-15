@@ -3,7 +3,6 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  ScrollView,
   FlatList,
   Image,
 } from "react-native";
@@ -12,7 +11,7 @@ import { size } from "@/config/size";
 import Svg, { Path } from "react-native-svg";
 
 export default function P2PMarket() {
-  const DATA = [
+  const BUY_DATA = [
     {
       id: "1",
       name: "Natalia Natasha",
@@ -76,6 +75,75 @@ export default function P2PMarket() {
       transactionCount: 167,
       completionRate: "90%",
       availableTokens: 100,
+      minOrder: 5000,
+      maxOrder: 20000,
+    },
+  ];
+
+  const SELL_DATA = [
+    {
+      id: "1",
+      name: "James brown",
+      image: require("@/assets/images/avatar-2.png"), // Replace with actual path to image
+      price: 110,
+      transactionCount: 87,
+      completionRate: "70%",
+      availableTokens: 80000,
+      minOrder: 10,
+      maxOrder: 200,
+    },
+    {
+      id: "2",
+      name: "Natalia Natasha",
+      image: require("@/assets/images/avatar-1.png"), // Replace with actual path to image
+      price: 100,
+      transactionCount: 59,
+      completionRate: "80%",
+      availableTokens: 800000,
+      minOrder: 50,
+      maxOrder: 2000,
+    },
+    {
+      id: "3",
+      name: "Sophia willis",
+      image: require("@/assets/images/userAvatar.png"), // Replace with actual path to image
+      price: 100,
+      transactionCount: 167,
+      completionRate: "90%",
+      availableTokens: 100,
+      minOrder: 20,
+      maxOrder: 200,
+    },
+    {
+      id: "4",
+      name: "Natalia Natasha",
+      image: require("@/assets/images/avatar-1.png"), // Replace with actual path to image
+      price: 100,
+      transactionCount: 59,
+      completionRate: "80%",
+      availableTokens: 1000000,
+      minOrder: 500,
+      maxOrder: 20000,
+    },
+    {
+      id: "5",
+      name: "James brown",
+      image: require("@/assets/images/avatar-2.png"), // Replace with actual path to image
+      price: 110,
+      transactionCount: 87,
+      completionRate: "70%",
+      availableTokens: 100000,
+      minOrder: 5000,
+      maxOrder: 20000,
+    },
+    {
+      id: "6",
+      name: "Sophia willis",
+      image: require("@/assets/images/userAvatar.png"), // Replace with actual path to image
+      price: 100,
+      transactionCount: 167,
+      completionRate: "90%",
+      availableTokens: 7000000,
       minOrder: 5000,
       maxOrder: 20000,
     },
@@ -169,7 +237,7 @@ export default function P2PMarket() {
       </View>
 
       <FlatList
-        data={DATA}
+        data={P2PType === "buy" ? BUY_DATA : SELL_DATA}
         contentContainerStyle={{
           gap: size.getHeightSize(16),
           paddingBottom: size.getHeightSize(200),
@@ -223,7 +291,8 @@ export default function P2PMarket() {
               >
                 Available{" "}
                 <Text style={{ fontFamily: "Satoshi-Bold" }}>
-                  {item.availableTokens}GM
+                  {item.availableTokens.toLocaleString()}
+                  {P2PType === "buy" ? " GM" : " NGN"}
                 </Text>
               </Text>
               <Text
@@ -269,7 +338,7 @@ export default function P2PMarket() {
                     color: "#fff",
                   }}
                 >
-                  Buy
+                  {P2PType === "buy" ? "Buy" : "Sell"}
                 </Text>
               </Pressable>
             </View>

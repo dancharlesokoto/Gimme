@@ -19,14 +19,14 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.gimme"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-
     "plugins": [
       "expo-router",
       [
@@ -43,8 +43,11 @@
       "typedRoutes": true
     },
     "extra": {
+      "router": {
+        "origin": false
+      },
       "eas": {
-        "projectId": "4ee74cf2-054f-4aa0-aca0-2767f79a7059"
+        "projectId": "bb443fd3-6af0-487c-bef4-64538e5be33c"
       }
     }
   }

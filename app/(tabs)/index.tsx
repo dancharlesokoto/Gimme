@@ -7,7 +7,6 @@ import {
   Image,
   ScrollView,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import { Svg, Path } from "react-native-svg";
