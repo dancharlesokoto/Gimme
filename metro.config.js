@@ -1,8 +1,8 @@
 const { getDefaultConfig } = require("expo/metro-config");
+const { withNativeWind } = require("nativewind/metro");
 
-module.exports = (() => {
+const config = (() => {
   const config = getDefaultConfig(__dirname);
-
   const { transformer, resolver } = config;
 
   config.transformer = {
@@ -17,3 +17,6 @@ module.exports = (() => {
 
   return config;
 })();
+
+// Apply NativeWind configuration to the modified config
+module.exports = withNativeWind(config, { input: "./global.css" });

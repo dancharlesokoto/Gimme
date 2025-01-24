@@ -1,84 +1,167 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  Image,
-  Modal,
-  FlatList,
-  ScrollView,
-} from "react-native";
-import flagIcon from "@/assets/images/usa.png";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { View, Text, Pressable, StyleSheet, Image } from "react-native";
 import { size } from "@/config/size";
 import { Svg, Path } from "react-native-svg";
+import {
+  BottomSheetBackdrop,
+  BottomSheetFlatList,
+  BottomSheetModal,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import useCurrencyStore from "@/store/currencyStore";
 
 const Country = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedCurrency, setSelectedCurrency] = useState("USD");
+  const currencyState = useCurrencyStore((state: any) => state.currency);
+  const changeCurrencyState = useCurrencyStore(
+    (state: any) => state.setCurrency
+  );
+
+  const handleChangeCurrency = (value: string) => changeCurrencyState(value);
+
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  // callbacks
+  const handleModalToggle = () => {
+    bottomSheetModalRef.current?.present();
+  };
+
   const currencies = [
-    { label: "USD", value: "usd" },
-    { label: "EUR", value: "eur" },
-    { label: "GBP", value: "gbp" },
+    {
+      label: "NGN",
+      value: "ngn",
+      name: "Nigerian Naira",
+      icon: require("@/assets/images/ngr.png"),
+    },
+    {
+      label: "USD",
+      value: "usd",
+      name: "United States Dollar",
+      icon: require("@/assets/images/usa.png"),
+    },
   ];
 
-  return (
-    <View style={styles.pickContainer}>
-      <Image
-        source={flagIcon}
-        style={{
-          width: size.getWidthSize(20),
-          height: size.getHeightSize(20),
-        }}
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1} // Backdrop disappears when sheet is fully closed
+        appearsOnIndex={0} // Backdrop appears when sheet is opened
+        opacity={0.5} // Adjust transparency here
       />
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Pressable
-          style={styles.dropdownButton}
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={styles.selectedText}>{selectedCurrency}</Text>
-        </Pressable>
-        <Svg
-          width="21"
-          height="20"
-          viewBox="0 0 21 20"
-          fill="none"
-          //   xmlns="http://www.w3.org/2000/svg"
-        >
-          <Path
-            d="M10.5001 10.879L14.2126 7.1665L15.2731 8.227L10.5001 13L5.72705 8.227L6.78755 7.1665L10.5001 10.879Z"
-            fill="#525466"
-          />
-        </Svg>
-      </View>
+    ),
+    []
+  );
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+  return (
+    <>
+      <Pressable style={styles.pickContainer} onPress={handleModalToggle}>
+        <Image
+          source={currencies.find((item) => item.value === currencyState)?.icon}
+          style={{
+            width: size.getWidthSize(20),
+            height: size.getWidthSize(20),
+          }}
+        />
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={styles.selectedText}>
+            {currencies.find((item) => item.value === currencyState)?.label}
+          </Text>
+          <Svg
+            width="21"
+            height="20"
+            viewBox="0 0 21 20"
+            fill="none"
+            //   xmlns="http://www.w3.org/2000/svg"
+          >
+            <Path
+              d="M10.5001 10.879L14.2126 7.1665L15.2731 8.227L10.5001 13L5.72705 8.227L6.78755 7.1665L10.5001 10.879Z"
+              fill="#525466"
+            />
+          </Svg>
+        </View>
+      </Pressable>
+
+      <BottomSheetModal
+        enablePanDownToClose
+        ref={bottomSheetModalRef}
+        snapPoints={["40%", "60%"]}
+        backdropComponent={renderBackdrop}
+        backgroundStyle={{ borderRadius: size.getWidthSize(20) }}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <FlatList
-              data={currencies}
-              keyExtractor={(item) => item.value}
-              renderItem={({ item }) => (
-                <Pressable
-                  style={styles.modalItem}
-                  onPress={() => {
-                    setSelectedCurrency(item.label);
-                    setModalVisible(false);
+        <BottomSheetView
+          style={{
+            flex: 1,
+            paddingHorizontal: size.getWidthSize(20),
+            paddingTop: size.getHeightSize(8),
+          }}
+        >
+          <BottomSheetFlatList
+            data={currencies}
+            keyExtractor={(item) => item.value}
+            contentContainerStyle={{
+              gap: size.getWidthSize(24),
+            }}
+            renderItem={({ item }) => (
+              <Pressable
+                onPress={() => handleChangeCurrency(item.value)}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: size.getWidthSize(8),
+                }}
+              >
+                <Image
+                  source={item.icon}
+                  style={{
+                    width: size.getWidthSize(40),
+                    height: size.getHeightSize(40),
+                  }}
+                />
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
-                  <Text style={styles.modalItemText}>{item.label}</Text>
-                </Pressable>
-              )}
-            />
-          </View>
-        </View>
-      </Modal>
-    </View>
+                  <View>
+                    <Text
+                      style={{
+                        fontFamily: "Satoshi-Bold",
+                        fontSize: size.fontSize(14),
+                      }}
+                    >
+                      {item.label}
+                    </Text>
+                    <Text
+                      style={{
+                        fontFamily: "Satoshi-Regular",
+                        color: "#868898",
+                        fontSize: size.fontSize(12),
+                      }}
+                    >
+                      {item.name}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      width: size.getWidthSize(24),
+                      height: size.getWidthSize(24),
+                      borderRadius: size.getWidthSize(1000),
+                      backgroundColor:
+                        item.value === currencyState ? "blue" : "#E2E3E9",
+                      borderColor: "#E2E3E9",
+                      borderWidth: size.getWidthSize(8),
+                    }}
+                  ></View>
+                </View>
+              </Pressable>
+            )}
+          />
+        </BottomSheetView>
+      </BottomSheetModal>
+    </>
   );
 };
 

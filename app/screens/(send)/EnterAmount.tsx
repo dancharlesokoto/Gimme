@@ -16,6 +16,7 @@ import Country from "@/components/Country";
 import Img from "@/assets/images/avatar-2.png";
 import CheckBox from "react-native-check-box";
 import { router } from "expo-router";
+import GenericHeader from "@/components/GenericHeader";
 
 export default function EnterAmount() {
   const [amount, setAmount] = useState(null);
@@ -28,13 +29,7 @@ export default function EnterAmount() {
   return (
     <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
       <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
-        <View style={{ justifyContent: "space-between", flexDirection: "row" }}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <BackPage />
-            <Text style={styles.pageName}>Amount to send</Text>
-          </View>
-          <Country />
-        </View>
+        <GenericHeader title="Amount to send" showCountry />
 
         <View
           style={{

@@ -14,7 +14,15 @@ export default function ScreensLayout() {
         options={{ headerShown: false, animation: "ios_from_right" }}
       />
       <Stack.Screen
+        name="(p2p)"
+        options={{ headerShown: false, animation: "ios_from_right" }}
+      />
+      <Stack.Screen
         name="(send)"
+        options={{ headerShown: false, animation: "ios_from_right" }}
+      />
+      <Stack.Screen
+        name="(settings)"
         options={{ headerShown: false, animation: "ios_from_right" }}
       />
       <Stack.Screen

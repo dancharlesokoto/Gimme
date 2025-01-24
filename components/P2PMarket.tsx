@@ -5,12 +5,14 @@ import {
   Pressable,
   FlatList,
   Image,
+  Platform,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { size } from "@/config/size";
 import Svg, { Path } from "react-native-svg";
+import { router, usePathname } from "expo-router";
 
-export default function P2PMarket() {
+export default function P2PMarket({ ...props }) {
   const BUY_DATA = [
     {
       id: "1",
@@ -149,6 +151,59 @@ export default function P2PMarket() {
     },
   ];
 
+  const [currentAsset, setCurrentAsset] = useState<"cash" | "airtime" | "data">(
+    "cash"
+  );
+
+  const [currentFilter, setCurrentFilter] = useState<
+    "all" | "verified" | "unverified"
+  >("all");
+
+  const [isFilterSelectorPopoverOpen, setIsFilterSelectorPopoverOpen] =
+    useState(false);
+
+  const [isAssetSelectorOpen, setIsAssetSelectorOpen] = useState(false);
+
+  const ASSET_MENU = [
+    {
+      label: "Cash",
+      value: "cash",
+    },
+    {
+      label: "Airtime",
+      value: "airtime",
+    },
+    {
+      label: "Data",
+      value: "data",
+    },
+  ];
+
+  const FILTER_MENU = [
+    {
+      label: "All ads",
+      value: "all",
+    },
+    {
+      label: "Verified merchants",
+      value: "verified",
+    },
+    {
+      label: "Unverified merchants",
+      value: "unverified",
+    },
+  ];
+
+  const pathname = usePathname();
+  useEffect(() => {
+    handleTouchEnd();
+  }, [pathname]);
+
+  const handleTouchEnd = () => {
+    setIsFilterSelectorPopoverOpen(false);
+    setIsAssetSelectorOpen(false);
+  };
+
   const [P2PType, setP2PType] = useState<"buy" | "sell">("buy");
   return (
     <View>
@@ -183,7 +238,13 @@ export default function P2PMarket() {
           </Pressable>
         </View>
 
-        <View style={styles.assetSelector}>
+        <Pressable
+          style={styles.assetSelector}
+          onPress={() => {
+            setIsFilterSelectorPopoverOpen(false);
+            setIsAssetSelectorOpen(!isAssetSelectorOpen);
+          }}
+        >
           <Text
             style={{
               fontSize: size.fontSize(14),
@@ -191,7 +252,7 @@ export default function P2PMarket() {
               color: "#525466",
             }}
           >
-            Cash
+            {ASSET_MENU.find((item) => item.value === currentAsset)?.label}
           </Text>
           <Svg
             width="20"
@@ -205,9 +266,47 @@ export default function P2PMarket() {
               fill="#868898"
             />
           </Svg>
+        </Pressable>
+        {/* popover for asset selector */}
+        <View
+          style={[
+            styles.popover,
+            { right: size.getWidthSize(50) },
+            isAssetSelectorOpen ? { display: "flex" } : { display: "none" },
+          ]}
+        >
+          {ASSET_MENU.map((item: any, index) => (
+            <Pressable
+              onPress={() => {
+                setCurrentAsset(item.value);
+              }}
+              style={
+                currentAsset === item.value
+                  ? styles.popoverItemSelected
+                  : styles.popoverItem
+              }
+              key={index}
+            >
+              <Text
+                style={
+                  currentAsset === item.value
+                    ? styles.popoverTextSelected
+                    : styles.popoverText
+                }
+              >
+                {item.label}
+              </Text>
+            </Pressable>
+          ))}
         </View>
 
-        <View style={styles.filterSelector}>
+        <Pressable
+          style={styles.filterSelector}
+          onPress={() => {
+            setIsAssetSelectorOpen(false);
+            setIsFilterSelectorPopoverOpen(!isFilterSelectorPopoverOpen);
+          }}
+        >
           <Svg
             width="20"
             height="21"
@@ -233,14 +332,50 @@ export default function P2PMarket() {
               fill="#868898"
             />
           </Svg>
+        </Pressable>
+        {/* popover for filter selector */}
+        <View
+          style={[
+            styles.popover,
+            { right: size.getWidthSize(5) },
+            isFilterSelectorPopoverOpen
+              ? { display: "flex" }
+              : { display: "none" },
+          ]}
+        >
+          {FILTER_MENU.map((item: any, index) => (
+            <Pressable
+              onPress={() => {
+                setCurrentFilter(item.value);
+              }}
+              style={
+                currentFilter === item.value
+                  ? styles.popoverItemSelected
+                  : styles.popoverItem
+              }
+              key={index}
+            >
+              <Text
+                style={
+                  currentFilter === item.value
+                    ? styles.popoverTextSelected
+                    : styles.popoverText
+                }
+              >
+                {item.label}
+              </Text>
+            </Pressable>
+          ))}
         </View>
       </View>
 
       <FlatList
+        onTouchEnd={handleTouchEnd}
+        onScroll={handleTouchEnd}
         data={P2PType === "buy" ? BUY_DATA : SELL_DATA}
         contentContainerStyle={{
           gap: size.getHeightSize(16),
-          paddingBottom: size.getHeightSize(200),
+          paddingBottom: size.getHeightSize(300),
         }}
         renderItem={({ item }) => (
           <View style={styles.itemCard}>
@@ -330,6 +465,13 @@ export default function P2PMarket() {
                   alignItems: "center",
                   justifyContent: "center",
                 }}
+                onPress={() =>
+                  router.push(
+                    P2PType === "buy"
+                      ? "/screens/(p2p)/BuyOrder"
+                      : "/screens/(p2p)/SellOrder"
+                  )
+                }
               >
                 <Text
                   style={{
@@ -357,27 +499,26 @@ const styles = StyleSheet.create({
     paddingVertical: size.getHeightSize(24),
     flexDirection: "row",
     gap: size.getWidthSize(10),
+    position: "relative",
   },
 
   P2PTypeSelector: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    width: size.getWidthSize(160),
-    height: size.getHeightSize(40),
-    gap: size.getWidthSize(10),
-    paddingHorizontal: size.getWidthSize(7),
-    paddingVertical: size.getHeightSize(7),
+    paddingHorizontal: size.getWidthSize(6),
+    paddingVertical: size.getHeightSize(4),
+    gap: size.getWidthSize(4),
     backgroundColor: "#F6F6FA",
     borderRadius: size.getWidthSize(10),
   },
 
   typeItem: {
-    flex: 1,
-    height: "100%",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: size.getWidthSize(6),
+    paddingHorizontal: size.getWidthSize(20),
+    paddingVertical: size.getHeightSize(4),
   },
 
   activeType: {
@@ -420,6 +561,56 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderColor: "#E2E3E9",
     padding: size.getWidthSize(10),
+  },
+
+  popover: {
+    position: "absolute",
+    top: size.getHeightSize(80),
+    width: size.getWidthSize(195),
+    zIndex: 100,
+    backgroundColor: "#fff",
+    borderRadius: size.getWidthSize(8),
+    borderWidth: size.getWidthSize(0.6),
+    gap: size.getWidthSize(4),
+    borderColor: "#CDCED5",
+    padding: size.getWidthSize(8),
+    ...Platform.select({
+      android: {
+        elevation: 60,
+        shadowColor: "#585C5F",
+      },
+      ios: {
+        shadowColor: "#585C5F",
+        shadowOffset: {
+          width: 0,
+          height: size.getHeightSize(16),
+        },
+        shadowRadius: 10,
+      },
+    }),
+  },
+
+  popoverItem: {
+    borderRadius: size.getWidthSize(4),
+    padding: size.getWidthSize(8),
+  },
+
+  popoverItemSelected: {
+    backgroundColor: "#F6F6FA",
+    borderRadius: size.getWidthSize(4),
+    padding: size.getWidthSize(8),
+  },
+
+  popoverText: {
+    fontSize: size.fontSize(14),
+    fontFamily: "Satoshi-Regular",
+    color: "#0A0B14",
+  },
+
+  popoverTextSelected: {
+    fontSize: size.fontSize(14),
+    fontFamily: "Satoshi-Bold",
+    color: "#0A0B14",
   },
 
   mainSection: { flex: 1 },

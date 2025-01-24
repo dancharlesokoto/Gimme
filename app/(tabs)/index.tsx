@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  RefreshControl,
 } from "react-native";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
@@ -18,6 +19,15 @@ import Recent from "@/components/Recent";
 import { router } from "expo-router";
 
 const HomeScreen = () => {
+  const [screenRefreshing, setScreenRefreshing] = useState(false);
+
+  const handleScreenRefresh = () => {
+    setScreenRefreshing(true);
+    setTimeout(() => {
+      setScreenRefreshing(false);
+    }, 2000);
+  };
+
   return (
     <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
       <View style={styles.container}>
@@ -39,6 +49,13 @@ const HomeScreen = () => {
           </Pressable>
         </View>
         <ScrollView
+          refreshControl={
+            <RefreshControl
+              colors={["#374BFB"]}
+              refreshing={screenRefreshing}
+              onRefresh={handleScreenRefresh}
+            />
+          }
           showsVerticalScrollIndicator={false}
           overScrollMode="always"
         >

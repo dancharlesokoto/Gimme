@@ -1,29 +1,15 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  Image,
-  Modal,
-  FlatList,
-  ScrollView,
-} from "react-native";
-import flagIcon from "@/assets/images/usa.png";
+import { View, Text, Pressable, StyleSheet, Image } from "react-native";
 import hide from "@/assets/images/hide.png";
 import { size } from "../config/size";
 import { Svg, Path } from "react-native-svg";
-import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
+import Country from "./Country";
 
 const WalletCard = () => {
-  const navigation = useNavigation();
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedCurrency, setSelectedCurrency] = useState("USD");
   const currencies = [
     { label: "USD", value: "usd" },
-    { label: "EUR", value: "eur" },
-    { label: "GBP", value: "gbp" },
+    { label: "NGN", value: "ngn" },
   ];
 
   const [hideFunds, setHideFunds] = useState(false);
@@ -33,7 +19,7 @@ const WalletCard = () => {
   return (
     <View style={styles.mainCard}>
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <View style={styles.pickContainer}>
+        {/* <View style={styles.pickContainer}>
           <Image
             source={flagIcon}
             style={{
@@ -88,7 +74,8 @@ const WalletCard = () => {
               </View>
             </View>
           </Modal>
-        </View>
+        </View> */}
+        <Country />
         <Pressable
           style={{
             paddingVertical: size.getHeightSize(6),
@@ -167,14 +154,35 @@ const WalletCard = () => {
           </View>
         ) : (
           <>
-            <Text
+            <View
               style={{
-                fontFamily: "Satoshi-Bold",
-                fontSize: size.fontSize(36),
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                display: "flex",
+                gap: size.getWidthSize(2),
               }}
             >
-              $1,340.35
-            </Text>
+              <Text
+                style={{
+                  color: "#868898",
+                  fontFamily: "Satoshi-Medium",
+                  fontSize: size.fontSize(16),
+                }}
+              >
+                ₦
+              </Text>
+              <Text
+                style={{
+                  fontFamily: "Satoshi-Bold",
+                  fontSize: size.fontSize(36),
+                }}
+              >
+                {(3500.0).toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                })}
+              </Text>
+            </View>
             <Text
               style={{
                 fontFamily: "Satoshi-Regular",

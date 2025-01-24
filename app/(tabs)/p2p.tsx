@@ -1,13 +1,41 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import React, { useState } from "react";
+import { View, Text, StyleSheet, Pressable, Platform } from "react-native";
+import React, { useEffect, useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import Svg, { Circle, Ellipse, Path, Rect } from "react-native-svg";
 import Country from "@/components/Country";
 import P2PMarket from "@/components/P2PMarket";
+import { Link, router, usePathname } from "expo-router";
 
 export default function P2P() {
   const [isP2PStarted, setIsP2pStarted] = useState(false);
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+
+  const OPTIONS_MENU = [
+    {
+      label: "Chats",
+      value: "chats",
+    },
+    {
+      label: "My ads",
+      value: "myads",
+      url: "/screens/(p2p)/MyAds",
+    },
+    {
+      label: "Disputes",
+      value: "disputes",
+    },
+  ];
+
+  const pathname = usePathname();
+  useEffect(() => {
+    handleTouchEnd();
+  }, [pathname]);
+
+  const handleTouchEnd = () => {
+    setIsOptionsOpen(false);
+  };
+
   const handleStartP2P = () => {
     setIsP2pStarted(true);
   };
@@ -22,7 +50,36 @@ export default function P2P() {
           </Text>
 
           <View style={styles.rightMenu}>
-            <Pressable>
+            <Pressable
+              hitSlop={size.getWidthSize(10)}
+              style={{ position: "relative" }}
+              onPress={() => router.push("/screens/(p2p)/Orders")}
+            >
+              {/* order count */}
+              <View
+                style={{
+                  position: "absolute",
+                  width: size.getWidthSize(16),
+                  height: size.getWidthSize(16),
+                  backgroundColor: "#DF1C36",
+                  borderRadius: size.getWidthSize(100),
+                  justifyContent: "center",
+                  alignItems: "center",
+                  top: size.getHeightSize(-4),
+                  right: size.getWidthSize(-4),
+                  zIndex: 1,
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#FFFFFF",
+                    fontSize: size.fontSize(10),
+                    fontFamily: "Satoshi-Medium",
+                  }}
+                >
+                  1
+                </Text>
+              </View>
               <Svg
                 width="24"
                 height="24"
@@ -36,8 +93,34 @@ export default function P2P() {
                 />
               </Svg>
             </Pressable>
+            {/* popover for options */}
+            <View
+              style={[
+                styles.popover,
+                {
+                  width: size.getWidthSize(150),
+                  right: size.getWidthSize(100),
+                },
+                isOptionsOpen ? { display: "flex" } : { display: "none" },
+              ]}
+            >
+              {OPTIONS_MENU.map((item: any, index) => (
+                <Pressable style={styles.popoverItem} key={index}>
+                  {item.url ? (
+                    <Link href={item.url}>
+                      <Text style={styles.popoverText}>{item.label}</Text>
+                    </Link>
+                  ) : (
+                    <Text style={styles.popoverText}>{item.label}</Text>
+                  )}
+                </Pressable>
+              ))}
+            </View>
 
-            <Pressable>
+            <Pressable
+              onPress={() => setIsOptionsOpen(!isOptionsOpen)}
+              hitSlop={size.getWidthSize(10)}
+            >
               <Svg
                 width="24"
                 height="24"
@@ -54,11 +137,15 @@ export default function P2P() {
             <Country />
           </View>
         </View>
+
         {/* Showing onboarding content  */}
         {isP2PStarted ? (
-          <P2PMarket />
+          <View onTouchEnd={handleTouchEnd}>
+            <P2PMarket />
+          </View>
         ) : (
           <View
+            onTouchEnd={handleTouchEnd}
             style={{
               paddingVertical: size.getHeightSize(36),
               gap: size.getHeightSize(20),
@@ -349,6 +436,50 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: size.getWidthSize(24),
     alignItems: "center",
+  },
+
+  popover: {
+    position: "absolute",
+    top: size.getHeightSize(40),
+    width: size.getWidthSize(195),
+    zIndex: 100,
+    backgroundColor: "#fff",
+    borderRadius: size.getWidthSize(8),
+    borderWidth: size.getWidthSize(0.6),
+    gap: size.getWidthSize(4),
+    borderColor: "#CDCED5",
+    padding: size.getWidthSize(8),
+    ...Platform.select({
+      android: {
+        elevation: 60,
+        shadowColor: "#585C5F",
+      },
+      ios: {
+        shadowColor: "#585C5F",
+        shadowOffset: {
+          width: 0,
+          height: size.getHeightSize(16),
+        },
+        shadowRadius: 10,
+      },
+    }),
+  },
+
+  popoverItem: {
+    borderRadius: size.getWidthSize(4),
+    padding: size.getWidthSize(8),
+  },
+
+  popoverItemSelected: {
+    backgroundColor: "#F6F6FA",
+    borderRadius: size.getWidthSize(4),
+    padding: size.getWidthSize(8),
+  },
+
+  popoverText: {
+    fontSize: size.fontSize(14),
+    fontFamily: "Satoshi-Regular",
+    color: "#0A0B14",
   },
 
   topContent: {

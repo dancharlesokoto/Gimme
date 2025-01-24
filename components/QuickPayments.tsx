@@ -1,6 +1,14 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  FlatList,
+  Pressable,
+} from "react-native";
 import { size } from "../config/size";
+import { router } from "expo-router";
 
 const DATA = [
   {
@@ -43,10 +51,13 @@ export default function QuickPayments() {
       <FlatList
         data={DATA}
         renderItem={({ item }) => (
-          <View style={styles.avatarContainer}>
+          <Pressable
+            onPress={() => router.push("/screens/(send)/EnterAmount")}
+            style={styles.avatarContainer}
+          >
             <Image source={item.image} style={styles.avatar} />
             <Text style={styles.name}>{item.name}</Text>
-          </View>
+          </Pressable>
         )}
         keyExtractor={(item) => item.id}
         horizontal={true}
