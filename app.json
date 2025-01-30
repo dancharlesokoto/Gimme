@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "gimme-x",
-    "slug": "gimme-x",
+    "name": "Gimme",
+    "slug": "gimme",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -17,10 +17,11 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/splash.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#374BFB"
       },
-      "package": "com.anonymous.gimme"
+      "package": "com.anonymous.gimme",
+      "permissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
       "bundler": "metro",
@@ -33,8 +34,8 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/splash.png",
-          "backgroundColor": "#374BFB",
-          "imageWidth": 200,
+          "backgroundColor": "#000000",
+          "imageWidth": 100,
           "dark": {
             "image": "./assets/images/splash.png",
             "backgroundColor": "#000000"
@@ -57,7 +58,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "bb443fd3-6af0-487c-bef4-64538e5be33c"
+        "projectId": "e796d73e-ffe5-427d-9b3e-20f484dadc9d"
       }
     }
   }

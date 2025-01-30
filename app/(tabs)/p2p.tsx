@@ -15,6 +15,7 @@ export default function P2P() {
     {
       label: "Chats",
       value: "chats",
+      url: "/screens/(p2p)/Chats",
     },
     {
       label: "My ads",

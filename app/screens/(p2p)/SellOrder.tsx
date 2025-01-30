@@ -148,14 +148,14 @@ const styles = StyleSheet.create({
   },
 
   inputContainer: {
+    height: size.getHeightSize(56),
     flexDirection: "row",
     gap: size.getWidthSize(8),
     alignItems: "center",
     borderRadius: size.getWidthSize(12),
     borderWidth: size.getWidthSize(1),
     borderColor: "#E2E3E9",
-    paddingHorizontal: size.getWidthSize(12),
-    paddingVertical: size.getHeightSize(10),
+    paddingHorizontal: size.getWidthSize(10),
   },
 
   disclaimerOrderLimitContainer: {

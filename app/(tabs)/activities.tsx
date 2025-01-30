@@ -1,16 +1,8 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Image,
-  Platform,
-  FlatList,
-} from "react-native";
-import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, Pressable } from "react-native";
+import React, { useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
-import Svg, { Path } from "react-native-svg";
+import EmptyActivity from "@/components/EmptyActivity";
 
 export default function Activities() {
   const [currentFilter, setCurrentFilter] = useState<
@@ -20,10 +12,9 @@ export default function Activities() {
   const FILTER_DATA = [
     { label: "Sending", value: "sending" },
     { label: "Receiving", value: "receiving" },
-    { label: "Receiving", value: "receiving" },
-    { label: "Receiving", value: "receiving" },
-
-    { label: "Receiving", value: "receiving" },
+    { label: "Withdraw", value: "withdraw" },
+    { label: "Funding", value: "funding" },
+    { label: "P2P", value: "p2p" },
   ];
 
   return (
@@ -37,32 +28,29 @@ export default function Activities() {
         <View style={styles.content}>
           <View style={styles.menuBar}>
             <View style={styles.menuBarInner}>
-              <FlatList
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                data={FILTER_DATA}
-                renderItem={({ item }) => (
-                  <Pressable
-                    onPress={() => setCurrentFilter(item.value)}
+              {FILTER_DATA.map((item: any, index) => (
+                <Pressable
+                  key={index}
+                  onPress={() => setCurrentFilter(item.value)}
+                  style={[
+                    styles.menuBarToggleBtn,
+                    currentFilter === item.value &&
+                      styles.menuBarToggleBtnActive,
+                  ]}
+                >
+                  <Text
                     style={[
-                      styles.menuBarToggleBtn,
-                      currentFilter === item.value &&
-                        styles.menuBarToggleBtnActive,
+                      styles.menuBarToggleText,
+                      currentFilter !== item.value && { color: "#868898" },
                     ]}
                   >
-                    <Text
-                      style={[
-                        styles.menuBarToggleText,
-                        currentFilter !== item.value && { color: "#868898" },
-                      ]}
-                    >
-                      {item.label}
-                    </Text>
-                  </Pressable>
-                )}
-              />
+                    {item.label}
+                  </Text>
+                </Pressable>
+              ))}
             </View>
           </View>
+          <EmptyActivity />
         </View>
       </View>
     </CustomSafeArea>
@@ -107,33 +95,28 @@ const styles = StyleSheet.create({
   },
 
   menuBar: {
-    width: "100%",
-    flexDirection: "row",
     gap: size.getWidthSize(16),
-    position: "relative",
   },
 
   menuBarInner: {
-    width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
     paddingHorizontal: size.getWidthSize(6),
     paddingVertical: size.getHeightSize(4),
-    gap: size.getWidthSize(4),
     backgroundColor: "#F6F6FA",
     borderRadius: size.getWidthSize(10),
   },
 
   menuBarToggleBtn: {
-    flex: 1,
-    paddingHorizontal: size.getWidthSize(16),
-    paddingVertical: size.getHeightSize(4),
+    paddingVertical: size.getHeightSize(6),
+    paddingHorizontal: size.getWidthSize(6),
     borderRadius: size.getWidthSize(6),
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   menuBarToggleBtnActive: {
-    flex: 1,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
     borderColor: "#0000001A",
@@ -141,7 +124,7 @@ const styles = StyleSheet.create({
 
   menuBarToggleText: {
     color: "#0A0B14",
-    fontFamily: "Satoshi-Bold",
-    fontSize: size.fontSize(14),
+    fontFamily: "Satoshi-Medium",
+    fontSize: size.fontSize(12),
   },
 });

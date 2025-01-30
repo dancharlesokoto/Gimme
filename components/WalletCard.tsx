@@ -5,6 +5,7 @@ import { size } from "../config/size";
 import { Svg, Path } from "react-native-svg";
 import { router } from "expo-router";
 import Country from "./Country";
+import CustomRippleButton from "./CustomRippleButton";
 
 const WalletCard = () => {
   const currencies = [
@@ -203,19 +204,21 @@ const WalletCard = () => {
           paddingBottom: size.getHeightSize(12),
         }}
       >
-        <Pressable
-          style={styles.mainButton}
+        <CustomRippleButton
+          style={{ borderRadius: size.getWidthSize(8) }}
+          contentContainerStyle={styles.mainButton}
           onPress={() => router.push("/screens/(fund)/FundWallet")}
         >
           <Text style={styles.mainButtonText}>Fund wallet</Text>
-        </Pressable>
+        </CustomRippleButton>
 
-        <Pressable
-          style={styles.mainButton}
-          onPress={() => router.push("/screens/(withdraw)/Withdraw")}
+        <CustomRippleButton
+          style={{ borderRadius: size.getWidthSize(8) }}
+          contentContainerStyle={styles.mainButton}
+          onPress={() => router.push("/screens/(fund)/FundWallet")}
         >
           <Text style={styles.mainButtonText}>Withdraw money</Text>
-        </Pressable>
+        </CustomRippleButton>
       </View>
     </View>
   );
@@ -241,7 +244,7 @@ const styles = StyleSheet.create({
   mainButton: {
     height: size.getHeightSize(40),
     width: size.getWidthSize(140),
-    borderRadius: 8,
+    borderRadius: size.getWidthSize(8),
     borderWidth: 1,
     backgroundColor: "#ffffff",
     borderColor: "#E2E3E9",

@@ -15,9 +15,7 @@ import { FlatList } from "react-native";
 import { Link, router, usePathname } from "expo-router";
 
 export default function Orders() {
-  const [orderType, setOrderType] = useState<"completed" | "pending">(
-    "pending"
-  );
+  const [orderType, setOrderType] = useState("pending");
 
   const [currentFilter, setCurrentFilter] = useState<
     "all" | "verified" | "unverified"
@@ -41,6 +39,7 @@ export default function Orders() {
     {
       label: "Chats",
       value: "chats",
+      url: "/screens/(p2p)/Chats",
     },
     {
       label: "My ads",
@@ -100,39 +99,6 @@ export default function Orders() {
       availableTokens: 100,
       minOrder: 20,
       maxOrder: 200,
-    },
-    {
-      id: "4",
-      name: "Natalia Natasha",
-      image: require("@/assets/images/avatar-1.png"), // Replace with actual path to image
-      price: 100,
-      transactionCount: 59,
-      completionRate: "80%",
-      availableTokens: 1000000,
-      minOrder: 500,
-      maxOrder: 20000,
-    },
-    {
-      id: "5",
-      name: "James brown",
-      image: require("@/assets/images/avatar-2.png"), // Replace with actual path to image
-      price: 110,
-      transactionCount: 87,
-      completionRate: "70%",
-      availableTokens: 100000,
-      minOrder: 5000,
-      maxOrder: 20000,
-    },
-    {
-      id: "6",
-      name: "Sophia willis",
-      image: require("@/assets/images/userAvatar.png"), // Replace with actual path to image
-      price: 100,
-      transactionCount: 167,
-      completionRate: "90%",
-      availableTokens: 7000000,
-      minOrder: 5000,
-      maxOrder: 20000,
     },
   ];
 
@@ -218,10 +184,10 @@ export default function Orders() {
                 <Text
                   style={[
                     styles.menuBarToggleText,
-                    orderType === "completed" && { color: "#868898" },
+                    orderType !== "pending" && { color: "#868898" },
                   ]}
                 >
-                  Pending ({PENDING_DATA.length})
+                  Pending
                 </Text>
               </Pressable>
               <Pressable
@@ -234,10 +200,10 @@ export default function Orders() {
                 <Text
                   style={[
                     styles.menuBarToggleText,
-                    orderType === "pending" && { color: "#868898" },
+                    orderType !== "completed" && { color: "#868898" },
                   ]}
                 >
-                  Completed ({COMPLETED_DATA.length})
+                  Completed
                 </Text>
               </Pressable>
             </View>
@@ -316,7 +282,7 @@ export default function Orders() {
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
               onScroll={handleTouchEnd}
-              data={orderType === "pending" ? PENDING_DATA : COMPLETED_DATA}
+              data={orderType === "completed" ? COMPLETED_DATA : PENDING_DATA}
               contentContainerStyle={{
                 gap: size.getHeightSize(16),
               }}
@@ -399,6 +365,9 @@ export default function Orders() {
                       NGN{item.price}
                     </Text>
                     <Pressable
+                      onPress={() =>
+                        router.push("/screens/(p2p)/ChatConversation")
+                      }
                       style={{
                         width: size.getWidthSize(103),
                         height: size.getHeightSize(32),

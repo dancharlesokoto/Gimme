@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,51 +13,46 @@ import { size } from "@/config/size";
 import Button from "@/components/Button";
 import BackPage from "@/components/BackPage";
 import { router } from "expo-router";
+import CustomRippleButton from "@/components/CustomRippleButton";
 
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [email, setEmail] = useState("");
-  const [phoneError, setPhoneError] = useState(false);
-  const [emailError, setEmailError] = useState(false);
-  const [error, setError] = useState(false);
-  const [empty, setEmpty] = useState(false);
+  const [inputError, setInputError] = useState(false);
+  const [emptyInput, setEmptyInput] = useState(false);
 
-  const validateInputs = () => {
-    let valid = true;
-
-    // Validate phone number
-    if (phoneNumber.length < 11 && phoneNumber.length > 1) {
-      setPhoneError(true);
-      valid = false;
+  const isPhoneNumberValid = () => {
+    if (
+      phoneNumber.trim().length === 11 &&
+      phoneNumber.substring(0, 1) === "0"
+    ) {
+      return true;
     } else {
-      setPhoneError(false);
+      return false;
     }
-
-    //empty phone number
-    if (phoneNumber.trim() === "") {
-      setEmpty(true);
-      valid = false;
-    } else {
-      setEmpty(false);
-    }
-
-    // Validate email (if not empty)
-    if (email && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-      setEmailError(true);
-      valid = false;
-    } else {
-      setEmailError(false);
-    }
-
-    return valid;
   };
 
-  const handleLogin = () => {
-    if (validateInputs()) {
-      router.push("/onboarding/EnterPin");
-    } else {
-      setError(true);
+  // checks if necessary fields have been corrected in order to remove the error message
+  useEffect(() => {
+    if (phoneNumber.length > 0) {
+      setEmptyInput(false);
     }
+    if (isPhoneNumberValid() === true) {
+      setInputError(false);
+    }
+  }, [phoneNumber]);
+
+  // checks the phone number is valid or not upon button click to display erro messages
+  const handleLogin = () => {
+    if (phoneNumber.trim().length < 1) {
+      setEmptyInput(true);
+      return;
+    }
+    if (isPhoneNumberValid() === false) {
+      setInputError(true);
+      return;
+    }
+
+    router.replace("/onboarding/EnterPin");
   };
 
   return (
@@ -73,15 +68,25 @@ const Login = () => {
             </Text>
           </View>
 
-          <View style={{ paddingTop: size.getHeightSize(32) }}>
+          <View
+            style={{
+              paddingTop: size.getHeightSize(32),
+              gap: size.getHeightSize(4),
+            }}
+          >
             <Text style={styles.label}>Phone Number or email address</Text>
             <TextInput
-              style={[styles.input, phoneError && { borderColor: "#DF1C36" }]}
+              style={[
+                styles.input,
+                inputError && { borderColor: "#DF1C36" },
+                emptyInput && { borderColor: "#DF1C36" },
+              ]}
               keyboardType="phone-pad"
+              placeholder="e.g 08111222101"
               value={phoneNumber}
               onChangeText={setPhoneNumber}
             />
-            {phoneError ? (
+            {inputError ? (
               <View style={styles.errorContainer}>
                 <Svg
                   width="12"
@@ -97,7 +102,7 @@ const Login = () => {
                 </Svg>
                 <Text style={styles.error}>Phone number is incorrect</Text>
               </View>
-            ) : empty ? (
+            ) : emptyInput ? (
               <View style={styles.errorContainer}>
                 <Svg
                   width="12"
@@ -116,7 +121,28 @@ const Login = () => {
             ) : null}
 
             <View style={{ paddingTop: size.getHeightSize(24) }}>
-              <Button text="Continue" width={116} onPress={handleLogin} />
+              <CustomRippleButton
+                style={{
+                  borderRadius: size.getWidthSize(16),
+                  alignSelf: "flex-start",
+                }}
+                contentContainerStyle={{
+                  backgroundColor: "#374BFB",
+                  paddingHorizontal: size.getWidthSize(16),
+                  paddingVertical: size.getHeightSize(16),
+                }}
+                onPress={handleLogin}
+              >
+                <Text
+                  style={{
+                    fontFamily: "Satoshi-Bold",
+                    fontSize: size.fontSize(18),
+                    color: "#fff",
+                  }}
+                >
+                  Continue
+                </Text>
+              </CustomRippleButton>
             </View>
           </View>
         </View>
@@ -138,19 +164,20 @@ const styles = StyleSheet.create({
   subHead: { fontFamily: "Satoshi-Regular", fontSize: size.fontSize(14) },
 
   label: {
-    fontSize: 14,
+    fontSize: size.fontSize(14),
     fontFamily: "Satoshi-Medium",
     lineHeight: 20,
   },
 
   input: {
-    height: 50,
+    height: size.getHeightSize(54),
     borderColor: "#E2E3E9",
+    fontFamily: "Satoshi-Regular",
     borderWidth: 1,
     borderRadius: 12,
     paddingLeft: 10,
     marginBottom: 16,
-    fontSize: 16,
+    fontSize: size.fontSize(14),
   },
 
   errorContainer: {

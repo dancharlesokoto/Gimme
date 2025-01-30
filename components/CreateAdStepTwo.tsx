@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { size } from "@/config/size";
 import CurrencyInput from "react-native-currency-input";
 import Svg, { Path } from "react-native-svg";
+import SelectorIcon from "@/assets/svg/selectorIcon.svg";
 
 export default function CreateAdStepTwo() {
   const [price, setPrice] = useState(null);
@@ -92,7 +93,7 @@ export default function CreateAdStepTwo() {
                   Will change when you update it
                 </Text>
               </View>
-              <View style={styles.selectorIndicator}></View>
+              <SelectorIcon />
             </View>
             <View style={[styles.largeSelectorItem, { flex: 1 }]}>
               <View
@@ -106,7 +107,7 @@ export default function CreateAdStepTwo() {
                   Will update with market rates
                 </Text>
               </View>
-              <View style={styles.selectorIndicator}></View>
+              <SelectorIcon />
             </View>
           </View>
         </View>

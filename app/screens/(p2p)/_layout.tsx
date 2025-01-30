@@ -38,6 +38,21 @@ export default function p2pLayout() {
         name="CreateAd"
         options={{ headerShown: false, animation: "ios_from_right" }}
       />
+
+      <Stack.Screen
+        name="Chats"
+        options={{ headerShown: false, animation: "ios_from_right" }}
+      />
+
+      <Stack.Screen
+        name="ChatConversation"
+        options={{ headerShown: false, animation: "ios_from_right" }}
+      />
+
+      <Stack.Screen
+        name="CancelOrder"
+        options={{ headerShown: false, animation: "ios_from_right" }}
+      />
     </Stack>
   );
 }

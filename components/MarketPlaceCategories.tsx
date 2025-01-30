@@ -1,6 +1,8 @@
-import { View, Text, FlatList, Image } from "react-native";
+import { View, Text, FlatList, Pressable } from "react-native";
 import React from "react";
 import { size } from "@/config/size";
+import { Image } from "expo-image";
+import { router } from "expo-router";
 
 export default function MarketPlaceCategories() {
   const CATEGORIES_DATA = [
@@ -22,7 +24,7 @@ export default function MarketPlaceCategories() {
     {
       id: "4",
       name: "Appliance",
-      icon: require("@/assets/images/fashionCat.png"),
+      icon: require("@/assets/images/gadgetCat.png"),
     },
   ];
 
@@ -53,7 +55,16 @@ export default function MarketPlaceCategories() {
         horizontal
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View
+          <Pressable
+            onPress={() =>
+              router.navigate({
+                pathname: "/screens/(market)/CategoryItem",
+                params: {
+                  name: item.name,
+                  categoryId: item.id,
+                },
+              })
+            }
             style={{
               width: size.getWidthSize(87),
               paddingVertical: size.getHeightSize(12),
@@ -67,6 +78,7 @@ export default function MarketPlaceCategories() {
           >
             <Image
               source={item.icon}
+              contentFit="cover"
               style={{
                 width: size.getWidthSize(44),
                 height: size.getWidthSize(44),
@@ -82,7 +94,7 @@ export default function MarketPlaceCategories() {
             >
               {item.name}
             </Text>
-          </View>
+          </Pressable>
         )}
       />
     </View>

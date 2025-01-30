@@ -6,18 +6,27 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView } from "react-native";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import Svg, { Path, Rect } from "react-native-svg";
 import BackPage from "@/components/BackPage";
 import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
 
 export default function ProcessBuyOrder() {
   const [hasSentMoney, setHasSentMoney] = useState(false);
   const [images, setImages] = useState<string[]>([]);
   const [isUploadLoading, setIsUploadLoading] = useState(false);
+
+  const [isFundsReleased, setIsFundsReleased] = useState(false);
+
+  useEffect(() => {
+    if (isFundsReleased) {
+      router.push("/screens/Receipt");
+    }
+  }, [isFundsReleased]);
   const pickImage = async () => {
     setIsUploadLoading(true);
     // No permissions request is necessary for launching the image library
@@ -40,6 +49,9 @@ export default function ProcessBuyOrder() {
 
   const handleNext = () => {
     setHasSentMoney(true);
+    setTimeout(() => {
+      setIsFundsReleased(true);
+    }, 3000);
   };
 
   return (
@@ -51,28 +63,37 @@ export default function ProcessBuyOrder() {
             <Text style={styles.pageName}>Order</Text>
           </View>
           <View style={styles.right}>
-            <Svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              //   xmlns="http://www.w3.org/2000/svg"
+            <Pressable
+              hitSlop={size.getWidthSize(20)}
+              onPress={() => router.push("/screens/(p2p)/ChatConversation")}
             >
-              <Path
-                d="M3.00001 12C3.00001 7.0293 7.02931 3 12 3C16.9707 3 21 7.0293 21 12C21 16.9707 16.9707 21 12 21H3.00001L5.63611 18.3639C4.79914 17.5291 4.13539 16.5371 3.683 15.445C3.23061 14.3529 2.9985 13.1821 3.00001 12ZM7.34521 19.2H12C13.424 19.2 14.8161 18.7777 16.0001 17.9866C17.1841 17.1954 18.107 16.0709 18.6519 14.7553C19.1969 13.4397 19.3395 11.992 19.0617 10.5953C18.7838 9.19869 18.0981 7.91577 17.0912 6.90883C16.0842 5.90189 14.8013 5.21616 13.4047 4.93835C12.008 4.66053 10.5603 4.80312 9.24469 5.34807C7.92906 5.89302 6.80457 6.81586 6.01343 7.99989C5.22228 9.18393 4.80001 10.576 4.80001 12C4.80001 13.9368 5.56591 15.7485 6.90871 17.0913L8.18131 18.3639L7.34521 19.2ZM8.40001 12.9H15.6C15.6 13.8548 15.2207 14.7705 14.5456 15.4456C13.8705 16.1207 12.9548 16.5 12 16.5C11.0452 16.5 10.1296 16.1207 9.45442 15.4456C8.77929 14.7705 8.40001 13.8548 8.40001 12.9Z"
-                fill="#0A0B14"
-              />
-            </Svg>
+              <Svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                //   xmlns="http://www.w3.org/2000/svg"
+              >
+                <Path
+                  d="M3.00001 12C3.00001 7.0293 7.02931 3 12 3C16.9707 3 21 7.0293 21 12C21 16.9707 16.9707 21 12 21H3.00001L5.63611 18.3639C4.79914 17.5291 4.13539 16.5371 3.683 15.445C3.23061 14.3529 2.9985 13.1821 3.00001 12ZM7.34521 19.2H12C13.424 19.2 14.8161 18.7777 16.0001 17.9866C17.1841 17.1954 18.107 16.0709 18.6519 14.7553C19.1969 13.4397 19.3395 11.992 19.0617 10.5953C18.7838 9.19869 18.0981 7.91577 17.0912 6.90883C16.0842 5.90189 14.8013 5.21616 13.4047 4.93835C12.008 4.66053 10.5603 4.80312 9.24469 5.34807C7.92906 5.89302 6.80457 6.81586 6.01343 7.99989C5.22228 9.18393 4.80001 10.576 4.80001 12C4.80001 13.9368 5.56591 15.7485 6.90871 17.0913L8.18131 18.3639L7.34521 19.2ZM8.40001 12.9H15.6C15.6 13.8548 15.2207 14.7705 14.5456 15.4456C13.8705 16.1207 12.9548 16.5 12 16.5C11.0452 16.5 10.1296 16.1207 9.45442 15.4456C8.77929 14.7705 8.40001 13.8548 8.40001 12.9Z"
+                  fill="#0A0B14"
+                />
+              </Svg>
+            </Pressable>
 
-            <Text
-              style={{
-                fontSize: size.fontSize(16),
-                fontFamily: "Satoshi-Bold",
-                color: "#525466",
-              }}
+            <Pressable
+              onPress={() => router.push("/screens/(p2p)/CancelOrder")}
             >
-              Cancel order
-            </Text>
+              <Text
+                style={{
+                  fontSize: size.fontSize(16),
+                  fontFamily: "Satoshi-Bold",
+                  color: "#525466",
+                }}
+              >
+                Cancel order
+              </Text>
+            </Pressable>
           </View>
         </View>
         <ScrollView

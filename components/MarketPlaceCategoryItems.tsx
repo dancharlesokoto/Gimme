@@ -1,10 +1,9 @@
-import { View, Text, FlatList, Image, Pressable } from "react-native";
+import { View, Text, FlatList, Image } from "react-native";
 import React from "react";
 import { size } from "@/config/size";
-import { router } from "expo-router";
 
-export default function MarketPlaceRecommended() {
-  const RECOMMENDED_DATA = [
+export default function MarketPlaceCategoryItems() {
+  const ITEMS_DATA = [
     {
       id: "1",
       name: "Nike",
@@ -45,20 +44,10 @@ export default function MarketPlaceRecommended() {
   return (
     <View
       style={{
-        flex: 1,
         gap: size.getHeightSize(16),
         paddingHorizontal: size.getWidthSize(24),
       }}
     >
-      <Text
-        style={{
-          color: "#0A0B14",
-          fontFamily: "Satoshi-Bold",
-          fontSize: size.fontSize(16),
-        }}
-      >
-        Recommeded
-      </Text>
       <View
         style={{
           flexDirection: "row",
@@ -68,9 +57,8 @@ export default function MarketPlaceRecommended() {
           columnGap: size.getWidthSize(8),
         }}
       >
-        {RECOMMENDED_DATA.map((item) => (
-          <Pressable
-            onPress={() => router.push("/screens/(market)/ProductItem")}
+        {ITEMS_DATA.map((item) => (
+          <View
             key={item.id}
             style={{
               width: "48%",
@@ -107,7 +95,7 @@ export default function MarketPlaceRecommended() {
                 NGN {item.price.toLocaleString()}
               </Text>
             </View>
-          </Pressable>
+          </View>
         ))}
       </View>
     </View>

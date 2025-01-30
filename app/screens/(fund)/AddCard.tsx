@@ -223,6 +223,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: size.getWidthSize(24),
   },
+
   check: {
     borderWidth: 1,
     borderColor: "#E2E4E9",

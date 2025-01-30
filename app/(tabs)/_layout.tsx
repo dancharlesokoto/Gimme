@@ -1,5 +1,5 @@
 import { size } from "@/config/size";
-import { Redirect, router, Stack, Tabs } from "expo-router";
+import { Redirect, router, Stack, Tabs, usePathname } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, View } from "react-native";
 
@@ -20,7 +20,7 @@ import Splash from "@/components/Splash";
 export default function TabLayout() {
   const [isLoading, setIsLoading] = useState(true);
   const [userAuthToken, setUserAuthToken] = useState(null);
-
+  const pathname = usePathname();
   useEffect(() => {
     async function checkUserSession() {
       try {
@@ -37,7 +37,7 @@ export default function TabLayout() {
       }
     }
     checkUserSession();
-  }, []);
+  }, [pathname]);
 
   if (isLoading) {
     return <Splash />;

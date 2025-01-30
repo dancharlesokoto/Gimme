@@ -2,72 +2,112 @@ import {
   View,
   Text,
   StyleSheet,
+  TextInput,
   Pressable,
   ScrollView,
   Modal,
 } from "react-native";
-import React, { act, useState } from "react";
+import React, { useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
-import { size } from "@/config/size";
 import GenericHeader from "@/components/GenericHeader";
-import CreateAdProgress from "@/components/CreateAdProgress";
-import CreateAdStepOne from "@/components/CreateAdStepOne";
-import CreateAdStepTwo from "@/components/CreateAdStepTwo";
-import CreateAdStepThree from "@/components/CreateAdStepThree";
-import CreateAdStepFour from "@/components/CreateAdStepFour";
+import { size } from "@/config/size";
+import CheckBox from "react-native-check-box";
 import Svg, { Path } from "react-native-svg";
 import { router } from "expo-router";
 
-export default function CreateAd() {
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | any>(1);
+export default function AddContactAddress() {
+  const [useAsDefault, setUseAsDefault] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleProgressNext = () => {
-    if (currentStep !== 4) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      setModalVisible(true);
-    }
-  };
-
-  const handleProgressBack = () => {
-    if (currentStep !== 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
   return (
     <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
       <View style={styles.container}>
-        <GenericHeader title="Create Ad" />
-        <CreateAdProgress step={currentStep} />
-        <ScrollView>
-          <View style={styles.progressContent}>
-            {currentStep === 1 && <CreateAdStepOne />}
-            {currentStep === 2 && <CreateAdStepTwo />}
-            {currentStep === 3 && <CreateAdStepThree />}
-            {currentStep === 4 && <CreateAdStepFour />}
-          </View>
-          {currentStep > 1 && (
+        <GenericHeader title="Add contact address" />
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.contactFormContainer}>
+            <View style={styles.contactFormItem}>
+              <Text style={styles.contactFormLabel}>Full name</Text>
+              <TextInput
+                style={styles.contactFormInput}
+                placeholder="e.g John Doe"
+              />
+            </View>
+
+            <View style={styles.contactFormItem}>
+              <Text style={styles.contactFormLabel}>Street address</Text>
+              <TextInput
+                style={styles.contactFormInput}
+                placeholder="e.g No.1 Gimme Street"
+              />
+            </View>
+
+            <View style={styles.contactFormItem}>
+              <Text style={styles.contactFormLabel}>City</Text>
+              <TextInput
+                style={styles.contactFormInput}
+                placeholder="e.g Ikeja"
+              />
+            </View>
+
+            <View style={styles.contactFormItem}>
+              <Text style={styles.contactFormLabel}>State</Text>
+              <TextInput
+                style={styles.contactFormInput}
+                placeholder="e.g Lagos"
+              />
+            </View>
+
+            <View style={styles.contactFormItem}>
+              <Text style={styles.contactFormLabel}>ZIP</Text>
+              <TextInput
+                style={styles.contactFormInput}
+                placeholder="e.g 100001"
+              />
+            </View>
+
+            {/* checkbox */}
+            <View>
+              <CheckBox
+                isChecked={useAsDefault}
+                onClick={() => setUseAsDefault(!useAsDefault)}
+                rightText={"Set as default for delivery"}
+                rightTextStyle={{
+                  fontFamily: "Satoshi-Regular",
+                  fontSize: size.fontSize(14),
+                }}
+                uncheckedCheckBoxColor="#1B1C1D1F"
+                checkBoxColor="#374BFB"
+              />
+            </View>
+
             <Pressable
-              style={styles.inactiveButton}
-              onPress={handleProgressBack}
+              onPress={() => setModalVisible(true)}
+              style={{
+                backgroundColor: "#374BFB",
+                height: size.getHeightSize(56),
+                marginVertical: size.getHeightSize(16),
+                borderRadius: size.getHeightSize(16),
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              <Text style={styles.inactiveButtonText}>Go back</Text>
+              <Text
+                style={{
+                  fontSize: size.fontSize(18),
+                  fontFamily: "Satoshi-Bold",
+                  color: "#ffffff",
+                  marginLeft: size.getWidthSize(10),
+                }}
+              >
+                Save
+              </Text>
             </Pressable>
-          )}
-          <Pressable
-            style={styles.activeButton}
-            onPress={() => handleProgressNext()}
-          >
-            <Text style={styles.activeButtonText}>
-              {currentStep === 4 && "Create Ad"}
-              {currentStep === 3 && "Preview"}
-              {currentStep < 3 && "Continue"}
-            </Text>
-          </Pressable>
+          </View>
         </ScrollView>
       </View>
-
       <Modal
         animationType="slide"
         transparent={true}
@@ -97,7 +137,7 @@ export default function CreateAd() {
                     />
                   </Svg>
                 </View>
-                <Text style={styles.success}>Your ad has been created </Text>
+                <Text style={styles.success}>New contact address added </Text>
               </View>
               <View style={{ marginTop: size.getHeightSize(300) }}>
                 <Pressable
@@ -136,38 +176,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: size.getWidthSize(24),
   },
 
-  progressContent: {
+  contactFormContainer: {
     paddingVertical: size.getHeightSize(24),
+    gap: size.getHeightSize(24),
   },
 
-  activeButton: {
-    backgroundColor: "#374BFB",
+  contactFormItem: {
+    gap: size.getHeightSize(4),
+  },
+
+  contactFormLabel: {
+    fontFamily: "Satoshi-Medium",
+    fontSize: size.fontSize(14),
+    color: "#0A0B14",
+  },
+
+  contactFormInput: {
     height: size.getHeightSize(56),
-    marginVertical: size.getHeightSize(8),
-    borderRadius: size.getWidthSize(16),
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  inactiveButton: {
-    backgroundColor: "#F6F6FA",
-    height: size.getHeightSize(56),
-    marginVertical: size.getHeightSize(8),
-    borderRadius: size.getWidthSize(16),
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  activeButtonText: {
-    color: "#FFFFFF",
-    fontFamily: "Satoshi-Bold",
-    fontSize: size.fontSize(18),
-  },
-
-  inactiveButtonText: {
-    color: "#525466",
-    fontFamily: "Satoshi-Bold",
-    fontSize: size.fontSize(18),
+    borderColor: "#E2E3E9",
+    fontFamily: "Satoshi-Regular",
+    borderWidth: size.getWidthSize(1),
+    borderRadius: size.getWidthSize(12),
+    paddingHorizontal: size.getWidthSize(12),
   },
 
   modalOverlay: {

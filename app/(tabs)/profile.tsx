@@ -1,18 +1,16 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Platform,
-  Image,
-} from "react-native";
+import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 import React, { useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import Svg, { Path, Rect } from "react-native-svg";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Profile() {
+  const handleLogout = async () => {
+    AsyncStorage.removeItem("USER_AUTH_TOKEN");
+    router.replace("/onboarding/main");
+  };
   return (
     <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
       <View style={styles.container}>
@@ -222,6 +220,7 @@ export default function Profile() {
             </Pressable>
 
             <Pressable
+              onPress={async () => await handleLogout()}
               style={[styles.optionItem, { marginTop: size.getHeightSize(40) }]}
             >
               <Svg

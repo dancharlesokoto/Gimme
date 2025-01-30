@@ -122,11 +122,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: size.getHeightSize(32),
+    gap: size.getWidthSize(8),
   },
 
   pinBox: {
-    width: 80,
-    height: 60,
+    flex: 1,
+    height: size.getHeightSize(64),
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,

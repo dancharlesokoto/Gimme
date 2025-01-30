@@ -3,9 +3,11 @@ import { Text, View } from "react-native";
 import Img from "@/assets/svg/phone.svg";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
-import Button from "@/components/Button";
 import { useRouter } from "expo-router";
 import { Colors } from "@/constants/Colors";
+import { Button, TouchableRipple } from "react-native-paper";
+import Ripple from "react-native-material-ripple";
+import CustomRippleButton from "@/components/CustomRippleButton";
 
 const OnboardingScreen = () => {
   const router = useRouter();
@@ -51,17 +53,35 @@ const OnboardingScreen = () => {
             </Text>
           </View>
           <View style={{ marginTop: size.getHeightSize(38) }}>
-            <Button
-              text="Create account"
-              width={166}
+            {/* button goes here */}
+            <CustomRippleButton
               onPress={() => router.push("./Signup")}
-            />
+              rippleColor="#fff"
+              contentContainerStyle={{
+                backgroundColor: "#374BFB",
+                paddingHorizontal: size.getWidthSize(16),
+                paddingVertical: size.getHeightSize(16),
+              }}
+              style={{
+                borderRadius: size.getWidthSize(16),
+              }}
+            >
+              <Text
+                style={{
+                  color: "#ffffff",
+                  fontSize: size.fontSize(18),
+                  fontFamily: "Satoshi-Bold",
+                }}
+              >
+                Create account
+              </Text>
+            </CustomRippleButton>
           </View>
           <Text
             style={{
               fontSize: size.fontSize(15),
               textAlign: "center",
-              paddingTop: size.getHeightSize(38),
+              marginTop: size.getHeightSize(38),
               textDecorationLine: "underline",
               fontFamily: "Satoshi-Medium",
             }}

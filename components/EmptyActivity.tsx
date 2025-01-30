@@ -1,26 +1,35 @@
 import { View, Text, Image } from "react-native";
 import React from "react";
-import SplashIcon from "@/assets/images/splash.png";
+import noTxn from "@/assets/images/noTxn.png";
 import { size } from "@/config/size";
 
-export default function Splash() {
+export default function EmptyActivity() {
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: "#000000",
         justifyContent: "center",
         alignItems: "center",
+        gap: size.getHeightSize(24),
       }}
     >
       <Image
-        source={SplashIcon}
+        source={noTxn}
         style={{
           width: size.getWidthSize(100),
           height: size.getHeightSize(100),
-          objectFit: "contain",
         }}
       />
+
+      <Text
+        style={{
+          fontFamily: "Satoshi-Regular",
+          fontSize: size.fontSize(14),
+          color: "#868898",
+        }}
+      >
+        No transaction or activities yet.
+      </Text>
     </View>
   );
 }

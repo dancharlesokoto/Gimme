@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, Platform } from "react-native";
 import React from "react";
 import { size } from "@/config/size";
+import SelectorIcon from "@/assets/svg/selectorIcon.svg";
 
 export default function CreateAdStepOne() {
   return (
@@ -13,7 +14,7 @@ export default function CreateAdStepOne() {
               fontFamily: "Satoshi-Medium",
               fontSize: size.fontSize(14),
               color: "#0A0B14",
-              lineHeight: size.getHeightSize(24),
+              lineHeight: size.getHeightSize(28),
             }}
           >
             What type of Ad are you creating?
@@ -38,7 +39,7 @@ export default function CreateAdStepOne() {
                   Customers buy assets from you
                 </Text>
               </View>
-              <View style={styles.selectorIndicator}></View>
+              <SelectorIcon />
             </View>
             <View style={[styles.largeSelectorItem, { flex: 1 }]}>
               <View
@@ -52,7 +53,7 @@ export default function CreateAdStepOne() {
                   Customers sell assets to you
                 </Text>
               </View>
-              <View style={styles.selectorIndicator}></View>
+              <SelectorIcon />
             </View>
           </View>
         </View>
@@ -81,7 +82,7 @@ export default function CreateAdStepOne() {
                   You will trade assets for Gimme token
                 </Text>
               </View>
-              <View style={styles.selectorIndicator}></View>
+              <SelectorIcon />
             </View>
             <View style={styles.largeSelectorItem}>
               <View
@@ -95,7 +96,7 @@ export default function CreateAdStepOne() {
                   You will trade assets for Airtime
                 </Text>
               </View>
-              <View style={styles.selectorIndicator}></View>
+              <SelectorIcon />
             </View>
 
             <View style={styles.largeSelectorItem}>
@@ -110,7 +111,7 @@ export default function CreateAdStepOne() {
                   You will trade assets for Data bundle
                 </Text>
               </View>
-              <View style={styles.selectorIndicator}></View>
+              <SelectorIcon />
             </View>
           </View>
         </View>

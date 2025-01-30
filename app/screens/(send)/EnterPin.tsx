@@ -88,13 +88,13 @@ const EnterPin = () => {
   return (
     <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
       <View style={styles.container}>
-        <BackPage />
         <View>
           <View
             style={{
               width: size.getWidthSize(64),
               height: size.getHeightSize(64),
               borderRadius: size.getWidthSize(100),
+              marginTop: size.getHeightSize(32),
               borderWidth: 1,
               borderColor: "#E2E4E9",
               justifyContent: "center",
@@ -115,7 +115,7 @@ const EnterPin = () => {
               />
             </Svg>
           </View>
-          <Text style={styles.title}>About to send</Text>
+          <Text style={styles.title}>About to pay</Text>
           <Text style={styles.subtitle}>NGN 20,000 to 0813******91</Text>
 
           <View style={styles.pinContainer}>
@@ -202,11 +202,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: size.getHeightSize(32),
+    gap: size.getWidthSize(8),
   },
 
   pinBox: {
-    width: 80,
-    height: 60,
+    flex: 1,
+    height: size.getHeightSize(64),
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
