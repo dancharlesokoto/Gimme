@@ -1,11 +1,19 @@
-import { View, Text, StyleSheet, Pressable, Platform } from "react-native";
-import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableHighlight,
+} from "react-native";
+import React, { useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import Svg, { Circle, Ellipse, Path, Rect } from "react-native-svg";
 import Country from "@/components/Country";
 import P2PMarket from "@/components/P2PMarket";
-import { Link, router, usePathname } from "expo-router";
+import { Link, router } from "expo-router";
+import CustomRippleButton from "@/components/CustomRippleButton";
+import { Menu } from "react-native-paper";
 
 export default function P2P() {
   const [isP2PStarted, setIsP2pStarted] = useState(false);
@@ -28,15 +36,6 @@ export default function P2P() {
     },
   ];
 
-  const pathname = usePathname();
-  useEffect(() => {
-    handleTouchEnd();
-  }, [pathname]);
-
-  const handleTouchEnd = () => {
-    setIsOptionsOpen(false);
-  };
-
   const handleStartP2P = () => {
     setIsP2pStarted(true);
   };
@@ -51,7 +50,7 @@ export default function P2P() {
           </Text>
 
           <View style={styles.rightMenu}>
-            <Pressable
+            <TouchableOpacity
               hitSlop={size.getWidthSize(10)}
               style={{ position: "relative" }}
               onPress={() => router.push("/screens/(p2p)/Orders")}
@@ -93,60 +92,58 @@ export default function P2P() {
                   fill="#525466"
                 />
               </Svg>
-            </Pressable>
-            {/* popover for options */}
-            <View
-              style={[
-                styles.popover,
-                {
-                  width: size.getWidthSize(150),
-                  right: size.getWidthSize(100),
-                },
-                isOptionsOpen ? { display: "flex" } : { display: "none" },
-              ]}
+            </TouchableOpacity>
+
+            <Menu
+              elevation={0}
+              contentStyle={styles.popover}
+              anchorPosition="bottom"
+              visible={isOptionsOpen} // Control visibility
+              onDismiss={() => setIsOptionsOpen(false)} // Close menu when dismissed
+              anchor={
+                <CustomRippleButton
+                  style={{ borderRadius: size.getWidthSize(8) }}
+                  onPress={() => setIsOptionsOpen(true)}
+                >
+                  <Svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    // xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <Path
+                      d="M12 5.25C11.175 5.25 10.5 5.925 10.5 6.75C10.5 7.575 11.175 8.25 12 8.25C12.825 8.25 13.5 7.575 13.5 6.75C13.5 5.925 12.825 5.25 12 5.25ZM12 15.75C11.175 15.75 10.5 16.425 10.5 17.25C10.5 18.075 11.175 18.75 12 18.75C12.825 18.75 13.5 18.075 13.5 17.25C13.5 16.425 12.825 15.75 12 15.75ZM12 10.5C11.175 10.5 10.5 11.175 10.5 12C10.5 12.825 11.175 13.5 12 13.5C12.825 13.5 13.5 12.825 13.5 12C13.5 11.175 12.825 10.5 12 10.5Z"
+                      fill="#525466"
+                    />
+                  </Svg>
+                </CustomRippleButton>
+              } // Anchor element
             >
               {OPTIONS_MENU.map((item: any, index) => (
-                <Pressable style={styles.popoverItem} key={index}>
-                  {item.url ? (
-                    <Link href={item.url}>
-                      <Text style={styles.popoverText}>{item.label}</Text>
-                    </Link>
-                  ) : (
-                    <Text style={styles.popoverText}>{item.label}</Text>
-                  )}
-                </Pressable>
+                <TouchableHighlight
+                  underlayColor="#F6F6FA"
+                  key={index}
+                  onPress={() => {
+                    setIsOptionsOpen(false);
+                    router.push(item.url);
+                  }}
+                  style={styles.popoverItem}
+                >
+                  <Text style={styles.popoverText}>{item.label}</Text>
+                </TouchableHighlight>
               ))}
-            </View>
-
-            <Pressable
-              onPress={() => setIsOptionsOpen(!isOptionsOpen)}
-              hitSlop={size.getWidthSize(10)}
-            >
-              <Svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                // xmlns="http://www.w3.org/2000/svg"
-              >
-                <Path
-                  d="M12 5.25C11.175 5.25 10.5 5.925 10.5 6.75C10.5 7.575 11.175 8.25 12 8.25C12.825 8.25 13.5 7.575 13.5 6.75C13.5 5.925 12.825 5.25 12 5.25ZM12 15.75C11.175 15.75 10.5 16.425 10.5 17.25C10.5 18.075 11.175 18.75 12 18.75C12.825 18.75 13.5 18.075 13.5 17.25C13.5 16.425 12.825 15.75 12 15.75ZM12 10.5C11.175 10.5 10.5 11.175 10.5 12C10.5 12.825 11.175 13.5 12 13.5C12.825 13.5 13.5 12.825 13.5 12C13.5 11.175 12.825 10.5 12 10.5Z"
-                  fill="#525466"
-                />
-              </Svg>
-            </Pressable>
+            </Menu>
+            {/* end */}
             <Country />
           </View>
         </View>
 
         {/* Showing onboarding content  */}
         {isP2PStarted ? (
-          <View onTouchEnd={handleTouchEnd}>
-            <P2PMarket />
-          </View>
+          <P2PMarket />
         ) : (
           <View
-            onTouchEnd={handleTouchEnd}
             style={{
               paddingVertical: size.getHeightSize(36),
               gap: size.getHeightSize(20),
@@ -391,9 +388,11 @@ export default function P2P() {
               </View>
             </View>
 
-            <Pressable
+            <CustomRippleButton
+              rippleColor="#fff"
               onPress={handleStartP2P}
-              style={{
+              style={{ borderRadius: size.getWidthSize(16) }}
+              contentContainerStyle={{
                 backgroundColor: "#374BFB",
                 height: size.getHeightSize(56),
                 marginVertical: size.getHeightSize(16),
@@ -412,7 +411,7 @@ export default function P2P() {
               >
                 Get started
               </Text>
-            </Pressable>
+            </CustomRippleButton>
           </View>
         )}
       </View>
@@ -440,41 +439,26 @@ const styles = StyleSheet.create({
   },
 
   popover: {
-    position: "absolute",
-    top: size.getHeightSize(40),
-    width: size.getWidthSize(195),
-    zIndex: 100,
-    backgroundColor: "#fff",
-    borderRadius: size.getWidthSize(8),
-    borderWidth: size.getWidthSize(0.6),
-    gap: size.getWidthSize(4),
-    borderColor: "#CDCED5",
+    width: size.getWidthSize(175),
+    backgroundColor: "#FFFFFF",
     padding: size.getWidthSize(8),
-    ...Platform.select({
-      android: {
-        elevation: 60,
-        shadowColor: "#585C5F",
-      },
-      ios: {
-        shadowColor: "#585C5F",
-        shadowOffset: {
-          width: 0,
-          height: size.getHeightSize(16),
-        },
-        shadowRadius: 10,
-      },
-    }),
+    marginTop: size.getHeightSize(8),
+    borderWidth: size.getWidthSize(1),
+
+    gap: size.getHeightSize(4),
+    borderColor: "#CDCED5",
+    borderRadius: size.getWidthSize(8),
   },
 
   popoverItem: {
     borderRadius: size.getWidthSize(4),
-    padding: size.getWidthSize(8),
+    padding: size.getWidthSize(12),
   },
 
   popoverItemSelected: {
     backgroundColor: "#F6F6FA",
     borderRadius: size.getWidthSize(4),
-    padding: size.getWidthSize(8),
+    padding: size.getWidthSize(12),
   },
 
   popoverText: {

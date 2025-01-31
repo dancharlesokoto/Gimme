@@ -4,7 +4,7 @@ import {
   StyleSheet,
   Pressable,
   Image,
-  Platform,
+  TouchableHighlight,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
@@ -12,7 +12,9 @@ import { size } from "@/config/size";
 import Svg, { Path, Rect } from "react-native-svg";
 import BackPage from "@/components/BackPage";
 import { FlatList } from "react-native";
-import { Link, router, usePathname } from "expo-router";
+import { router, usePathname } from "expo-router";
+import { Menu } from "react-native-paper";
+import CustomRippleButton from "@/components/CustomRippleButton";
 
 export default function Orders() {
   const [orderType, setOrderType] = useState("pending");
@@ -29,12 +31,13 @@ export default function Orders() {
   const pathname = usePathname();
   useEffect(() => {
     handleTouchEnd();
-  }, [pathname]);
+  }, []);
 
   const handleTouchEnd = () => {
     setIsFilterSelectorPopoverOpen(false);
     setIsOptionsOpen(false);
   };
+
   const OPTIONS_MENU = [
     {
       label: "Chats",
@@ -126,49 +129,47 @@ export default function Orders() {
             <Text style={styles.pageName}>Orders</Text>
           </View>
           <View style={styles.right}>
-            <Pressable
-              onPress={() => {
-                setIsOptionsOpen(!isOptionsOpen);
-                setIsFilterSelectorPopoverOpen(false);
-              }}
-            >
-              <Svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                // xmlns="http:?//www.w3.org/2000/svg"
-              >
-                <Path
-                  d="M12 5.25C11.175 5.25 10.5 5.925 10.5 6.75C10.5 7.575 11.175 8.25 12 8.25C12.825 8.25 13.5 7.575 13.5 6.75C13.5 5.925 12.825 5.25 12 5.25ZM12 15.75C11.175 15.75 10.5 16.425 10.5 17.25C10.5 18.075 11.175 18.75 12 18.75C12.825 18.75 13.5 18.075 13.5 17.25C13.5 16.425 12.825 15.75 12 15.75ZM12 10.5C11.175 10.5 10.5 11.175 10.5 12C10.5 12.825 11.175 13.5 12 13.5C12.825 13.5 13.5 12.825 13.5 12C13.5 11.175 12.825 10.5 12 10.5Z"
-                  fill="#525466"
-                />
-              </Svg>
-            </Pressable>
-
             {/* popover for options */}
-            <View
-              style={[
-                styles.popover,
-                {
-                  width: size.getWidthSize(150),
-                  right: size.getWidthSize(5),
-                },
-                isOptionsOpen ? { display: "flex" } : { display: "none" },
-              ]}
+            <Menu
+              elevation={0}
+              contentStyle={styles.popover}
+              anchorPosition="bottom"
+              visible={isOptionsOpen} // Control visibility
+              onDismiss={() => setIsOptionsOpen(false)} // Close menu when dismissed
+              anchor={
+                <CustomRippleButton
+                  style={{ borderRadius: size.getWidthSize(8) }}
+                  onPress={() => setIsOptionsOpen(true)}
+                >
+                  <Svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    // xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <Path
+                      d="M12 5.25C11.175 5.25 10.5 5.925 10.5 6.75C10.5 7.575 11.175 8.25 12 8.25C12.825 8.25 13.5 7.575 13.5 6.75C13.5 5.925 12.825 5.25 12 5.25ZM12 15.75C11.175 15.75 10.5 16.425 10.5 17.25C10.5 18.075 11.175 18.75 12 18.75C12.825 18.75 13.5 18.075 13.5 17.25C13.5 16.425 12.825 15.75 12 15.75ZM12 10.5C11.175 10.5 10.5 11.175 10.5 12C10.5 12.825 11.175 13.5 12 13.5C12.825 13.5 13.5 12.825 13.5 12C13.5 11.175 12.825 10.5 12 10.5Z"
+                      fill="#525466"
+                    />
+                  </Svg>
+                </CustomRippleButton>
+              } // Anchor element
             >
               {OPTIONS_MENU.map((item: any, index) => (
-                <Pressable style={styles.popoverItem} key={index}>
-                  {item.url ? (
-                    <Link href={item.url}>
-                      <Text style={styles.popoverText}>{item.label}</Text>
-                    </Link>
-                  ) : (
-                    <Text style={styles.popoverText}>{item.label}</Text>
-                  )}
-                </Pressable>
+                <TouchableHighlight
+                  underlayColor="#F6F6FA"
+                  key={index}
+                  onPress={() => {
+                    setIsOptionsOpen(false);
+                    router.push(item.url);
+                  }}
+                  style={styles.popoverItem}
+                >
+                  <Text style={styles.popoverText}>{item.label}</Text>
+                </TouchableHighlight>
               ))}
-            </View>
+            </Menu>
           </View>
         </View>
         <View style={styles.content}>
@@ -208,52 +209,54 @@ export default function Orders() {
               </Pressable>
             </View>
 
-            <Pressable
-              style={styles.filterSelector}
-              onPress={() => {
-                setIsFilterSelectorPopoverOpen(!isFilterSelectorPopoverOpen);
-                setIsOptionsOpen(false);
-              }}
-            >
-              <Svg
-                width="20"
-                height="21"
-                viewBox="0 0 20 21"
-                fill="none"
-                // xmlns="http://www.w3.org/2000/svg"
-              >
-                <Path
-                  d="M8.5 15H11.5V13.5H8.5V15ZM3.25 6V7.5H16.75V6H3.25ZM5.5 11.25H14.5V9.75H5.5V11.25Z"
-                  fill="#525466"
-                />
-              </Svg>
-
-              <Svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                // xmlns="http://www.w3.org/2000/svg"
-              >
-                <Path
-                  d="M10.0001 11.3785L13.7126 7.66602L14.7731 8.72652L10.0001 13.4995L5.22705 8.72652L6.28755 7.66602L10.0001 11.3785Z"
-                  fill="#868898"
-                />
-              </Svg>
-            </Pressable>
             {/* popover for filter selector */}
-            <View
-              style={[
-                styles.popover,
-                { right: size.getWidthSize(5) },
-                isFilterSelectorPopoverOpen
-                  ? { display: "flex" }
-                  : { display: "none" },
-              ]}
+            <Menu
+              elevation={0}
+              contentStyle={styles.popover}
+              anchorPosition="bottom"
+              visible={isFilterSelectorPopoverOpen} // Control visibility
+              onDismiss={() => setIsFilterSelectorPopoverOpen(false)} // Close menu when dismissed
+              anchor={
+                <Pressable
+                  style={styles.filterSelector}
+                  onPress={() => {
+                    setIsFilterSelectorPopoverOpen(true);
+                  }}
+                >
+                  <Svg
+                    width="20"
+                    height="21"
+                    viewBox="0 0 20 21"
+                    fill="none"
+                    // xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <Path
+                      d="M8.5 15H11.5V13.5H8.5V15ZM3.25 6V7.5H16.75V6H3.25ZM5.5 11.25H14.5V9.75H5.5V11.25Z"
+                      fill="#525466"
+                    />
+                  </Svg>
+
+                  <Svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    // xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <Path
+                      d="M10.0001 11.3785L13.7126 7.66602L14.7731 8.72652L10.0001 13.4995L5.22705 8.72652L6.28755 7.66602L10.0001 11.3785Z"
+                      fill="#868898"
+                    />
+                  </Svg>
+                </Pressable>
+              } // Anchor element
             >
               {FILTER_MENU.map((item: any, index) => (
-                <Pressable
+                <TouchableHighlight
+                  underlayColor="#F6F6FA"
+                  key={index}
                   onPress={() => {
+                    setIsFilterSelectorPopoverOpen(false);
                     setCurrentFilter(item.value);
                   }}
                   style={
@@ -261,7 +264,6 @@ export default function Orders() {
                       ? styles.popoverItemSelected
                       : styles.popoverItem
                   }
-                  key={index}
                 >
                   <Text
                     style={
@@ -272,9 +274,9 @@ export default function Orders() {
                   >
                     {item.label}
                   </Text>
-                </Pressable>
+                </TouchableHighlight>
               ))}
-            </View>
+            </Menu>
           </View>
 
           <View onTouchEnd={handleTouchEnd} style={{ height: "100%" }}>
@@ -441,11 +443,13 @@ const styles = StyleSheet.create({
 
   menuBar: {
     flexDirection: "row",
+    justifyContent: "space-between",
     gap: size.getWidthSize(16),
     position: "relative",
   },
 
   menuBarInner: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -457,6 +461,9 @@ const styles = StyleSheet.create({
   },
 
   menuBarToggleBtn: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: size.getWidthSize(16),
     paddingVertical: size.getHeightSize(4),
     borderRadius: size.getWidthSize(6),
@@ -475,41 +482,25 @@ const styles = StyleSheet.create({
   },
 
   popover: {
-    position: "absolute",
-    top: size.getHeightSize(50),
-    width: size.getWidthSize(195),
-    zIndex: 100,
-    backgroundColor: "#fff",
-    borderRadius: size.getWidthSize(8),
-    borderWidth: size.getWidthSize(0.6),
-    gap: size.getWidthSize(4),
-    borderColor: "#CDCED5",
+    width: size.getWidthSize(175),
+    backgroundColor: "#FFFFFF",
     padding: size.getWidthSize(8),
-    ...Platform.select({
-      android: {
-        elevation: 60,
-        shadowColor: "#585C5F",
-      },
-      ios: {
-        shadowColor: "#585C5F",
-        shadowOffset: {
-          width: 0,
-          height: size.getHeightSize(16),
-        },
-        shadowRadius: 10,
-      },
-    }),
+    marginTop: size.getHeightSize(8),
+    borderWidth: size.getWidthSize(1),
+    gap: size.getHeightSize(4),
+    borderColor: "#CDCED5",
+    borderRadius: size.getWidthSize(8),
   },
 
   popoverItem: {
     borderRadius: size.getWidthSize(4),
-    padding: size.getWidthSize(8),
+    padding: size.getWidthSize(12),
   },
 
   popoverItemSelected: {
     backgroundColor: "#F6F6FA",
     borderRadius: size.getWidthSize(4),
-    padding: size.getWidthSize(8),
+    padding: size.getWidthSize(12),
   },
 
   popoverText: {

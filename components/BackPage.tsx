@@ -1,10 +1,8 @@
 import React from "react";
-import { Pressable } from "react-native";
+import { TouchableHighlight } from "react-native";
 import { Svg, Path } from "react-native-svg";
 import { size } from "@/config/size";
 import { useRouter } from "expo-router";
-import { Button, TouchableRipple } from "react-native-paper";
-import CustomRippleButton from "./CustomRippleButton";
 
 const BackPage = ({
   page,
@@ -27,9 +25,9 @@ const BackPage = ({
   };
 
   return (
-    <CustomRippleButton
-      style={{ borderRadius: size.getWidthSize(30) }}
-      rippleColor={"grey"}
+    <TouchableHighlight
+      style={{ borderRadius: size.getWidthSize(8) }}
+      underlayColor={"rgba(0, 0, 0, 0.05)"}
       onPress={handlePress}
     >
       <Svg width="30" height="30" viewBox="0 0 24 24" fill="none">
@@ -38,7 +36,7 @@ const BackPage = ({
           fill="#525466"
         />
       </Svg>
-    </CustomRippleButton>
+    </TouchableHighlight>
   );
 };
 

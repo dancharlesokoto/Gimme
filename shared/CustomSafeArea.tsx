@@ -4,12 +4,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const CustomSafeArea = ({
   children,
-  bottomSafeAreaInset,
   topColor,
   bgColor,
 }: {
   children: ReactNode;
-  bottomSafeAreaInset?: number;
+  setBottomSafeAreaInset?: boolean;
   topColor?: string;
   bgColor?: string;
 }) => {
@@ -20,7 +19,7 @@ const CustomSafeArea = ({
         flex: 1,
         backgroundColor: topColor ? topColor : "#161E64",
         paddingTop: top,
-        paddingBottom: bottomSafeAreaInset ? bottom : 0,
+        paddingBottom: bottom,
       }}
     >
       <View

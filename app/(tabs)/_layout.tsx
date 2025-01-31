@@ -1,7 +1,8 @@
 import { size } from "@/config/size";
-import { Redirect, router, Stack, Tabs, usePathname } from "expo-router";
+import { Redirect, Tabs, usePathname } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Image, View } from "react-native";
+import { Image, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HomeIcon from "@/assets/svg/home.svg";
 import P2PIcon from "@/assets/svg/p2p.svg";
@@ -21,6 +22,8 @@ export default function TabLayout() {
   const [isLoading, setIsLoading] = useState(true);
   const [userAuthToken, setUserAuthToken] = useState(null);
   const pathname = usePathname();
+  const insets = useSafeAreaInsets();
+
   useEffect(() => {
     async function checkUserSession() {
       try {
@@ -53,10 +56,16 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: Colors.text,
         tabBarInactiveTintColor: Colors.lightText,
+        tabBarButton: (props: any) => (
+          <TouchableOpacity activeOpacity={0.3} {...props} />
+        ),
         tabBarStyle: {
-          height: size.getHeightSize(85),
-          paddingBottom: size.getHeightSize(20),
-          paddingTop: size.getHeightSize(20),
+          height: size.getHeightSize(75) + insets.bottom,
+          elevation: 0,
+          alignItems: "center",
+          paddingTop: size.getHeightSize(10),
+          paddingBottom: insets.bottom,
+          justifyContent: "center",
         },
       }}
     >

@@ -11,6 +11,9 @@ import React, { useEffect, useState } from "react";
 import { size } from "@/config/size";
 import Svg, { Path } from "react-native-svg";
 import { router, usePathname } from "expo-router";
+import { Menu } from "react-native-paper";
+import { TouchableHighlight } from "react-native";
+import Popover from "react-native-popover-view";
 
 export default function P2PMarket({ ...props }) {
   const BUY_DATA = [
@@ -238,46 +241,50 @@ export default function P2PMarket({ ...props }) {
           </Pressable>
         </View>
 
-        <Pressable
-          style={styles.assetSelector}
-          onPress={() => {
-            setIsFilterSelectorPopoverOpen(false);
-            setIsAssetSelectorOpen(!isAssetSelectorOpen);
-          }}
-        >
-          <Text
-            style={{
-              fontSize: size.fontSize(14),
-              fontFamily: "Satoshi-Regular",
-              color: "#525466",
-            }}
-          >
-            {ASSET_MENU.find((item) => item.value === currentAsset)?.label}
-          </Text>
-          <Svg
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            // xmlns="http://www.w3.org/2000/svg"
-          >
-            <Path
-              d="M10.0001 11.3785L13.7126 7.66602L14.7731 8.72652L10.0001 13.4995L5.22705 8.72652L6.28755 7.66602L10.0001 11.3785Z"
-              fill="#868898"
-            />
-          </Svg>
-        </Pressable>
         {/* popover for asset selector */}
-        <View
-          style={[
-            styles.popover,
-            { right: size.getWidthSize(50) },
-            isAssetSelectorOpen ? { display: "flex" } : { display: "none" },
-          ]}
+        <Menu
+          elevation={0}
+          contentStyle={styles.popover}
+          anchorPosition="bottom"
+          visible={isAssetSelectorOpen} // Control visibility
+          onDismiss={() => setIsAssetSelectorOpen(false)} // Close menu when dismissed
+          anchor={
+            <Pressable
+              style={styles.assetSelector}
+              onPress={() => {
+                setIsAssetSelectorOpen(true);
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: size.fontSize(14),
+                  fontFamily: "Satoshi-Regular",
+                  color: "#525466",
+                }}
+              >
+                {ASSET_MENU.find((item) => item.value === currentAsset)?.label}
+              </Text>
+              <Svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                // xmlns="http://www.w3.org/2000/svg"
+              >
+                <Path
+                  d="M10.0001 11.3785L13.7126 7.66602L14.7731 8.72652L10.0001 13.4995L5.22705 8.72652L6.28755 7.66602L10.0001 11.3785Z"
+                  fill="#868898"
+                />
+              </Svg>
+            </Pressable>
+          } // Anchor element
         >
           {ASSET_MENU.map((item: any, index) => (
-            <Pressable
+            <TouchableHighlight
+              underlayColor="#F6F6FA"
+              key={index}
               onPress={() => {
+                setIsAssetSelectorOpen(false);
                 setCurrentAsset(item.value);
               }}
               style={
@@ -285,7 +292,6 @@ export default function P2PMarket({ ...props }) {
                   ? styles.popoverItemSelected
                   : styles.popoverItem
               }
-              key={index}
             >
               <Text
                 style={
@@ -296,56 +302,58 @@ export default function P2PMarket({ ...props }) {
               >
                 {item.label}
               </Text>
-            </Pressable>
+            </TouchableHighlight>
           ))}
-        </View>
+        </Menu>
 
-        <Pressable
-          style={styles.filterSelector}
-          onPress={() => {
-            setIsAssetSelectorOpen(false);
-            setIsFilterSelectorPopoverOpen(!isFilterSelectorPopoverOpen);
-          }}
-        >
-          <Svg
-            width="20"
-            height="21"
-            viewBox="0 0 20 21"
-            fill="none"
-            // xmlns="http://www.w3.org/2000/svg"
-          >
-            <Path
-              d="M8.5 15H11.5V13.5H8.5V15ZM3.25 6V7.5H16.75V6H3.25ZM5.5 11.25H14.5V9.75H5.5V11.25Z"
-              fill="#525466"
-            />
-          </Svg>
-
-          <Svg
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            // xmlns="http://www.w3.org/2000/svg"
-          >
-            <Path
-              d="M10.0001 11.3785L13.7126 7.66602L14.7731 8.72652L10.0001 13.4995L5.22705 8.72652L6.28755 7.66602L10.0001 11.3785Z"
-              fill="#868898"
-            />
-          </Svg>
-        </Pressable>
         {/* popover for filter selector */}
-        <View
-          style={[
-            styles.popover,
-            { right: size.getWidthSize(5) },
-            isFilterSelectorPopoverOpen
-              ? { display: "flex" }
-              : { display: "none" },
-          ]}
+        <Menu
+          elevation={0}
+          contentStyle={styles.popover}
+          anchorPosition="bottom"
+          visible={isFilterSelectorPopoverOpen} // Control visibility
+          onDismiss={() => setIsFilterSelectorPopoverOpen(false)} // Close menu when dismissed
+          anchor={
+            <Pressable
+              style={styles.filterSelector}
+              onPress={() => {
+                setIsFilterSelectorPopoverOpen(true);
+              }}
+            >
+              <Svg
+                width="20"
+                height="21"
+                viewBox="0 0 20 21"
+                fill="none"
+                // xmlns="http://www.w3.org/2000/svg"
+              >
+                <Path
+                  d="M8.5 15H11.5V13.5H8.5V15ZM3.25 6V7.5H16.75V6H3.25ZM5.5 11.25H14.5V9.75H5.5V11.25Z"
+                  fill="#525466"
+                />
+              </Svg>
+
+              <Svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                // xmlns="http://www.w3.org/2000/svg"
+              >
+                <Path
+                  d="M10.0001 11.3785L13.7126 7.66602L14.7731 8.72652L10.0001 13.4995L5.22705 8.72652L6.28755 7.66602L10.0001 11.3785Z"
+                  fill="#868898"
+                />
+              </Svg>
+            </Pressable>
+          } // Anchor element
         >
           {FILTER_MENU.map((item: any, index) => (
-            <Pressable
+            <TouchableHighlight
+              underlayColor="#F6F6FA"
+              key={index}
               onPress={() => {
+                setIsFilterSelectorPopoverOpen(false);
                 setCurrentFilter(item.value);
               }}
               style={
@@ -353,7 +361,6 @@ export default function P2PMarket({ ...props }) {
                   ? styles.popoverItemSelected
                   : styles.popoverItem
               }
-              key={index}
             >
               <Text
                 style={
@@ -364,9 +371,9 @@ export default function P2PMarket({ ...props }) {
               >
                 {item.label}
               </Text>
-            </Pressable>
+            </TouchableHighlight>
           ))}
-        </View>
+        </Menu>
       </View>
 
       <FlatList
@@ -496,13 +503,15 @@ export default function P2PMarket({ ...props }) {
 
 const styles = StyleSheet.create({
   menuBar: {
+    justifyContent: "space-between",
     paddingVertical: size.getHeightSize(24),
     flexDirection: "row",
-    gap: size.getWidthSize(10),
+    gap: size.getWidthSize(4),
     position: "relative",
   },
 
   P2PTypeSelector: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -514,6 +523,7 @@ const styles = StyleSheet.create({
   },
 
   typeItem: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: size.getWidthSize(6),
@@ -539,7 +549,8 @@ const styles = StyleSheet.create({
 
   assetSelector: {
     flex: 1,
-    gap: size.getWidthSize(5),
+    gap: size.getWidthSize(4),
+    flexShrink: 1,
     height: size.getHeightSize(40),
     flexDirection: "row",
     borderRadius: size.getWidthSize(12),
@@ -564,41 +575,25 @@ const styles = StyleSheet.create({
   },
 
   popover: {
-    position: "absolute",
-    top: size.getHeightSize(80),
-    width: size.getWidthSize(195),
-    zIndex: 100,
-    backgroundColor: "#fff",
-    borderRadius: size.getWidthSize(8),
-    borderWidth: size.getWidthSize(0.6),
-    gap: size.getWidthSize(4),
-    borderColor: "#CDCED5",
+    width: size.getWidthSize(175),
+    backgroundColor: "#FFFFFF",
     padding: size.getWidthSize(8),
-    ...Platform.select({
-      android: {
-        elevation: 60,
-        shadowColor: "#585C5F",
-      },
-      ios: {
-        shadowColor: "#585C5F",
-        shadowOffset: {
-          width: 0,
-          height: size.getHeightSize(16),
-        },
-        shadowRadius: 10,
-      },
-    }),
+    marginTop: size.getHeightSize(8),
+    borderWidth: size.getWidthSize(1),
+    gap: size.getHeightSize(4),
+    borderColor: "#CDCED5",
+    borderRadius: size.getWidthSize(8),
   },
 
   popoverItem: {
     borderRadius: size.getWidthSize(4),
-    padding: size.getWidthSize(8),
+    padding: size.getWidthSize(12),
   },
 
   popoverItemSelected: {
     backgroundColor: "#F6F6FA",
     borderRadius: size.getWidthSize(4),
-    padding: size.getWidthSize(8),
+    padding: size.getWidthSize(12),
   },
 
   popoverText: {

@@ -2,12 +2,10 @@ import { View, Text, StyleSheet, Pressable, Platform } from "react-native";
 import React, { useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
-import Svg, { Circle, Ellipse, Path, Rect } from "react-native-svg";
-import Country from "@/components/Country";
+import Svg, { Path, Rect } from "react-native-svg";
 import MarketPlace from "@/components/MarketPlace";
-import { ScrollView } from "react-native-gesture-handler";
-import { router } from "expo-router";
 import MarketPlaceHeader from "@/components/MarketPlaceHeader";
+import CustomRippleButton from "@/components/CustomRippleButton";
 // import P2PMarket from "@/components/P2PMarket";
 
 export default function P2P() {
@@ -281,9 +279,11 @@ export default function P2P() {
               </View>
             </View>
 
-            <Pressable
+            <CustomRippleButton
+              rippleColor="#fff"
               onPress={handleStartShopping}
-              style={{
+              style={{ borderRadius: size.getWidthSize(16) }}
+              contentContainerStyle={{
                 backgroundColor: "#374BFB",
                 height: size.getHeightSize(56),
                 marginVertical: size.getHeightSize(16),
@@ -302,7 +302,7 @@ export default function P2P() {
               >
                 Start shopping
               </Text>
-            </Pressable>
+            </CustomRippleButton>
           </View>
         )}
       </View>

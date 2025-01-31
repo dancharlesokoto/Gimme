@@ -1,4 +1,10 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
 import Country from "./Country";
 import Svg, { Path } from "react-native-svg";
@@ -21,7 +27,7 @@ export default function MarketPlaceHeader({
       </View>
 
       <View style={styles.rightMenu}>
-        <Pressable
+        <TouchableOpacity
           hitSlop={10}
           onPress={() => router.push("/screens/(market)/Cart")}
           style={{ position: "relative" }}
@@ -63,7 +69,7 @@ export default function MarketPlaceHeader({
               fill="#525466"
             />
           </Svg>
-        </Pressable>
+        </TouchableOpacity>
         <Country />
       </View>
     </View>
