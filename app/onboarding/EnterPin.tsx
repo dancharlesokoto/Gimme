@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
 import { size } from "@/config/size";
 import CustomSafeArea from "@/shared/CustomSafeArea";
@@ -8,11 +15,17 @@ import Cancel from "@/assets/svg/cancel.svg";
 import Finger from "@/assets/svg/finger.svg";
 import User from "@/assets/images/user.png";
 import BackPage from "@/components/BackPage";
-import { router } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useGlobalSearchParams } from "expo-router";
+import { loginUser } from "@/services/auth";
+import { toast } from "sonner-native";
 
 const EnterPin = () => {
   const [pin, setPin] = useState(["", "", "", ""]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const { phone } = useGlobalSearchParams();
+  const [phoneNumber, setPhoneNumber] = useState(phone as string);
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
 
   useEffect(() => {
@@ -57,8 +70,29 @@ const EnterPin = () => {
   };
 
   const handleNext = async () => {
-    await AsyncStorage.setItem("USER_AUTH_TOKEN", "5");
-    router.replace("/(tabs)");
+    if (pin.join("").length < 4) {
+      setError(true);
+      setErrorMsg("Pin must be 4 digits");
+      toast.error("Pin must be 4 digits", {
+        duration: 2000,
+        dismissible: true,
+      });
+      return;
+    }
+    try {
+      setIsLoading(true);
+      const req = await loginUser({
+        phone: phoneNumber,
+        pin: pin.join(""),
+      });
+    } catch (error: any) {
+      toast.error("An error occured", {
+        duration: 2000,
+        dismissible: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const authenticateBiometrics = async () => {
@@ -148,7 +182,12 @@ const EnterPin = () => {
           </View>
         </View>
 
-        <Button width={325} onPress={handleNext} text="Continue" />
+        <Button
+          disabled={isLoading}
+          width={325}
+          onPress={handleNext}
+          text={isLoading ? <ActivityIndicator color={"#fff"} /> : "Continue"}
+        />
       </View>
     </CustomSafeArea>
   );

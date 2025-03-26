@@ -11,6 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ConfirmPin = () => {
   const [pin, setPin] = useState(["", "", "", ""]);
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
 
   const handlePress = (value: string | number | any) => {
@@ -96,7 +97,11 @@ const ConfirmPin = () => {
           </View>
         </View>
 
-        <Button width={325} onPress={handleNext} text="Done" />
+        <Button
+          width={325}
+          onPress={handleNext}
+          text={isLoading ? "Loading..." : "Continue"}
+        />
       </View>
     </CustomSafeArea>
   );

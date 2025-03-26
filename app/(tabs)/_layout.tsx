@@ -15,39 +15,18 @@ import ActiveHome from "../../assets/svg/activeHome.svg";
 import ActiveP2P from "../../assets/svg/activeP2p.svg";
 import ActiveMarket from "../../assets/svg/activeMarket.svg";
 import ActiveActivities from "../../assets/svg/activeActivities.svg";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Splash from "@/components/Splash";
+import { useUserStore } from "@/store/userStore";
 
 export default function TabLayout() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [userAuthToken, setUserAuthToken] = useState(null);
-  const pathname = usePathname();
+  const { user } = useUserStore();
   const insets = useSafeAreaInsets();
 
-  useEffect(() => {
-    async function checkUserSession() {
-      try {
-        const user = await AsyncStorage.getItem("USER_AUTH_TOKEN");
-        if (user) {
-          setUserAuthToken(JSON.parse(user));
-        } else {
-          setUserAuthToken(null);
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    checkUserSession();
-  }, [pathname]);
-
-  if (isLoading) {
-    return <Splash />;
-  }
-
-  if (!userAuthToken) {
+  if (!user.userId) {
     return <Redirect href="/onboarding/main" />;
+  }
+  if (!user.isVerified) {
+    return <Redirect href="/onboarding/Verify" />;
   }
 
   return (

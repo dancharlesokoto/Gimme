@@ -1,4 +1,11 @@
-import { View, Text, StyleProp, ViewStyle, TextStyle } from "react-native";
+import {
+  View,
+  Text,
+  StyleProp,
+  ViewStyle,
+  TextStyle,
+  Pressable,
+} from "react-native";
 import React from "react";
 import Ripple from "react-native-material-ripple";
 
@@ -9,16 +16,18 @@ export default function CustomRippleButton({
   rippleDuration = 400,
   style,
   contentContainerStyle,
+  disabled,
 }: {
   children: React.ReactNode;
   onPress?: () => void;
   rippleColor?: string;
+  disabled?: boolean;
   rippleDuration?: number;
   style?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
 }) {
   return (
-    <View style={[style, { overflow: "hidden" }]}>
+    <Pressable disabled={disabled} style={[style, { overflow: "hidden" }]}>
       <Ripple
         rippleDuration={rippleDuration}
         onPress={() => onPress && onPress()}
@@ -27,6 +36,6 @@ export default function CustomRippleButton({
       >
         {children}
       </Ripple>
-    </View>
+    </Pressable>
   );
 }

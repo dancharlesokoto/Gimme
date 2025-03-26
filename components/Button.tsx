@@ -5,14 +5,17 @@ import { size } from "../config/size";
 const Button = ({
   width,
   text,
+  disabled,
   onPress,
 }: {
   width: number;
-  text: string;
+  text: string | React.ReactNode;
+  disabled?: boolean;
   onPress: () => void;
 }) => {
   return (
     <Pressable
+      disabled={disabled}
       onPress={onPress}
       style={{
         backgroundColor: "#374BFB",

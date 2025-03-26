@@ -16,7 +16,7 @@ const OnboardingScreen = () => {
       <View style={{ flex: 1 }}>
         <View
           style={{
-            paddingTop: size.getHeightSize(97),
+            paddingTop: size.getHeightSize(90),
             paddingHorizontal: size.getHeightSize(28),
             alignItems: "center",
           }}

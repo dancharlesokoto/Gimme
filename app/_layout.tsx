@@ -9,6 +9,7 @@ import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PaperProvider } from "react-native-paper";
 import "@/global.css";
+import { Toaster } from "sonner-native";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -52,6 +53,7 @@ export default function RootLayout() {
             </Stack>
             <StatusBar style="dark" hidden />
           </BottomSheetModalProvider>
+          <Toaster />
         </PaperProvider>
       </GestureHandlerRootView>
     </>

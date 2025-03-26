@@ -1,7 +1,13 @@
 import React from "react";
-import { Stack } from "expo-router";
+import { Redirect, Stack } from "expo-router";
+import { useUserStore } from "@/store/userStore";
 
 export default function OnboardingLayout() {
+  const { user } = useUserStore();
+  if (user.userId) {
+    if (user.isVerified) return <Redirect href="/(tabs)" />;
+    return <Redirect href="/onboarding/Verify" />;
+  }
   return (
     <Stack>
       <Stack.Screen

@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { Svg, Path } from "react-native-svg";
@@ -14,11 +15,15 @@ import Button from "@/components/Button";
 import BackPage from "@/components/BackPage";
 import { router } from "expo-router";
 import CustomRippleButton from "@/components/CustomRippleButton";
+import { loginUser } from "@/services/auth";
 
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [inputError, setInputError] = useState(false);
   const [emptyInput, setEmptyInput] = useState(false);
+  const [error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const isPhoneNumberValid = () => {
     if (
@@ -42,7 +47,7 @@ const Login = () => {
   }, [phoneNumber]);
 
   // checks the phone number is valid or not upon button click to display erro messages
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (phoneNumber.trim().length < 1) {
       setEmptyInput(true);
       return;
@@ -52,7 +57,7 @@ const Login = () => {
       return;
     }
 
-    router.replace("/onboarding/EnterPin");
+    router.push(`/onboarding/EnterPin?phone=${phoneNumber}`);
   };
 
   return (
@@ -133,15 +138,24 @@ const Login = () => {
                 }}
                 onPress={handleLogin}
               >
-                <Text
+                <View
                   style={{
-                    fontFamily: "Satoshi-Bold",
-                    fontSize: size.fontSize(18),
-                    color: "#fff",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: size.getWidthSize(8),
                   }}
                 >
-                  Continue
-                </Text>
+                  <Text
+                    style={{
+                      fontFamily: "Satoshi-Bold",
+                      fontSize: size.fontSize(18),
+                      color: "#fff",
+                    }}
+                  >
+                    Continue
+                  </Text>
+                  {isLoading && <ActivityIndicator color={"#fff"} />}
+                </View>
               </CustomRippleButton>
             </View>
           </View>

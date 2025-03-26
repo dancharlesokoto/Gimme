@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,23 +6,31 @@ import {
   TextInput,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { Svg, Path } from "react-native-svg";
 import { size } from "@/config/size";
-import Button from "@/components/Button";
-import BackPage from "@/components/BackPage";
-import { router } from "expo-router";
 import GenericHeader from "@/components/GenericHeader";
 import CustomRippleButton from "@/components/CustomRippleButton";
+import { createUser } from "@/services/auth";
+import { toast } from "sonner-native";
+import { router } from "expo-router";
 
 const Create = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [phoneError, setPhoneError] = useState(false);
   const [emailError, setEmailError] = useState(false);
-  const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [empty, setEmpty] = useState(false);
+
+  useEffect(() => {
+    if (phoneNumber.length > 0) {
+      setEmpty(false);
+    }
+  }, [phoneNumber]);
+
   const validateInputs = () => {
     let valid = true;
 
@@ -53,11 +61,34 @@ const Create = () => {
     return valid;
   };
 
-  const handleCreateAccount = () => {
+  const handleCreateAccount = async () => {
     if (validateInputs()) {
-      router.push("/onboarding/Verify");
-    } else {
-      setError(true);
+      try {
+        setIsLoading(true);
+        const res = await createUser({
+          phone: phoneNumber,
+          email: email,
+        });
+
+        const userId = res.userId;
+        !userId &&
+          toast.error("An error occured", {
+            duration: 2000,
+            dismissible: true,
+          });
+
+        userId &&
+          router.push(
+            `/onboarding/Verify?userId=${userId}&phone=${phoneNumber}`
+          );
+      } catch (error: any) {
+        toast.error(error.message, {
+          duration: 2000,
+          dismissible: true,
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -77,7 +108,11 @@ const Create = () => {
           <View style={{ paddingTop: size.getHeightSize(24) }}>
             <Text style={styles.label}>Phone Number</Text>
             <TextInput
-              style={[styles.input, phoneError && { borderColor: "#DF1C36" }]}
+              style={[
+                styles.input,
+                phoneError && { borderColor: "#DF1C36" },
+                empty && { borderColor: "#DF1C36" },
+              ]}
               placeholder="e.g 08111222101"
               keyboardType="phone-pad"
               value={phoneNumber}
@@ -101,7 +136,7 @@ const Create = () => {
               </View>
             ) : null}
 
-            <Text style={styles.label}>Email Address (Optional)</Text>
+            <Text style={styles.label}>Email Address</Text>
             <TextInput
               style={[styles.input, emailError && { borderColor: "#DF1C36" }]}
               placeholder="e.g john@gmail.com"
@@ -161,18 +196,42 @@ const Create = () => {
                   backgroundColor: "#374BFB",
                   paddingHorizontal: size.getWidthSize(16),
                   paddingVertical: size.getHeightSize(16),
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
                 onPress={handleCreateAccount}
+                disabled={isLoading}
               >
-                <Text
+                <View
                   style={{
-                    fontFamily: "Satoshi-Bold",
-                    fontSize: size.fontSize(18),
-                    color: "#fff",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: size.getWidthSize(8),
                   }}
                 >
-                  Create account
-                </Text>
+                  <Text
+                    style={{
+                      color: "#fff",
+                      fontFamily: "Satoshi-Bold",
+                      fontSize: size.fontSize(18),
+                      opacity: isLoading ? 0 : 1,
+                    }}
+                  >
+                    Create Account
+                  </Text>
+                  {isLoading && (
+                    <ActivityIndicator
+                      style={{
+                        width: "100%",
+                        position: "absolute",
+                        left: 0,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                      color={"#fff"}
+                    />
+                  )}
+                </View>
               </CustomRippleButton>
             </View>
           </View>
@@ -222,11 +281,11 @@ const styles = StyleSheet.create({
     color: "#DF1C36",
     paddingLeft: size.getWidthSize(4),
     fontFamily: "Satoshi-Regular",
-    fontSize: 14,
+    fontSize: size.fontSize(14),
   },
 
   empty: {
-    color: "#0A0B14",
+    color: "#DF1C36",
     fontFamily: "Satoshi-Regular",
     fontSize: size.fontSize(14),
   },
@@ -235,7 +294,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: size.getHeightSize(16),
     marginTop: size.getHeightSize(8),
-    backgroundColor: "#FDEDEF",
+    // backgroundColor: "#FDEDEF",
     padding: size.getWidthSize(8),
     borderRadius: size.getWidthSize(8),
     gap: size.getWidthSize(8),

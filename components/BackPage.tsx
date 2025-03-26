@@ -26,7 +26,7 @@ const BackPage = ({
 
   return (
     <TouchableHighlight
-      style={{ borderRadius: size.getWidthSize(8) }}
+      style={{ borderRadius: size.getWidthSize(8), alignSelf: "flex-start" }}
       underlayColor={"rgba(0, 0, 0, 0.05)"}
       onPress={handlePress}
     >
