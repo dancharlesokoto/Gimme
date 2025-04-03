@@ -4,9 +4,9 @@ import {
     Text,
     Pressable,
     StyleSheet,
-    TextInput,
     TouchableWithoutFeedback,
     Keyboard,
+    ActivityIndicator,
 } from "react-native";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
@@ -15,20 +15,20 @@ import Button from "@/components/Button";
 import { router, useGlobalSearchParams } from "expo-router";
 import { toast } from "sonner-native";
 import { verifyPhone } from "@/services/auth";
+import PinInput from "@/components/PinInupt";
 
 const Verify = () => {
-    const [pin, setPin] = useState(["", "", "", ""]);
-    const { phone, userId }: { phone: string; userId: string } =
-        useGlobalSearchParams();
-    const phoneNumber = phone.substring(0, 3) + "***" + phone.slice(-4);
-    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-    const inputRefs = useRef<any>([]);
-
+    const [code, setCode] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [phone, setPhone] = useState(useGlobalSearchParams().phone as string);
+    const [userId, setUserId] = useState(
+        useGlobalSearchParams().userId as string
+    );
+    const phoneNumber = `${phone.substring(0, 3)}***${phone.slice(-4)}`;
     const [timeLeft, setTimeLeft] = useState(59);
 
     useEffect(() => {
         if (timeLeft <= 0) return;
-
         const interval = setInterval(() => {
             setTimeLeft((time) => {
                 if (time <= 1) {
@@ -43,10 +43,18 @@ const Verify = () => {
     }, [timeLeft]);
 
     const handleVerify = async () => {
+        if (code.length !== 4) {
+            toast.error("Please enter a four-digit code", {
+                duration: 2000,
+                dismissible: true,
+            });
+            return;
+        }
         try {
+            setIsLoading(true);
             const res = await verifyPhone({
-                phone,
-                code: pin.join(""),
+                userId: userId,
+                code: code,
             });
             toast.success(res.message, {
                 duration: 2000,
@@ -58,23 +66,8 @@ const Verify = () => {
                 duration: 2000,
                 dismissible: true,
             });
-        }
-    };
-
-    const handleChange = (text: string, index: number) => {
-        const newPin = [...pin];
-        newPin[index] = text;
-
-        setPin(newPin);
-
-        if (text && index < inputRefs.current.length - 1) {
-            inputRefs.current[index + 1].focus();
-        }
-    };
-
-    const handleKeyPress = (e: any, index: number) => {
-        if (e.nativeEvent.key === "Backspace" && index > 0) {
-            inputRefs.current[index - 1].focus();
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -91,7 +84,6 @@ const Verify = () => {
                             height="24"
                             viewBox="0 0 24 24"
                             fill="none"
-                            //   xmlns="http://www.w3.org/2000/svg"
                         >
                             <Path
                                 d="M8.871 11.25H18V12.75H8.871L12.894 16.773L11.8335 17.8335L6 12L11.8335 6.1665L12.894 7.227L8.871 11.25Z"
@@ -107,7 +99,7 @@ const Verify = () => {
                         </Text>
                     </View>
                     <View style={styles.textContainer}>
-                        {pin.map((_, index) => (
+                        {/* {pin.map((_, index) => (
                             <View
                                 key={index}
                                 style={[
@@ -130,7 +122,8 @@ const Verify = () => {
                                     value={pin[index]}
                                 />
                             </View>
-                        ))}
+                        ))} */}
+                        <PinInput code={code} onChange={setCode} />
                     </View>
                     <View style={styles.countdown}>
                         <Svg
@@ -138,7 +131,6 @@ const Verify = () => {
                             height="20"
                             viewBox="0 0 20 20"
                             fill="none"
-                            //   xmlns="http://www.w3.org/2000/svg"
                         >
                             <Path
                                 d="M10 17.5C5.85775 17.5 2.5 14.1423 2.5 10C2.5 5.85775 5.85775 2.5 10 2.5C14.1423 2.5 17.5 5.85775 17.5 10C17.5 14.1423 14.1423 17.5 10 17.5ZM10 16C11.5913 16 13.1174 15.3679 14.2426 14.2426C15.3679 13.1174 16 11.5913 16 10C16 8.4087 15.3679 6.88258 14.2426 5.75736C13.1174 4.63214 11.5913 4 10 4C8.4087 4 6.88258 4.63214 5.75736 5.75736C4.63214 6.88258 4 8.4087 4 10C4 11.5913 4.63214 13.1174 5.75736 14.2426C6.88258 15.3679 8.4087 16 10 16ZM10.75 10H13.75V11.5H9.25V6.25H10.75V10Z"
@@ -150,7 +142,14 @@ const Verify = () => {
                         </Text>
                     </View>
                     <Button
-                        text="Verify Code"
+                        disabled={code.length !== 4 || isLoading}
+                        text={
+                            isLoading ? (
+                                <ActivityIndicator color={"#fff"} />
+                            ) : (
+                                "Verify Code"
+                            )
+                        }
                         width={133}
                         onPress={handleVerify}
                     />
@@ -165,7 +164,6 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: size.getWidthSize(24),
     },
-
     header: {
         fontFamily: "Satoshi-Bold",
         fontSize: size.fontSize(28),
@@ -176,14 +174,12 @@ const styles = StyleSheet.create({
         maxWidth: size.getWidthSize(345),
         flexWrap: "wrap",
     },
-
     textContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
         paddingTop: size.getHeightSize(32),
         gap: size.getWidthSize(8),
     },
-
     box: {
         flex: 1,
         height: size.getHeightSize(64),
@@ -196,12 +192,10 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 12,
         borderBottomLeftRadius: 12,
     },
-
     lastBox: {
         borderTopRightRadius: 12,
         borderBottomRightRadius: 12,
     },
-
     input: {
         fontSize: 24,
         fontWeight: "bold",
@@ -210,14 +204,12 @@ const styles = StyleSheet.create({
         width: "100%",
         height: "100%",
     },
-
     countdown: {
         flexDirection: "row",
         alignItems: "center",
         paddingTop: 16,
         paddingBottom: 24,
     },
-
     count: {
         marginLeft: 8,
         fontSize: size.fontSize(14),
