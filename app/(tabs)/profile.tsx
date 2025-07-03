@@ -4,48 +4,51 @@ import {
     StyleSheet,
     Pressable,
     Image,
-    ActivityIndicator,
+    ScrollView,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import Svg, { Path, Rect } from "react-native-svg";
 import { router } from "expo-router";
 import { useUserStore } from "@/store/userStore";
 import { fetchUser } from "@/services/user";
-import { User } from "@/types/User";
 import { IMAGE_URL } from "@/services/api";
 import PageLoader from "@/components/PageLoader";
+import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner-native";
+import { useAppStore } from "@/store/appStore";
 
 export default function Profile() {
     const { user } = useUserStore();
     const { userId } = user;
-    const [isLoading, setIsLoading] = useState(true);
-    const [userData, setUserData] = useState<User>({
-        userId: "",
-        username: "",
-        phone: "",
-        balance: null,
+
+    //Fetch logic..........................
+    const {
+        data: userData,
+        error,
+        isError,
+        isLoading,
+    } = useQuery({
+        queryKey: ["getUser"],
+        queryFn: async () => await fetchUser(userId),
     });
 
-    const getUser = async () => {
-        try {
-            setIsLoading(true);
-            const data = await fetchUser(userId);
-            setUserData(data);
-            setIsLoading(false);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
+    //Error reactive logic..........................
     useEffect(() => {
-        getUser();
-    }, []);
+        isError &&
+            toast.error(error.message, {
+                duration: 2000,
+                dismissible: true,
+            });
+    }, [error]);
 
+    //Logout logic..........................
     const handleLogout = async () => {
         try {
             useUserStore.getState().resetUser();
+            useAppStore.getState().setIsMarketStarted(false);
+            useAppStore.getState().setIsP2PStarted(false);
             router.replace("/");
         } catch (error) {
             console.log(error);
@@ -53,7 +56,11 @@ export default function Profile() {
     };
 
     if (isLoading) {
-        return <PageLoader />;
+        return (
+            <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
+                <PageLoader />
+            </CustomSafeArea>
+        );
     }
 
     return (
@@ -70,7 +77,10 @@ export default function Profile() {
                     </Text>
                 </View>
 
-                <View style={styles.main}>
+                <ScrollView
+                    contentContainerStyle={styles.main}
+                    showsVerticalScrollIndicator={false}
+                >
                     <View style={styles.mainInfo}>
                         <Image
                             source={{
@@ -90,7 +100,7 @@ export default function Profile() {
                             {userData.fullName ? (
                                 <Text
                                     style={{
-                                        fontSize: size.fontSize(24),
+                                        fontSize: size.fontSize(18),
                                         fontFamily: "Satoshi-Bold",
                                         color: "#0B0A14",
                                     }}
@@ -100,8 +110,8 @@ export default function Profile() {
                             ) : (
                                 <Text
                                     style={{
-                                        fontSize: size.fontSize(24),
-                                        fontFamily: "Satoshi-Bold",
+                                        fontSize: size.fontSize(18),
+                                        fontFamily: "Satoshi-Regular",
                                         color: "#0B0A14",
                                     }}
                                 >
@@ -170,6 +180,61 @@ export default function Profile() {
                         </View>
                     </View>
                     <View style={styles.options}>
+                        <Pressable
+                            style={[
+                                styles.optionItem,
+                                {
+                                    marginVertical: size.getHeightSize(20),
+                                    backgroundColor: "#FEF4EB",
+                                    borderColor: "#FFDFC2",
+                                },
+                            ]}
+                            onPress={() =>
+                                router.push(
+                                    "/screens/(settings)/GeneralSettings"
+                                )
+                            }
+                        >
+                            <Svg
+                                width="40"
+                                height="40"
+                                viewBox="0 0 40 40"
+                                fill="none"
+                                // xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <Rect
+                                    width="40"
+                                    height="40"
+                                    rx="16"
+                                    fill="#FFDFC2"
+                                />
+                                <Path
+                                    d="M20 16.2508C21.5913 16.2508 23.1174 16.8829 24.2426 18.0081C25.3679 19.1333 26 20.6595 26 22.2508C26 23.842 25.3679 25.3682 24.2426 26.4934C23.1174 27.6186 21.5913 28.2507 20 28.2507C18.4087 28.2507 16.8826 27.6186 15.7574 26.4934C14.6321 25.3682 14 23.842 14 22.2508C14 20.6595 14.6321 19.1333 15.7574 18.0081C16.8826 16.8829 18.4087 16.2508 20 16.2508ZM20 17.7508C18.8065 17.7508 17.6619 18.2249 16.818 19.0688C15.9741 19.9127 15.5 21.0573 15.5 22.2508C15.5 23.4442 15.9741 24.5888 16.818 25.4327C17.6619 26.2766 18.8065 26.7507 20 26.7507C21.1935 26.7507 22.3381 26.2766 23.182 25.4327C24.0259 24.5888 24.5 23.4442 24.5 22.2508C24.5 21.0573 24.0259 19.9127 23.182 19.0688C22.3381 18.2249 21.1935 17.7508 20 17.7508ZM20 18.8758L20.9922 20.8858L23.21 21.2083L21.605 22.772L21.9838 24.9815L20 23.9383L18.0162 24.9807L18.395 22.772L16.79 21.2075L19.0078 20.885L20 18.8758ZM24.5 12.5008V14.7508L23.4777 15.6042C22.6295 15.1592 21.7033 14.8819 20.75 14.7875V12.5008H24.5ZM19.25 12.5V14.7875C18.297 14.8817 17.3711 15.1588 16.523 15.6035L15.5 14.7508V12.5008L19.25 12.5Z"
+                                    fill="#6E3B0C"
+                                />
+                            </Svg>
+
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.optionTitle}>
+                                    Account tier - 0
+                                </Text>
+                                <Text style={styles.optionSubtitle}>
+                                    Unlock account limits with KYC verifications{" "}
+                                </Text>
+                            </View>
+                            <Svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                // xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <Path
+                                    d="M10.7162 9.99882L7.375 6.65757L8.32945 5.70312L12.6251 9.99882L8.32945 14.2945L7.375 13.3401L10.7162 9.99882Z"
+                                    fill="#525466"
+                                />
+                            </Svg>
+                        </Pressable>
                         <Pressable
                             style={styles.optionItem}
                             onPress={() =>
@@ -347,7 +412,7 @@ export default function Profile() {
                             </View>
                         </Pressable>
                     </View>
-                </View>
+                </ScrollView>
             </View>
         </CustomSafeArea>
     );

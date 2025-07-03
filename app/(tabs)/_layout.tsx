@@ -20,7 +20,7 @@ import { useUserStore } from "@/store/userStore";
 import { IMAGE_URL } from "@/services/api";
 
 export default function TabLayout() {
-    const { user } = useUserStore();
+    const user = useUserStore((state) => state.user);
     const insets = useSafeAreaInsets();
 
     if (!user.userId) {

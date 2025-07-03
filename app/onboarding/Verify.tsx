@@ -11,36 +11,45 @@ import {
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import { Svg, Path } from "react-native-svg";
-import Button from "@/components/Button";
 import { router, useGlobalSearchParams } from "expo-router";
 import { toast } from "sonner-native";
 import { verifyPhone } from "@/services/auth";
 import PinInput from "@/components/PinInupt";
+import CustomRippleButton from "@/components/CustomRippleButton";
+import GenericHeader from "@/components/GenericHeader";
 
 const Verify = () => {
     const [code, setCode] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [phone, setPhone] = useState(useGlobalSearchParams().phone as string);
+    const [email, setEmail] = useState(useGlobalSearchParams().email as string);
     const [userId, setUserId] = useState(
         useGlobalSearchParams().userId as string
     );
     const phoneNumber = `${phone.substring(0, 3)}***${phone.slice(-4)}`;
     const [timeLeft, setTimeLeft] = useState(59);
+    const [isTimeGone, setIsTimeGone] = useState(false);
 
     useEffect(() => {
         if (timeLeft <= 0) return;
+        if (timeLeft == 1) {
+            setIsTimeGone(true);
+        }
         const interval = setInterval(() => {
             setTimeLeft((time) => {
                 if (time <= 1) {
                     clearInterval(interval);
                     return 0;
                 }
+
                 return time - 1;
             });
         }, 1000);
 
         return () => clearInterval(interval);
     }, [timeLeft]);
+
+    const handleResendCode = async () => {};
 
     const handleVerify = async () => {
         if (code.length !== 4) {
@@ -60,7 +69,8 @@ const Verify = () => {
                 duration: 2000,
                 dismissible: true,
             });
-            router.push(`/onboarding/SetPin?userId=${userId}&phone=${phone}`);
+            router.push(`/onboarding/KYC?userId=${userId}&phone=${phone}`);
+            // router.push(`/onboarding/SetPin?userId=${userId}&phone=${phone}`);
         } catch (error: any) {
             toast.error(error.message, {
                 duration: 2000,
@@ -75,27 +85,11 @@ const Verify = () => {
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={styles.container}>
-                    <Pressable
-                        onPress={() => router.back()}
-                        style={{ paddingVertical: size.getHeightSize(14) }}
-                    >
-                        <Svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                        >
-                            <Path
-                                d="M8.871 11.25H18V12.75H8.871L12.894 16.773L11.8335 17.8335L6 12L11.8335 6.1665L12.894 7.227L8.871 11.25Z"
-                                fill="#525466"
-                            />
-                        </Svg>
-                    </Pressable>
+                    <GenericHeader title="" />
                     <View style={{ paddingTop: size.getHeightSize(24) }}>
                         <Text style={styles.header}>Account Verification</Text>
                         <Text style={styles.subHead}>
-                            Please enter the verification code sent to (
-                            {phoneNumber})
+                            Please enter the verification code sent to ({email})
                         </Text>
                     </View>
                     <View style={styles.textContainer}>
@@ -141,18 +135,48 @@ const Verify = () => {
                             00:{timeLeft} to resend code
                         </Text>
                     </View>
-                    <Button
-                        disabled={code.length !== 4 || isLoading}
-                        text={
-                            isLoading ? (
-                                <ActivityIndicator color={"#fff"} />
-                            ) : (
-                                "Verify Code"
-                            )
-                        }
-                        width={133}
+
+                    <CustomRippleButton
                         onPress={handleVerify}
-                    />
+                        disabled={isLoading}
+                        style={{
+                            borderRadius: size.getWidthSize(16),
+                            height: size.getHeightSize(56),
+                            backgroundColor: "#374BFB",
+                            alignSelf: "flex-start",
+                        }}
+                        contentContainerStyle={{
+                            padding: size.getWidthSize(14),
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Text
+                            style={{
+                                fontSize: size.fontSize(18),
+                                fontFamily: "Satoshi-Bold",
+                                color: "#ffffff",
+                            }}
+                        >
+                            Verify Code
+                        </Text>
+                    </CustomRippleButton>
+                    {isTimeGone && (
+                        <CustomRippleButton
+                            disabled={isLoading}
+                            onPress={handleResendCode}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: size.fontSize(18),
+                                    fontFamily: "Satoshi-Bold",
+                                    color: "#ffffff",
+                                }}
+                            >
+                                Resend code
+                            </Text>
+                        </CustomRippleButton>
+                    )}
                 </View>
             </TouchableWithoutFeedback>
         </CustomSafeArea>

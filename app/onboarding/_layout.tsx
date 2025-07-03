@@ -33,6 +33,10 @@ export default function OnboardingLayout() {
                 name="EnterPin"
                 options={{ headerShown: false, animation: "ios_from_right" }}
             />
+            <Stack.Screen
+                name="KYC"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
         </Stack>
     );
 }

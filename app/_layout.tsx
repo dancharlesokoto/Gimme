@@ -10,10 +10,10 @@ import { PaperProvider } from "react-native-paper";
 import "@/global.css";
 import { Toaster } from "sonner-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Paystack from "paystack-react-native";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-
 export default function RootLayout() {
     const queryClient = new QueryClient();
     const [loaded] = useFonts({
@@ -21,6 +21,14 @@ export default function RootLayout() {
         "Satoshi-Regular": fonts.REGULAR,
         "Satoshi-Medium": fonts.MEDIUM,
     });
+
+    useEffect(() => {
+        const initPaystack = async () => {
+            Paystack.init(process.env.PAYSTACK_PUBLIC_KEY!);
+            console.log("Paystack initialized");
+        };
+        initPaystack();
+    }, []);
 
     useEffect(() => {
         if (loaded) {

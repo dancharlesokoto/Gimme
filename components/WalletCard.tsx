@@ -10,6 +10,7 @@ import ContentLoader, { Rect, Circle } from "react-content-loader/native";
 
 const formatter = new Intl.NumberFormat("en-US", {
     currency: "NGN",
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
 });
 
@@ -179,11 +180,12 @@ const WalletCard = ({ balance }: { balance: string | number }) => {
                                     />
                                 </ContentLoader>
                             ) : (
-                                "~GM" +
+                                "~GM " +
                                 (Number(balance) / 100).toLocaleString(
                                     "en-US",
                                     {
                                         maximumFractionDigits: 2,
+                                        minimumFractionDigits: 2,
                                     }
                                 )
                             )}

@@ -2,12 +2,17 @@ import { useUserStore } from "@/store/userStore";
 import { axiosInstance } from "./api";
 
 export const createUser = async ({
+    name,
     phone,
     email,
 }: {
+    name: string;
     phone: string;
     email: string | null;
 }) => {
+    if (!name || name.length < 3) {
+        throw new Error("Full name is required");
+    }
     if (!phone) {
         throw new Error("Phone number is required");
     }
@@ -20,15 +25,14 @@ export const createUser = async ({
     }
     try {
         const request = await axiosInstance.post("/auth/signup", {
+            name,
             phone,
             email,
         });
         return request.data;
     } catch (error: any) {
-        console.log(error);
-        if (error.response?.data?.message) {
-            throw new Error(error.response.data.message);
-        }
+        const errorMessage = error.response?.data?.message || error.message;
+        throw new Error(errorMessage);
     }
 };
 
@@ -50,9 +54,8 @@ export const loginUser = async ({ uid, pin }: { uid: string; pin: string }) => {
         useUserStore.getState().setUser(request.data);
         return request.data;
     } catch (error: any) {
-        if (error.response?.data?.message) {
-            throw new Error(error.response.data.message);
-        }
+        const errorMessage = error.response?.data?.message || error.message;
+        throw new Error(errorMessage);
     }
 };
 
@@ -77,9 +80,27 @@ export const verifyPhone = async ({
         });
         return request.data;
     } catch (error: any) {
-        if (error.response?.data?.message) {
-            throw new Error(error.response.data.message);
-        }
+        const errorMessage = error.response?.data?.message || error.message;
+        throw new Error(errorMessage);
+    }
+};
+
+export const resendCode = async ({ userId }: { userId: string }) => {
+    if (!userId) {
+        throw new Error("Something went wrong");
+    }
+
+    try {
+        const request = await axiosInstance.post(
+            "/auth/resend-verification-code",
+            {
+                userId,
+            }
+        );
+        return request.data;
+    } catch (error: any) {
+        const errorMessage = error.response?.data?.message || error.message;
+        throw new Error(errorMessage);
     }
 };
 
@@ -103,8 +124,7 @@ export const createPin = async ({
         });
         return request.data;
     } catch (error: any) {
-        if (error.response?.data?.message) {
-            throw new Error(error.response.data.message);
-        }
+        const errorMessage = error.response?.data?.message || error.message;
+        throw new Error(errorMessage);
     }
 };

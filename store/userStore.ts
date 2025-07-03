@@ -5,6 +5,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 interface UserStore {
     user: {
         userId: string;
+        email: string;
         name: string;
         profileImage: string;
         token: string;
@@ -19,6 +20,7 @@ export const useUserStore = create(
         (set) => ({
             user: {
                 userId: "",
+                email: "",
                 name: "",
                 profileImage: "",
                 token: "",
@@ -29,6 +31,7 @@ export const useUserStore = create(
                 set({
                     user: {
                         userId: "",
+                        email: "",
                         name: "",
                         profileImage: "",
                         token: "",
