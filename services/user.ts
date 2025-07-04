@@ -16,6 +16,40 @@ export const fetchUser = async (userId: string) => {
     }
 };
 
+export const updateUser = async ({
+    username,
+    phone,
+    email,
+}: {
+    username: string;
+    phone: string;
+    email: string;
+}) => {
+    if (phone.substring(0, 1) === "0") {
+        phone = "+234" + phone.slice(1);
+    }
+    if (phone.substring(0, 2) === "234") {
+        phone = "+234" + phone.slice(2);
+    }
+    try {
+        const request = await axiosInstance.patch(`/user/update`, {
+            userId: useUserStore.getState().user.userId,
+            username,
+            phone,
+            email,
+        });
+        return request.data;
+    } catch (error: any) {
+        if (error.response?.status === 401) {
+            useUserStore.getState().resetUser();
+            throw new Error("User not found");
+        }
+        const errorMessage = error.response?.data?.message || error.message;
+        console.log(errorMessage);
+        throw new Error(errorMessage);
+    }
+};
+
 export const createBankAccount = async ({
     userId,
     email,

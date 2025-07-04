@@ -10,7 +10,7 @@ import React, { useEffect } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import Svg, { Path, Rect } from "react-native-svg";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useUserStore } from "@/store/userStore";
 import { fetchUser } from "@/services/user";
 import { IMAGE_URL } from "@/services/api";
@@ -29,10 +29,20 @@ export default function Profile() {
         error,
         isError,
         isLoading,
+        refetch,
     } = useQuery({
         queryKey: ["getUser"],
         queryFn: async () => await fetchUser(userId),
+        refetchOnWindowFocus: true,
+        refetchOnMount: true,
+        refetchOnReconnect: true,
     });
+
+    useFocusEffect(
+        React.useCallback(() => {
+            refetch();
+        }, [refetch])
+    );
 
     //Error reactive logic..........................
     useEffect(() => {
@@ -191,7 +201,7 @@ export default function Profile() {
                             ]}
                             onPress={() =>
                                 router.push(
-                                    "/screens/(settings)/GeneralSettings"
+                                    `/screens/(settings)/GeneralSettings?data=${userData}`
                                 )
                             }
                         >
@@ -239,7 +249,7 @@ export default function Profile() {
                             style={styles.optionItem}
                             onPress={() =>
                                 router.push(
-                                    "/screens/(settings)/GeneralSettings"
+                                    `/screens/(settings)/GeneralSettings?username=${userData.username}&phoneNumber=${userData.phone}&email=${userData.email}`
                                 )
                             }
                         >
