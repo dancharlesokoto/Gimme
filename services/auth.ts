@@ -21,7 +21,7 @@ export const createUser = async ({
     }
 
     if (phone.substring(0, 1) === "0") {
-        phone = "+234" + phone.slice(1);
+        phone = phone.slice(1);
     }
     try {
         const request = await axiosInstance.post("/auth/signup", {
@@ -43,8 +43,8 @@ export const loginUser = async ({ uid, pin }: { uid: string; pin: string }) => {
         throw new Error("Phone number  or email is required");
     }
 
-    if (isPhoneNumber && uid.substring(0, 1) === "0") {
-        uid = "+234" + uid.slice(1);
+    if (uid.substring(0, 1) == "0") {
+        uid = uid.slice(1);
     }
     try {
         const request = await axiosInstance.post("/auth/login", {

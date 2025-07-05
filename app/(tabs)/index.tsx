@@ -145,7 +145,7 @@ const HomeScreen = () => {
                             No recent transaction or activities yet.
                         </Text>
                     </View>
-                    <Recent />
+                    {/* <Recent /> */}
                 </ScrollView>
             </View>
         </CustomSafeArea>

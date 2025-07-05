@@ -5,8 +5,9 @@ import {
     Pressable,
     Image,
     ScrollView,
+    RefreshControl,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import Svg, { Path, Rect } from "react-native-svg";
@@ -23,6 +24,15 @@ export default function Profile() {
     const { user } = useUserStore();
     const { userId } = user;
 
+    const [screenRefreshing, setScreenRefreshing] = useState(false);
+
+    const handleScreenRefresh = () => {
+        setScreenRefreshing(true);
+        setTimeout(() => {
+            refetch();
+            setScreenRefreshing(false);
+        }, 500);
+    };
     //Fetch logic..........................
     const {
         data: userData,
@@ -46,11 +56,7 @@ export default function Profile() {
 
     //Error reactive logic..........................
     useEffect(() => {
-        isError &&
-            toast.error(error.message, {
-                duration: 2000,
-                dismissible: true,
-            });
+        isError && handleLogout();
     }, [error]);
 
     //Logout logic..........................
@@ -65,7 +71,7 @@ export default function Profile() {
         }
     };
 
-    if (isLoading) {
+    if (isLoading || isError) {
         return (
             <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
                 <PageLoader />
@@ -88,6 +94,13 @@ export default function Profile() {
                 </View>
 
                 <ScrollView
+                    refreshControl={
+                        <RefreshControl
+                            colors={["#374BFB"]}
+                            refreshing={screenRefreshing}
+                            onRefresh={handleScreenRefresh}
+                        />
+                    }
                     contentContainerStyle={styles.main}
                     showsVerticalScrollIndicator={false}
                 >
@@ -161,7 +174,7 @@ export default function Profile() {
                                     color: "#0A0B14",
                                 }}
                             >
-                                {userData.phone}
+                                (+234) {userData.phone}
                             </Text>
                         </View>
                         <View style={styles.contactInfo}>
@@ -200,9 +213,7 @@ export default function Profile() {
                                 },
                             ]}
                             onPress={() =>
-                                router.push(
-                                    `/screens/(settings)/GeneralSettings?data=${userData}`
-                                )
+                                router.push(`/screens/(settings)/AccountTier`)
                             }
                         >
                             <Svg
@@ -249,7 +260,11 @@ export default function Profile() {
                             style={styles.optionItem}
                             onPress={() =>
                                 router.push(
-                                    `/screens/(settings)/GeneralSettings?username=${userData.username}&phoneNumber=${userData.phone}&email=${userData.email}`
+                                    `/screens/(settings)/GeneralSettings?username=${
+                                        userData.username
+                                    }&phoneNumber=${encodeURIComponent(
+                                        userData.phone
+                                    )}&email=${userData.email}`
                                 )
                             }
                         >
@@ -431,35 +446,34 @@ export default function Profile() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingHorizontal: size.getWidthSize(24),
     },
 
     headerContainer: {
         flexDirection: "row",
-        paddingVertical: size.getHeightSize(14),
+        padding: size.getHeightSize(24),
         justifyContent: "space-between",
         alignItems: "center",
     },
 
     main: {
-        paddingVertical: size.getHeightSize(24),
+        paddingHorizontal: size.getHeightSize(24),
         gap: size.getWidthSize(8),
     },
 
     mainInfo: {
         flexDirection: "row",
-        paddingVertical: size.getHeightSize(5),
         gap: size.getWidthSize(12),
         alignItems: "center",
     },
 
-    contactInfoContainer: {},
+    contactInfoContainer: {
+        gap: size.getHeightSize(4),
+        paddingVertical: size.getHeightSize(12),
+    },
 
     contactInfo: {
         flexDirection: "row",
         gap: size.getWidthSize(14),
-        paddingVertical: size.getHeightSize(10),
-        paddingHorizontal: size.getWidthSize(10),
     },
 
     options: {

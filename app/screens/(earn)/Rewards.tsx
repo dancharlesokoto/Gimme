@@ -23,69 +23,79 @@ export default function Rewards() {
         setModalVisible(false);
     };
     return (
-        <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
-            <View style={styles.container}>
-                <GenericHeader title="Rewards"></GenericHeader>
-                <ScrollView contentContainerStyle={styles.page}>
-                    <View style={styles.pageCard}>
-                        <View className="TOP" style={styles.pageCardTop}>
-                            <RewardsBadge />
-                            <View
-                                style={{
-                                    alignItems: "center",
-                                    gap: size.getHeightSize(4),
-                                }}
-                            >
-                                <Text style={styles.pageCardTopText}>
-                                    Current reward
-                                </Text>
+        <>
+            <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
+                <View style={styles.container}>
+                    <GenericHeader title="Rewards"></GenericHeader>
+                    <ScrollView contentContainerStyle={styles.page}>
+                        <View style={styles.pageCard}>
+                            <View className="TOP" style={styles.pageCardTop}>
+                                <RewardsBadge />
                                 <View
                                     style={{
-                                        flexDirection: "row",
                                         alignItems: "center",
-                                        gap: size.getWidthSize(2),
+                                        gap: size.getHeightSize(4),
                                     }}
                                 >
-                                    <Text
+                                    <Text style={styles.pageCardTopText}>
+                                        Current reward
+                                    </Text>
+                                    <View
                                         style={{
-                                            color: "#868898",
-                                            fontFamily: "Satoshi-Medium",
-                                            fontSize: size.fontSize(16),
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            gap: size.getWidthSize(2),
                                         }}
                                     >
-                                        $
-                                    </Text>
-                                    <Text style={styles.pageCardTopBalance}>
-                                        4.00
+                                        <Text
+                                            style={{
+                                                color: "#868898",
+                                                fontFamily: "Satoshi-Medium",
+                                                fontSize: size.fontSize(16),
+                                            }}
+                                        >
+                                            $
+                                        </Text>
+                                        <Text style={styles.pageCardTopBalance}>
+                                            4.00
+                                        </Text>
+                                    </View>
+                                    <Text style={styles.pageCardTopText}>
+                                        ~GM40
                                     </Text>
                                 </View>
-                                <Text style={styles.pageCardTopText}>
-                                    ~GM40
-                                </Text>
+                                <View
+                                    style={{ width: size.getWidthSize(60) }}
+                                />
                             </View>
-                            <View style={{ width: size.getWidthSize(60) }} />
-                        </View>
-                        <View className="BOTTOM" style={styles.pageCardBottom}>
-                            <CustomRippleButton
-                                onPress={() => setModalVisible(true)}
-                                contentContainerStyle={
-                                    styles.pageCardBottomButton
-                                }
+                            <View
+                                className="BOTTOM"
+                                style={styles.pageCardBottom}
                             >
-                                <Text style={styles.pageCardBottomButtonText}>
-                                    Withdraw to wallet
-                                </Text>
-                            </CustomRippleButton>
+                                <CustomRippleButton
+                                    onPress={() => setModalVisible(true)}
+                                    contentContainerStyle={
+                                        styles.pageCardBottomButton
+                                    }
+                                >
+                                    <Text
+                                        style={styles.pageCardBottomButtonText}
+                                    >
+                                        Withdraw to wallet
+                                    </Text>
+                                </CustomRippleButton>
+                            </View>
                         </View>
-                    </View>
 
-                    <Tasks />
-                    <RecentActivities />
-                </ScrollView>
-            </View>
+                        <Tasks />
+                        <RecentActivities />
+                    </ScrollView>
+                </View>
+            </CustomSafeArea>
             <Modal
                 visible={modalVisible}
                 animationType="slide"
+                presentationStyle="overFullScreen"
                 transparent={true}
                 onRequestClose={() => setModalVisible(false)}
             >
@@ -160,7 +170,7 @@ export default function Rewards() {
                     </View>
                 </View>
             </Modal>
-        </CustomSafeArea>
+        </>
     );
 }
 

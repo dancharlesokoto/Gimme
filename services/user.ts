@@ -26,10 +26,7 @@ export const updateUser = async ({
     email: string;
 }) => {
     if (phone.substring(0, 1) === "0") {
-        phone = "+234" + phone.slice(1);
-    }
-    if (phone.substring(0, 2) === "234") {
-        phone = "+234" + phone.slice(2);
+        phone = phone.slice(1);
     }
     try {
         const request = await axiosInstance.patch(`/user/update`, {
