@@ -408,10 +408,7 @@ export default function Profile() {
 
                         <Pressable
                             onPress={async () => await handleLogout()}
-                            style={[
-                                styles.optionItem,
-                                { marginTop: size.getHeightSize(40) },
-                            ]}
+                            style={[styles.optionItem]}
                         >
                             <Svg
                                 width="40"
