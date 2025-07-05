@@ -3,6 +3,7 @@ import React from "react";
 import { size } from "@/config/size";
 import Svg, { Path, Rect } from "react-native-svg";
 import CustomRippleButton from "../CustomRippleButton";
+import { router } from "expo-router";
 
 export default function Todos() {
     return (
@@ -69,7 +70,10 @@ export default function Todos() {
                     </Text>
                 </View>
                 <CustomRippleButton
-                    style={{
+                    onPress={() =>
+                        router.push("/screens/(settings)/AccountTier")
+                    }
+                    contentContainerStyle={{
                         padding: size.getWidthSize(6),
                         borderRadius: size.getWidthSize(8),
                         backgroundColor: "#374BFB",
