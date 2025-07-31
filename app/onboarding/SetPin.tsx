@@ -8,12 +8,13 @@ import {
 } from "react-native";
 import { size } from "@/config/size";
 import CustomSafeArea from "@/shared/CustomSafeArea";
-import Button from "@/components/Button";
-import BackPage from "@/components/BackPage";
+import Finger from "@/assets/svg/finger.svg";
 import Cancel from "@/assets/svg/cancel.svg";
 import { router, useGlobalSearchParams } from "expo-router";
 import { toast } from "sonner-native";
-import PinInput from "@/components/PinInupt";
+import GenericHeader from "@/components/GenericHeader";
+import ReEnterPinField from "@/components/Onboarding/ReEnterPinField";
+import CustomRippleButton from "@/components/CustomRippleButton";
 
 const SetPin = () => {
     const [pin, setPin] = useState("");
@@ -21,8 +22,8 @@ const SetPin = () => {
     const [userId, setUserId] = useState(
         useGlobalSearchParams().userId as string
     );
-    const [phone, setPhone] = useState(useGlobalSearchParams().phone as string);
 
+    const [phone, setPhone] = useState(useGlobalSearchParams().phone as string);
     const handlePress = (value: any) => {
         pin.length < 4 && setPin((prevPin) => prevPin + value);
     };
@@ -60,21 +61,54 @@ const SetPin = () => {
     return (
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
             <View style={styles.container}>
-                <BackPage />
                 <View>
-                    <Text style={styles.title}>Set up your Pin</Text>
-                    <Text style={styles.subtitle}>
-                        This pin will be used to login and complete transactions
-                    </Text>
+                    <GenericHeader title="" />
+                    <View style={{ alignItems: "center" }}>
+                        <Text style={styles.title}>Set up your Pin</Text>
+                        <Text style={styles.subtitle}>
+                            This pin will be used to login and complete
+                            transactions
+                        </Text>
 
-                    <View style={styles.pinContainer}>
-                        <PinInput code={pin} onChange={setPin} />
+                        <View style={styles.pinContainer}>
+                            <ReEnterPinField
+                                code={pin}
+                                onChange={setPin}
+                                editable={false}
+                            />
+                            {/* <PinInput
+                            code={pin}
+                            protectedField={true}
+                            onChange={setPin}
+                        /> */}
+                        </View>
                     </View>
-
+                </View>
+                <View>
                     <View style={styles.keypadContainer}>
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, null, 0, ""].map(
                             (value, index) =>
-                                value !== null ? (
+                                value === null ? (
+                                    <TouchableOpacity
+                                        key={index}
+                                        style={styles.keypadButton}
+                                        onPress={handleDelete}
+                                    >
+                                        <Cancel />
+                                    </TouchableOpacity>
+                                ) : value === "" ? (
+                                    <TouchableOpacity
+                                        key={index}
+                                        disabled={true}
+                                        style={[
+                                            styles.keypadButton,
+                                            { opacity: 0.4 },
+                                        ]}
+                                        onPress={() => {}}
+                                    >
+                                        <Finger />
+                                    </TouchableOpacity>
+                                ) : (
                                     <TouchableOpacity
                                         key={index}
                                         style={styles.keypadButton}
@@ -84,31 +118,21 @@ const SetPin = () => {
                                             {value}
                                         </Text>
                                     </TouchableOpacity>
-                                ) : (
-                                    <TouchableOpacity
-                                        key={index}
-                                        style={styles.keypadButton}
-                                        onPress={handleDelete}
-                                    >
-                                        <Cancel />
-                                    </TouchableOpacity>
                                 )
                         )}
                     </View>
-                </View>
-
-                <Button
-                    width={325}
-                    disabled={isLoading}
-                    onPress={handleNext}
-                    text={
-                        isLoading ? (
-                            <ActivityIndicator color={"#fff"} />
+                    <CustomRippleButton
+                        onPress={handleNext}
+                        contentContainerStyle={styles.pageButton}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <ActivityIndicator color="#fff" />
                         ) : (
-                            "Continue"
-                        )
-                    }
-                />
+                            <Text style={styles.pageButtonText}>Continue</Text>
+                        )}
+                    </CustomRippleButton>
+                </View>
             </View>
         </CustomSafeArea>
     );
@@ -118,6 +142,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: size.getWidthSize(24),
+        justifyContent: "space-between",
     },
 
     backButton: {
@@ -127,7 +152,7 @@ const styles = StyleSheet.create({
         fontSize: size.fontSize(20),
         fontFamily: "Satoshi-Bold",
         textAlign: "center",
-        marginTop: 95,
+        marginTop: size.getHeightSize(50),
     },
     subtitle: {
         fontSize: size.fontSize(14),
@@ -156,19 +181,19 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
         justifyContent: "space-between",
-        paddingBottom: size.getHeightSize(32),
+        paddingHorizontal: size.getWidthSize(0),
     },
 
     keypadButton: {
         width: "30%",
-        height: size.getHeightSize(77),
+        height: size.getHeightSize(70),
         justifyContent: "center",
         alignItems: "center",
     },
 
     keypadText: {
-        fontSize: 24,
-        fontFamily: "Satoshi-Medium",
+        fontSize: size.fontSize(20),
+        fontFamily: "ClashDisplay-Medium",
     },
     firstPinBox: {
         borderTopLeftRadius: 16,
@@ -196,6 +221,23 @@ const styles = StyleSheet.create({
     continueText: {
         color: "#fff",
         fontSize: 16,
+    },
+
+    pageButton: {
+        height: size.getHeightSize(56),
+        borderRadius: size.getWidthSize(12),
+        marginVertical: size.getHeightSize(24),
+        padding: size.getWidthSize(16),
+        backgroundColor: "#374BFB",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+
+    pageButtonText: {
+        fontFamily: "Satoshi-Bold",
+        fontSize: size.fontSize(18),
+        lineHeight: size.getHeightSize(24),
+        color: "#ffffff",
     },
 });
 

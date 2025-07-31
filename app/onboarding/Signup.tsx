@@ -125,7 +125,6 @@ export default function Signup() {
                                     placeholder="Should match your (NIN or BVN)"
                                     value={name}
                                     onChangeText={setName}
-                                    autoCapitalize="none"
                                 />
                             </View>
                         </View>
@@ -245,15 +244,20 @@ const styles = StyleSheet.create({
     },
 
     header: {
-        fontFamily: "Satoshi-Bold",
-        fontSize: size.fontSize(20),
+        fontFamily: "ClashDisplay-SemiBold",
+        color: "rgba(0, 0, 0, 0.9)",
+        fontSize: size.fontSize(22),
     },
-    subHead: { fontFamily: "Satoshi-Regular", fontSize: size.fontSize(14) },
+    subHead: {
+        fontFamily: "Satoshi-Regular",
+        fontSize: size.fontSize(14),
+        color: "#8E8E93",
+    },
 
     label: {
-        fontSize: 14,
+        fontSize: size.fontSize(14),
         fontFamily: "Satoshi-Medium",
-        lineHeight: 30,
+        lineHeight: size.getHeightSize(30),
     },
 
     inputContainer: {

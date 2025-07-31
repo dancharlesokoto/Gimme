@@ -10,18 +10,19 @@ import {
 import * as LocalAuthentication from "expo-local-authentication";
 import { size } from "@/config/size";
 import CustomSafeArea from "@/shared/CustomSafeArea";
-import Button from "@/components/Button";
 import Cancel from "@/assets/svg/cancel.svg";
 import Finger from "@/assets/svg/finger.svg";
 import User from "@/assets/images/user.png";
-import BackPage from "@/components/BackPage";
 import { router, useGlobalSearchParams } from "expo-router";
 import { loginUser } from "@/services/auth";
 import { toast } from "sonner-native";
-import PinInput from "@/components/PinInupt";
+import ReEnterPinField from "@/components/Onboarding/ReEnterPinField";
+import CustomRippleButton from "@/components/CustomRippleButton";
+import GenericHeader from "@/components/GenericHeader";
 
 const EnterPin = () => {
     const [pin, setPin] = useState("");
+    // const [displayedPin, setDisplayedPin] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [uid, setUid] = useState(useGlobalSearchParams().uid as string);
     const [isBiometricSupported, setIsBiometricSupported] = useState(false);
@@ -115,18 +116,30 @@ const EnterPin = () => {
     return (
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
             <View style={styles.container}>
-                <BackPage />
                 <View>
-                    <Image source={User} style={styles.user} />
-                    <Text style={styles.title}>Welcome Back</Text>
-                    <Text style={styles.subtitle}>
-                        Enter your pin below to enter Gimme
-                    </Text>
+                    <GenericHeader title="" />
+                    <View style={{ alignItems: "center" }}>
+                        <Image source={User} style={styles.user} />
+                        <Text style={styles.title}>Welcome Back</Text>
+                        <Text style={styles.subtitle}>
+                            Enter your pin below to enter Gimme
+                        </Text>
 
-                    <View style={styles.pinContainer}>
-                        <PinInput code={pin} onChange={setPin} />
+                        <View style={styles.pinContainer}>
+                            <ReEnterPinField
+                                code={pin}
+                                onChange={setPin}
+                                editable={false}
+                            />
+                            {/* <PinInput
+                            code={pin}
+                            onChange={setPin}
+                            protectedField={true}
+                        /> */}
+                        </View>
                     </View>
-
+                </View>
+                <View>
                     <View style={styles.keypadContainer}>
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, null, 0, ""].map(
                             (value, index) => {
@@ -144,7 +157,10 @@ const EnterPin = () => {
                                     return (
                                         <TouchableOpacity
                                             key={index}
-                                            style={styles.keypadButton}
+                                            style={[
+                                                styles.keypadButton,
+                                                { opacity: 0.4 },
+                                            ]}
                                             onPress={authenticateBiometrics}
                                         >
                                             <Finger />
@@ -166,20 +182,18 @@ const EnterPin = () => {
                             }
                         )}
                     </View>
-                </View>
-
-                <Button
-                    disabled={isLoading}
-                    width={325}
-                    onPress={handleNext}
-                    text={
-                        isLoading ? (
-                            <ActivityIndicator color={"#fff"} />
+                    <CustomRippleButton
+                        onPress={handleNext}
+                        contentContainerStyle={styles.pageButton}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <ActivityIndicator color="#fff" />
                         ) : (
-                            "Continue"
-                        )
-                    }
-                />
+                            <Text style={styles.pageButtonText}>Proceed</Text>
+                        )}
+                    </CustomRippleButton>
+                </View>
             </View>
         </CustomSafeArea>
     );
@@ -189,6 +203,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: size.getWidthSize(24),
+        justifyContent: "space-between",
     },
 
     backButton: {
@@ -227,19 +242,19 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
         justifyContent: "space-between",
-        paddingBottom: size.getHeightSize(32),
+        paddingHorizontal: size.getWidthSize(0),
     },
 
     keypadButton: {
         width: "30%",
-        height: size.getHeightSize(77),
+        height: size.getHeightSize(70),
         justifyContent: "center",
         alignItems: "center",
     },
 
     keypadText: {
-        fontSize: 24,
-        fontFamily: "Satoshi-Medium",
+        fontSize: size.fontSize(20),
+        fontFamily: "ClashDisplay-Medium",
     },
     firstPinBox: {
         borderTopLeftRadius: 16,
@@ -273,6 +288,23 @@ const styles = StyleSheet.create({
         width: 72,
         height: 72,
         marginTop: size.getHeightSize(32),
+    },
+
+    pageButton: {
+        height: size.getHeightSize(56),
+        borderRadius: size.getWidthSize(12),
+        marginVertical: size.getHeightSize(24),
+        padding: size.getWidthSize(16),
+        backgroundColor: "#374BFB",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+
+    pageButtonText: {
+        fontFamily: "Satoshi-Bold",
+        fontSize: size.fontSize(18),
+        lineHeight: size.getHeightSize(24),
+        color: "#ffffff",
     },
 });
 

@@ -9,7 +9,7 @@ import React, { useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import Svg, { Circle, Ellipse, Path, Rect } from "react-native-svg";
-import Country from "@/components/Country";
+import CurrencyToggle from "@/components/Home/CurrencyToggle";
 import P2PMarket from "@/components/P2PMarket";
 import { Link, router } from "expo-router";
 import CustomRippleButton from "@/components/CustomRippleButton";
@@ -41,7 +41,11 @@ export default function P2P() {
     ];
 
     return (
-        <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
+        <CustomSafeArea
+            topColor="#ffffff"
+            bgColor="#ffffff"
+            setBottomSafeAreaInset={false}
+        >
             <View style={styles.container}>
                 <View style={styles.headerContainer}>
                     <Text
@@ -143,7 +147,7 @@ export default function P2P() {
                             ))}
                         </Menu>
                         {/* end */}
-                        <Country />
+                        <CurrencyToggle />
                     </View>
                 </View>
 

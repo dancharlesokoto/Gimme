@@ -17,6 +17,10 @@ export default function FundLayout() {
                 options={{ headerShown: false, animation: "ios_from_right" }}
             />
             <Stack.Screen
+                name="FundWithCrypto"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
+            <Stack.Screen
                 name="FundWithData"
                 options={{ headerShown: false, animation: "ios_from_right" }}
             />
@@ -30,6 +34,10 @@ export default function FundLayout() {
             />
             <Stack.Screen
                 name="CreateBankAccount"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
+            <Stack.Screen
+                name="Convert"
                 options={{ headerShown: false, animation: "ios_from_right" }}
             />
         </Stack>

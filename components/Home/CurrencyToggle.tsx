@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { View, Text, Pressable, StyleSheet, Image } from "react-native";
 import { size } from "@/config/size";
 import { Svg, Path } from "react-native-svg";
@@ -10,38 +16,62 @@ import {
 } from "@gorhom/bottom-sheet";
 import useCurrencyStore from "@/store/currencyStore";
 
-const Country = () => {
-    const currencyState = useCurrencyStore((state: any) => state.currency);
+export const currencies = [
+    {
+        label: "NGN",
+        value: "ngn",
+        name: "Nigerian Naira",
+        icon: require("@/assets/images/ngr.png"),
+    },
+    {
+        label: "USD",
+        value: "usd",
+        name: "United States Dollar",
+        icon: require("@/assets/images/usa.png"),
+    },
+    {
+        label: "GM",
+        value: "gm",
+        name: "Gimme Coupon",
+        icon: require("@/assets/images/icon.png"),
+    },
+];
+
+export default function CurrencyToggle({
+    toggle = false,
+    hidden = false,
+}: {
+    toggle?: any | null;
+    hidden?: boolean;
+}) {
+    ///....
+
+    const _currencyState = useCurrencyStore((state: any) => state.currency);
+    const [currencyState, setCurrecyState] = useState(_currencyState);
+    //...
+    const snapPoints = useMemo(() => ["60%", "100%"], []);
+    //...
     const changeCurrencyState = useCurrencyStore(
         (state: any) => state.setCurrency
     );
-
-    const handleChangeCurrency = (value: string) => changeCurrencyState(value);
-
+    //...
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-    // callbacks
-    const handleModalToggle = () => {
-        bottomSheetModalRef.current?.present();
-        bottomSheetModalRef.current?.expand();
-        bottomSheetModalRef.current?.present();
-        bottomSheetModalRef.current?.expand();
+    //...
+    const handleChangeCurrency = (value: string) => {
+        setCurrecyState(value);
+        changeCurrencyState(value);
     };
+    // callbacks..
+    const handleModalToggle = async () => {
+        bottomSheetModalRef.current?.present();
+    };
+    useEffect(() => {
+        if (toggle) {
+            handleModalToggle();
+        }
+    }, [toggle]);
 
-    const currencies = [
-        {
-            label: "NGN",
-            value: "ngn",
-            name: "Nigerian Naira",
-            icon: require("@/assets/images/ngr.png"),
-        },
-        {
-            label: "USD",
-            value: "usd",
-            name: "United States Dollar",
-            icon: require("@/assets/images/usa.png"),
-        },
-    ];
-
+    ///....
     const renderBackdrop = useCallback(
         (props: any) => (
             <BottomSheetBackdrop
@@ -56,13 +86,17 @@ const Country = () => {
 
     return (
         <>
-            <Pressable style={styles.pickContainer} onPress={handleModalToggle}>
+            <Pressable
+                style={[styles.pickContainer, hidden && { display: "none" }]}
+                onPress={handleModalToggle}
+            >
                 <Image
                     source={
                         currencies.find((item) => item.value === currencyState)
                             ?.icon
                     }
                     style={{
+                        borderRadius: 1000,
                         width: size.getWidthSize(20),
                         height: size.getWidthSize(20),
                     }}
@@ -91,23 +125,28 @@ const Country = () => {
             </Pressable>
 
             <BottomSheetModal
+                enableDynamicSizing={false}
                 enablePanDownToClose
                 ref={bottomSheetModalRef}
-                snapPoints={["60%"]}
+                snapPoints={snapPoints}
                 backdropComponent={renderBackdrop}
-                backgroundStyle={{ borderRadius: size.getWidthSize(20) }}
+                backgroundStyle={{
+                    borderRadius: size.getWidthSize(20),
+                    flex: 1,
+                }}
             >
                 <BottomSheetView
                     style={{
                         flex: 1,
                         paddingHorizontal: size.getWidthSize(20),
-                        paddingTop: size.getHeightSize(8),
+                        paddingVertical: size.getHeightSize(8),
                     }}
                 >
                     <BottomSheetFlatList
                         data={currencies}
                         keyExtractor={(item) => item.value}
                         contentContainerStyle={{
+                            flex: 1,
                             gap: size.getWidthSize(24),
                         }}
                         renderItem={({ item }) => (
@@ -122,6 +161,7 @@ const Country = () => {
                                 <Image
                                     source={item.icon}
                                     style={{
+                                        borderRadius: 1000,
                                         width: size.getWidthSize(40),
                                         height: size.getHeightSize(40),
                                     }}
@@ -176,19 +216,18 @@ const Country = () => {
             </BottomSheetModal>
         </>
     );
-};
+}
 
 const styles = StyleSheet.create({
     pickContainer: {
+        gap: size.getHeightSize(4),
         flexDirection: "row",
         justifyContent: "space-between",
         backgroundColor: "#E2E3E9",
         paddingHorizontal: size.getHeightSize(4),
         paddingVertical: size.getWidthSize(4),
         borderRadius: size.getWidthSize(100),
-        width: size.getWidthSize(86),
-        height: size.getHeightSize(28),
-        alignItems: "center",
+        // width: size.getWidthSize(86),
     },
 
     dropdownButton: {
@@ -222,5 +261,3 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
 });
-
-export default Country;

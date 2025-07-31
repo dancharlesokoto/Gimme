@@ -53,7 +53,11 @@ export default function QuickPayments() {
                 renderItem={({ item }: { item: any }) => (
                     <Pressable
                         onPress={() =>
-                            router.push("/screens/(send)/EnterAmount")
+                            router.push(
+                                `/screens/(send)/EnterAmount?data=${JSON.stringify(
+                                    { data: item.receiver, sender: item.sender }
+                                )}`
+                            )
                         }
                         style={styles.avatarContainer}
                     >
@@ -81,8 +85,8 @@ export default function QuickPayments() {
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: size.getHeightSize(24),
         paddingLeft: size.getWidthSize(24),
+        paddingBottom: size.getHeightSize(24),
     },
     title: {
         fontSize: size.fontSize(14),
@@ -91,7 +95,10 @@ const styles = StyleSheet.create({
     },
 
     avatarContainer: {
+        width: size.getWidthSize(72),
         marginRight: size.getWidthSize(16),
+        justifyContent: "center",
+        alignItems: "center",
     },
     avatar: {
         width: size.getWidthSize(72),
@@ -101,6 +108,8 @@ const styles = StyleSheet.create({
     name: {
         marginTop: size.getHeightSize(4),
         fontSize: size.fontSize(11),
+        color: "#8E8E93",
+        textAlign: "center",
         fontFamily: "Satoshi-Medium",
     },
 });

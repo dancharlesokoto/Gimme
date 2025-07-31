@@ -11,7 +11,6 @@ export default function Todos() {
             style={{
                 gap: size.getHeightSize(8),
                 padding: size.getWidthSize(24),
-                paddingBottom: size.getHeightSize(0),
             }}
         >
             <Text

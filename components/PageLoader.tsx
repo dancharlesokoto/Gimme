@@ -1,7 +1,8 @@
 import { size } from "@/config/size";
 import React from "react";
+import { ActivityIndicator } from "react-native";
 import { View } from "react-native";
-import { ActivityIndicator } from "react-native-paper";
+
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PageLoader() {
@@ -15,13 +16,7 @@ export default function PageLoader() {
                 backgroundColor: "#fff",
             }}
         >
-            <ActivityIndicator
-                style={{
-                    marginTop: -size.getHeightSize(insets.top),
-                }}
-                size="large"
-                color="#374BFB"
-            />
+            <ActivityIndicator size="large" color="#374BFB" />
         </View>
     );
 }

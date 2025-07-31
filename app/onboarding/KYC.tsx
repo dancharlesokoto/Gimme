@@ -7,16 +7,25 @@ import Svg, { Path } from "react-native-svg";
 import Notice from "@/components/Global/Notice";
 import CustomRippleButton from "@/components/CustomRippleButton";
 import { router, useGlobalSearchParams } from "expo-router";
+import { toast } from "sonner-native";
 
 export default function KYC() {
+    /////....
     const [isLoading, setIsLoading] = useState(false);
+    //...
     const [userId, setUserId] = useState(
         useGlobalSearchParams().userId as string
     );
     const [phone, setPhone] = useState(useGlobalSearchParams().phone as string);
+    //..
 
-    const handleValidate = async () => {};
-
+    const handleVerifyKYC = async () => {
+        toast.error("This feature is not available yet", {
+            duration: 2000,
+            dismissible: true,
+        });
+    };
+    //...
     const handleSkip = async () => {
         router.push(`/onboarding/SetPin?userId=${userId}&phone=${phone}`);
     };
@@ -145,6 +154,7 @@ export default function KYC() {
                     >
                         <CustomRippleButton
                             disabled={isLoading}
+                            onPress={handleVerifyKYC}
                             style={{
                                 width: size.getWidthSize(140),
                                 borderRadius: size.getWidthSize(16),

@@ -1,11 +1,32 @@
-import { View, Text, ScrollView, StyleSheet } from "react-native";
-import React from "react";
+import {
+    View,
+    Text,
+    ScrollView,
+    StyleSheet,
+    ActivityIndicator,
+} from "react-native";
+import React, { useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import GenericHeader from "@/components/GenericHeader";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
+import TierOne from "@/components/Tier/TierOne";
+import CustomRippleButton from "@/components/CustomRippleButton";
+import { toast } from "sonner-native";
 
 export default function AccountTier() {
+    //...
+    const [isLoading, setIsLoading] = useState(false);
+
+    //...
+    const handleUpgradeAccount = async () => {
+        setIsLoading(true);
+        toast.info("This feature is not available yet", {
+            duration: 2000,
+            dismissible: true,
+        });
+        setIsLoading(false);
+    };
     return (
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
             <View
@@ -16,7 +37,7 @@ export default function AccountTier() {
                 <GenericHeader title="Account tier" />
             </View>
             <ScrollView
-                style={styles.container}
+                contentContainerStyle={styles.container}
                 keyboardShouldPersistTaps="handled"
             >
                 <View style={styles.pageCard}>
@@ -80,6 +101,22 @@ export default function AccountTier() {
                         </View>
                     </View>
                 </View>
+
+                <TierOne />
+
+                <CustomRippleButton
+                    onPress={handleUpgradeAccount}
+                    contentContainerStyle={styles.pageButton}
+                    disabled={isLoading}
+                >
+                    {isLoading ? (
+                        <ActivityIndicator color="#fff" />
+                    ) : (
+                        <Text style={styles.pageButtonText}>
+                            Update account
+                        </Text>
+                    )}
+                </CustomRippleButton>
             </ScrollView>
         </CustomSafeArea>
     );
@@ -89,6 +126,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: size.getWidthSize(24),
+        gap: size.getHeightSize(24),
     },
 
     page: {
@@ -137,5 +175,21 @@ const styles = StyleSheet.create({
         fontSize: size.fontSize(12),
         lineHeight: size.getHeightSize(16),
         color: "#525466",
+    },
+
+    pageButton: {
+        height: size.getHeightSize(56),
+        borderRadius: size.getWidthSize(16),
+        padding: size.getWidthSize(16),
+        backgroundColor: "#374BFB",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+
+    pageButtonText: {
+        fontFamily: "Satoshi-Bold",
+        fontSize: size.fontSize(18),
+        lineHeight: size.getHeightSize(24),
+        color: "#ffffff",
     },
 });

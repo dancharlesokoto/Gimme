@@ -4,48 +4,50 @@ import {
     Text,
     Pressable,
     StyleSheet,
-    Image,
     ScrollView,
     RefreshControl,
+    Image,
+    TouchableOpacity,
 } from "react-native";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
-import { Svg, Path } from "react-native-svg";
-import noTxn from "@/assets/images/noTxn.png";
 import Promotion from "@/components/Promotion";
 import QuickPayments from "@/components/QuickPayments";
-import WalletCard from "@/components/WalletCard";
-import Recent from "@/components/Recent";
 import { router, useFocusEffect } from "expo-router";
-import { User } from "@/types/User";
-import { fetchUser } from "@/services/user";
+import { fetchUser, getBankAccount } from "@/services/user";
 import { useUserStore } from "@/store/userStore";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner-native";
 import RewardsIcon from "@/assets/svg/rewardsIcon.svg";
 import PrimaryOptions from "@/components/Home/PrimaryOptions";
 import Todos from "@/components/Home/Todos";
 import RewardsCTA from "@/components/Home/RewardsCTA";
 import NotificationsIcon from "@/assets/svg/notificationsIcon.svg";
+import useCurrencyStore from "@/store/currencyStore";
+import Transactions from "@/components/Home/Transactions";
+import WalletCarousel from "@/components/Home/WalletCarousel";
+import { IMAGE_URL } from "@/services/api";
+import ContentLoader, { Rect } from "react-content-loader/native";
+import { toast } from "sonner-native";
 
 const HomeScreen = () => {
     const [screenRefreshing, setScreenRefreshing] = useState(false);
+    const currency = useCurrencyStore((state: any) => state.currency);
     //Fetch logic..........................
     const { userId } = useUserStore().user;
     const {
         data: userData,
         isError,
-        error,
         isLoading,
         isRefetching,
         refetch,
     } = useQuery({
-        queryKey: ["userData", userId],
-        retry: true,
+        queryKey: ["getUser", userId],
         queryFn: async () => await fetchUser(userId),
         refetchOnWindowFocus: true,
         refetchOnMount: true,
         refetchOnReconnect: true,
+        retryOnMount: true,
+        retry: true,
     });
 
     // Refetch when tab comes into focus
@@ -55,15 +57,6 @@ const HomeScreen = () => {
         }, [refetch])
     );
 
-    //Error reactive logic..........................
-    useEffect(() => {
-        isError &&
-            toast.error(error.message, {
-                duration: 2000,
-                dismissible: true,
-            });
-    }, [error]);
-
     const handleScreenRefresh = () => {
         setScreenRefreshing(true);
         setTimeout(() => {
@@ -72,11 +65,95 @@ const HomeScreen = () => {
         }, 500);
     };
 
+    //Preloading this data to cache and to avoid long times
+    const {
+        data: accountDetails,
+        error: accountError,
+        isError: accountIsError,
+        isLoading: accountIsLoading,
+    } = useQuery({
+        retry: true,
+        queryKey: ["getBankAccount", userId],
+        queryFn: getBankAccount,
+    });
+
     return (
-        <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
+        <CustomSafeArea
+            topColor="#ffffff"
+            bgColor="#ffffff"
+            setBottomSafeAreaInset={false}
+        >
             <View style={styles.container}>
                 <View style={styles.headerContainer}>
-                    <Text style={styles.welcomeText}>Welcome back</Text>
+                    <View
+                        style={{
+                            flex: 1,
+                            flexDirection: "row",
+                            gap: size.getWidthSize(8),
+                            alignItems: "center",
+                        }}
+                    >
+                        <TouchableOpacity
+                            hitSlop={size.getWidthSize(20)}
+                            onPress={() => router.push(`/(tabs)/profile`)}
+                        >
+                            {isLoading || isError ? (
+                                <Image
+                                    source={require("@/assets/images/user.png")}
+                                    alt=""
+                                    style={{
+                                        width: size.getWidthSize(40),
+                                        borderWidth: 1,
+                                        borderColor: "#E2E3E9",
+                                        height: size.getHeightSize(40),
+                                        borderRadius: size.getWidthSize(1000),
+                                    }}
+                                />
+                            ) : (
+                                <Image
+                                    loadingIndicatorSource={require("@/assets/images/user.png")}
+                                    source={{
+                                        uri:
+                                            IMAGE_URL +
+                                            "/profile/" +
+                                            userData.profileImage,
+                                    }}
+                                    alt=""
+                                    style={{
+                                        width: size.getWidthSize(40),
+                                        borderWidth: 1,
+                                        borderColor: "#E2E3E9",
+                                        height: size.getHeightSize(40),
+                                        borderRadius: size.getWidthSize(1000),
+                                    }}
+                                />
+                            )}
+                        </TouchableOpacity>
+
+                        <Text style={styles.welcomeText}>
+                            {!isLoading && !isError ? (
+                                "Welcome, " + userData.fullName.split(" ")[0]
+                            ) : (
+                                <ContentLoader
+                                    style={{
+                                        height: size.getHeightSize(15),
+                                        paddingVertical: size.getHeightSize(5),
+                                    }}
+                                    viewBox="0 0 100 15"
+                                    foregroundColor="#fff"
+                                    backgroundColor="#E2E3E9"
+                                >
+                                    <Rect
+                                        y="1"
+                                        rx="5"
+                                        ry="5"
+                                        width="90"
+                                        height="15"
+                                    />
+                                </ContentLoader>
+                            )}
+                        </Text>
+                    </View>
                     <View
                         style={{
                             flexDirection: "row",
@@ -84,14 +161,14 @@ const HomeScreen = () => {
                             alignItems: "center",
                         }}
                     >
-                        <Pressable
+                        {/* <Pressable
                             hitSlop={20}
                             onPress={() =>
                                 router.push("/screens/(earn)/Rewards")
                             }
                         >
                             <RewardsIcon />
-                        </Pressable>
+                        </Pressable> */}
                         <Pressable
                             hitSlop={20}
                             onPress={() =>
@@ -113,15 +190,16 @@ const HomeScreen = () => {
                     showsVerticalScrollIndicator={false}
                     overScrollMode="always"
                 >
-                    <WalletCard
-                        balance={isLoading || isError ? null : userData.balance}
+                    <WalletCarousel
+                        userData={userData}
+                        isError={isError}
+                        isLoading={isLoading}
                     />
+
+                    <Todos />
                     <QuickPayments />
-                    {!isLoading && !isError && userData.isKYC ? (
-                        <PrimaryOptions />
-                    ) : (
-                        <Todos />
-                    )}
+                    <PrimaryOptions />
+
                     <View
                         style={{
                             borderRadius: "20px",
@@ -132,19 +210,8 @@ const HomeScreen = () => {
                         <Promotion />
                     </View>
                     <RewardsCTA />
-                    <View style={{ marginBottom: size.getHeightSize(45) }}>
-                        <Image source={noTxn} style={styles.noTxn} />
-                        <Text
-                            style={{
-                                marginTop: size.getHeightSize(20),
-                                textAlign: "center",
-                                fontFamily: "Satoshi-Regular",
-                                fontSize: size.getWidthSize(14),
-                            }}
-                        >
-                            No recent transaction or activities yet.
-                        </Text>
-                    </View>
+
+                    <Transactions isPageRefetching={isRefetching} />
                     {/* <Recent /> */}
                 </ScrollView>
             </View>
@@ -160,15 +227,17 @@ const styles = StyleSheet.create({
     headerContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
+        gap: size.getWidthSize(12),
         alignItems: "center",
         paddingTop: size.getHeightSize(36),
-        paddingBottom: size.getHeightSize(6),
+        paddingBottom: size.getHeightSize(3),
         paddingHorizontal: size.getWidthSize(24),
     },
 
     welcomeText: {
-        fontSize: size.fontSize(16),
-        fontFamily: "Satoshi-Bold",
+        flex: 1,
+        fontSize: size.fontSize(18),
+        fontFamily: "Satoshi-Medium",
     },
 
     iconButton: {

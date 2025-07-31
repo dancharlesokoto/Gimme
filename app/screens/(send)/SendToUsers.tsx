@@ -5,36 +5,52 @@ import {
     TextInput,
     ScrollView,
     Pressable,
+    ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
-import BackPage from "@/components/BackPage";
+
 import { size } from "@/config/size";
 import QuickPayments from "@/components/QuickPayments";
 import { router } from "expo-router";
 import Svg, { Path } from "react-native-svg";
 import GenericHeader from "@/components/GenericHeader";
 import RecepientLiveSearch from "@/components/Send/RecepientLiveSearch";
+import { toast } from "sonner-native";
+import { getRecipient } from "@/services/gimme-wallet";
+import CustomRippleButton from "@/components/CustomRippleButton";
 
 export default function SendToUsers() {
-    const [username, setUsername] = useState("");
+    ///.......
+    const [uid, setUid] = useState("");
     const [empty, setEmpty] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        if (username) {
+        if (uid) {
             setEmpty(false);
-            if (!username.startsWith("@")) {
-                setUsername("@" + username);
-            }
         }
-    }, [username]);
+    }, [uid]);
 
-    const handleSend = () => {
-        if (!username) {
+    const handleNext = async () => {
+        if (!uid) {
             setEmpty(true);
             return;
         }
-        router.push("/screens/(send)/EnterAmount");
+        try {
+            setIsLoading(true);
+            const res = await getRecipient(uid);
+            router.push(
+                `/screens/(send)/EnterAmount?data=${JSON.stringify(res)}`
+            );
+        } catch (error: any | Error) {
+            toast.error(error.message, {
+                duration: 2000,
+                dismissible: true,
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
     return (
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
@@ -63,11 +79,11 @@ export default function SendToUsers() {
                             <TextInput
                                 style={[styles.input]}
                                 keyboardType="default"
-                                value={username}
-                                onChangeText={setUsername}
+                                value={uid}
+                                onChangeText={setUid}
                                 placeholder="@username or phone number"
                             />
-                            <RecepientLiveSearch uid={username} />
+                            <RecepientLiveSearch uid={uid} />
                             {empty && (
                                 <View style={styles.errorContainer}>
                                     <Svg
@@ -87,28 +103,19 @@ export default function SendToUsers() {
                                     </Text>
                                 </View>
                             )}
-                            <Pressable
-                                onPress={handleSend}
-                                style={{
-                                    backgroundColor: "#374BFB",
-                                    height: size.getHeightSize(56),
-                                    marginVertical: size.getHeightSize(16),
-                                    borderRadius: size.getHeightSize(16),
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
+                            <CustomRippleButton
+                                onPress={handleNext}
+                                contentContainerStyle={styles.pageButton}
+                                disabled={isLoading}
                             >
-                                <Text
-                                    style={{
-                                        fontSize: size.fontSize(18),
-                                        fontFamily: "Satoshi-Bold",
-                                        color: "#ffffff",
-                                        marginLeft: size.getWidthSize(10),
-                                    }}
-                                >
-                                    Proceed
-                                </Text>
-                            </Pressable>
+                                {isLoading ? (
+                                    <ActivityIndicator color="#fff" />
+                                ) : (
+                                    <Text style={styles.pageButtonText}>
+                                        Proceed
+                                    </Text>
+                                )}
+                            </CustomRippleButton>
                         </View>
                     </View>
                 </ScrollView>
@@ -158,5 +165,22 @@ const styles = StyleSheet.create({
         marginBottom: size.getHeightSize(6),
         fontFamily: "Satoshi-Medium",
         fontSize: size.fontSize(14),
+    },
+
+    pageButton: {
+        height: size.getHeightSize(56),
+        borderRadius: size.getWidthSize(16),
+        marginTop: size.getHeightSize(24),
+        padding: size.getWidthSize(16),
+        backgroundColor: "#374BFB",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+
+    pageButtonText: {
+        fontFamily: "Satoshi-Bold",
+        fontSize: size.fontSize(18),
+        lineHeight: size.getHeightSize(24),
+        color: "#ffffff",
     },
 });

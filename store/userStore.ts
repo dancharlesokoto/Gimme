@@ -7,10 +7,15 @@ interface UserStore {
         userId: string;
         email: string;
         name: string;
+        phone: string;
         profileImage: string;
+        paystackCustomerId: string;
+        paystackVirtualAccountId: string;
         token: string;
         isVerified: boolean;
     };
+    isStale: boolean;
+    setIsStale: (value: boolean) => void;
     setUser: (user: UserStore["user"]) => void;
     resetUser: () => void;
 }
@@ -22,10 +27,15 @@ export const useUserStore = create(
                 userId: "",
                 email: "",
                 name: "",
+                phone: "",
                 profileImage: "",
+                paystackCustomerId: "",
+                paystackVirtualAccountId: "",
                 token: "",
                 isVerified: false,
             },
+            isStale: true,
+            setIsStale: (value) => set({ isStale: value }),
             setUser: (user) => set({ user }),
             resetUser: () =>
                 set({
@@ -33,10 +43,14 @@ export const useUserStore = create(
                         userId: "",
                         email: "",
                         name: "",
+                        phone: "",
                         profileImage: "",
+                        paystackCustomerId: "",
+                        paystackVirtualAccountId: "",
                         token: "",
                         isVerified: false,
                     },
+                    isStale: true,
                 }),
         }),
         {

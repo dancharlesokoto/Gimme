@@ -6,11 +6,14 @@ const CustomSafeArea = ({
     children,
     topColor,
     bgColor,
+    setBottomSafeAreaInset,
+    avoidInset,
 }: {
     children: ReactNode;
     setBottomSafeAreaInset?: boolean;
     topColor?: string;
     bgColor?: string;
+    avoidInset?: boolean;
 }) => {
     const { top, bottom } = useSafeAreaInsets();
     return (
@@ -18,7 +21,9 @@ const CustomSafeArea = ({
             style={{
                 flex: 1,
                 backgroundColor: topColor ? topColor : "#161E64",
-                paddingTop: top,
+                paddingTop: avoidInset ? 0 : top,
+                paddingBottom:
+                    avoidInset || setBottomSafeAreaInset === false ? 0 : bottom,
             }}
         >
             <View

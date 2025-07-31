@@ -30,7 +30,8 @@ export default function CustomRippleButton({
         <Pressable disabled={disabled} style={[style, { overflow: "hidden" }]}>
             <Ripple
                 rippleDuration={rippleDuration}
-                onPress={() => onPress && onPress()}
+                disabled={disabled}
+                onPress={() => onPress && (disabled ? {} : onPress())}
                 rippleColor={rippleColor}
                 style={contentContainerStyle as unknown as any}
             >

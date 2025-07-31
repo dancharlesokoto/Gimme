@@ -5,35 +5,93 @@ import {
     Image,
     TextInput,
     ScrollView,
+    ActivityIndicator,
     Pressable,
 } from "react-native";
 import React, { useState } from "react";
 import CurrencyInput from "react-native-currency-input";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
-import BackPage from "@/components/BackPage";
-import Country from "@/components/Country";
-import Img from "@/assets/images/avatar-2.png";
-import CheckBox from "react-native-check-box";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import GenericHeader from "@/components/GenericHeader";
-
+import { IMAGE_URL } from "@/services/api";
+import CustomRippleButton from "@/components/CustomRippleButton";
+import { toast } from "sonner-native";
+import Checkbox from "expo-checkbox";
+import useCurrencyStore from "@/store/currencyStore";
+import { convertCurrency, formatCurrency } from "@/lib/currency";
 export default function EnterAmount() {
-    const [amount, setAmount] = useState(null);
+    //...
+    const [amount, setAmount] = useState<"ngn" | "usd" | "gm" | any>(null);
+    const [remark, setRemark] = useState("");
     const [isChecked, setIsChecked] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    // const currency = useCurrencyStore((state: any) => state.currency);
+    const currency = "ngn"; //Hardcoded for now
 
-    const handleNext = () => {
-        router.push("/screens/(send)/EnterPin");
+    //....
+    const data = JSON.parse(useLocalSearchParams().data as string);
+    const recipientData = data.data;
+    const senderData = data.sender;
+    //...
+    const handleNext = async () => {
+        if (!amount) {
+            toast.error("Please enter an amount", {
+                duration: 2000,
+                dismissible: true,
+            });
+            return;
+        }
+        if (amount < 1000) {
+            toast.error("Amount must be at least NGN1,000", {
+                duration: 2000,
+                dismissible: true,
+            });
+            return;
+        }
+        if (amount > +senderData.ngnBalance / 100) {
+            toast.error("Insufficient funds", {
+                duration: 2000,
+                dismissible: true,
+            });
+            return;
+        }
+        if (amount > 99000) {
+            toast.error("Amount must be at most NGN99,000", {
+                duration: 2000,
+                dismissible: true,
+            });
+            return;
+        }
+        try {
+            router.push(
+                `/screens/(send)/EnterPin?data=${JSON.stringify({
+                    saveToQuickPayments: isChecked,
+                    currency,
+                    recipient: recipientData,
+                    amount,
+                    remark,
+                })}`
+            );
+        } catch (error: any | Error) {
+            toast.error(error.message, {
+                duration: 2000,
+                dismissible: true,
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
+            <View style={{ paddingHorizontal: size.getWidthSize(24) }}>
+                <GenericHeader title="Amount to send" currency={currency} />
+            </View>
             <ScrollView
-                style={styles.container}
+                contentContainerStyle={styles.container}
                 keyboardShouldPersistTaps="handled"
             >
-                <GenericHeader title="Amount to send" showCountry />
-
                 <View
                     style={{
                         gap: size.getHeightSize(8),
@@ -64,32 +122,53 @@ export default function EnterAmount() {
                             backgroundColor: "#EBEFFF",
                         }}
                     >
-                        <Image
-                            source={Img}
-                            alt=""
-                            style={{
-                                width: size.getWidthSize(40),
-                                height: size.getHeightSize(40),
-                            }}
-                        />
-                        <View>
+                        {recipientData.profileImage == "default.png" ||
+                        recipientData.profileImage == "" ? (
+                            <Image
+                                source={require("@/assets/images/user.png")}
+                                alt=""
+                                style={{
+                                    width: size.getWidthSize(40),
+                                    height: size.getHeightSize(40),
+                                    borderRadius: size.getWidthSize(1000),
+                                }}
+                            />
+                        ) : (
+                            <Image
+                                loadingIndicatorSource={require("@/assets/images/user.png")}
+                                source={{
+                                    uri:
+                                        IMAGE_URL +
+                                        "/profile/" +
+                                        recipientData.profileImage,
+                                }}
+                                alt=""
+                                style={{
+                                    width: size.getWidthSize(40),
+                                    height: size.getHeightSize(40),
+                                    borderRadius: size.getWidthSize(1000),
+                                }}
+                            />
+                        )}
+                        <View style={{ flex: 1 }}>
                             <Text
                                 style={{
+                                    width: "100%",
                                     fontSize: size.fontSize(16),
                                     lineHeight: size.getHeightSize(24),
                                     fontFamily: "Satoshi-Bold",
                                 }}
                             >
-                                @rotimi
+                                {recipientData.fullName}
                             </Text>
                             <Text
                                 style={{
-                                    fontSize: size.fontSize(16),
+                                    fontSize: size.fontSize(14),
                                     lineHeight: size.getHeightSize(24),
                                     fontFamily: "Satoshi-Regular",
                                 }}
                             >
-                                08138818591
+                                0{recipientData.phone}
                             </Text>
                         </View>
                     </View>
@@ -110,7 +189,11 @@ export default function EnterAmount() {
                         >
                             <Text style={styles.label}>Amount to to send</Text>
                             <Text style={styles.labelBal}>
-                                Balance: NGN 150,000
+                                Balance: {currency.toUpperCase()}{" "}
+                                {formatCurrency({
+                                    value: senderData.ngnBalance,
+                                    currency,
+                                })}
                             </Text>
                         </View>
                         <CurrencyInput
@@ -129,7 +212,12 @@ export default function EnterAmount() {
                         >
                             Equivalent to{" "}
                             <Text style={{ fontFamily: "Satoshi-Bold" }}>
-                                GM 0
+                                GM{" "}
+                                {convertCurrency({
+                                    value: amount * 100,
+                                    from: "ngn",
+                                    to: "gm",
+                                })}
                             </Text>
                         </Text>
                     </View>
@@ -144,48 +232,42 @@ export default function EnterAmount() {
                             <Text style={styles.label}>Remark</Text>
                         </View>
                         <TextInput
+                            value={remark}
+                            onChangeText={setRemark}
                             style={styles.input}
                             placeholder="Reason for sending"
                         />
                     </View>
 
-                    <View>
-                        <CheckBox
-                            style={{ flex: 1 }}
-                            onClick={() => setIsChecked(!isChecked)}
-                            isChecked={isChecked}
-                            rightText={"Save to quick payment list"}
-                            rightTextStyle={{
-                                fontFamily: "Satoshi-Regular",
-                                fontSize: size.fontSize(14),
-                            }}
-                            uncheckedCheckBoxColor="#1B1C1D1F"
-                            checkBoxColor="#374BFB"
-                        />
-                    </View>
-
-                    <Pressable
-                        onPress={handleNext}
+                    <View
                         style={{
-                            backgroundColor: "#374BFB",
-                            height: size.getHeightSize(56),
-                            marginVertical: size.getHeightSize(16),
-                            borderRadius: size.getHeightSize(16),
-                            alignItems: "center",
-                            justifyContent: "center",
+                            flexDirection: "row",
+                            gap: size.getWidthSize(8),
                         }}
                     >
-                        <Text
-                            style={{
-                                fontSize: size.fontSize(18),
-                                fontFamily: "Satoshi-Bold",
-                                color: "#ffffff",
-                                marginLeft: size.getWidthSize(10),
-                            }}
-                        >
-                            Proceed
-                        </Text>
-                    </Pressable>
+                        <Checkbox
+                            // style={styles.checkbox}
+                            value={isChecked}
+                            onValueChange={setIsChecked}
+                        />
+                        <Pressable onPress={() => setIsChecked(!isChecked)}>
+                            <Text style={styles.label}>
+                                Save to quick payment list
+                            </Text>
+                        </Pressable>
+                    </View>
+
+                    <CustomRippleButton
+                        onPress={handleNext}
+                        contentContainerStyle={styles.pageButton}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={styles.pageButtonText}>Proceed</Text>
+                        )}
+                    </CustomRippleButton>
                 </View>
             </ScrollView>
         </CustomSafeArea>
@@ -235,5 +317,22 @@ const styles = StyleSheet.create({
         marginBottom: size.getHeightSize(6),
         fontFamily: "Satoshi-Medium",
         fontSize: size.fontSize(14),
+    },
+
+    pageButton: {
+        height: size.getHeightSize(56),
+        borderRadius: size.getWidthSize(16),
+        marginTop: size.getHeightSize(24),
+        padding: size.getWidthSize(16),
+        backgroundColor: "#374BFB",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+
+    pageButtonText: {
+        fontFamily: "Satoshi-Bold",
+        fontSize: size.fontSize(18),
+        lineHeight: size.getHeightSize(24),
+        color: "#ffffff",
     },
 });

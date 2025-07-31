@@ -1,65 +1,67 @@
 {
-  "expo": {
-    "name": "Gimme",
-    "slug": "gimme",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.gimme",
-      "infoPlist": {
-        "NSFaceIDUsageDescription": "This app uses Face ID to authenticate you."
-      }
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#374BFB"
-      },
-      "package": "com.anonymous.gimme",
-      "permissions": ["android.permission.RECORD_AUDIO"]
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash.png",
-          "backgroundColor": "#000000",
-          "imageWidth": 100,
-          "dark": {
-            "image": "./assets/images/splash.png",
-            "backgroundColor": "#000000"
-          },
-          "resizeMode": "contain"
-        }
-      ],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
-        }
-      ]
-    ],
-    "experiments": {
-      "typedRoutes": true
-    },
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "e796d73e-ffe5-427d-9b3e-20f484dadc9d"
-      }
+    "expo": {
+        "name": "Gimme",
+        "slug": "gimme",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/images/icon.png",
+        "scheme": "myapp",
+        "userInterfaceStyle": "automatic",
+        "newArchEnabled": true,
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.anonymous.gimme",
+            "infoPlist": {
+                "NSFaceIDUsageDescription": "This app uses Face ID to authenticate you."
+            }
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/images/icon.png",
+                "backgroundColor": "#374BFB"
+            },
+            "package": "com.anonymous.gimme",
+            "permissions": ["android.permission.RECORD_AUDIO"]
+        },
+        "web": {
+            "bundler": "metro",
+            "output": "static",
+            "favicon": "./assets/images/favicon.png"
+        },
+        "plugins": [
+            "expo-router",
+            [
+                "expo-splash-screen",
+                {
+                    "image": "./assets/images/splash.png",
+                    "backgroundColor": "#000000",
+                    "imageWidth": 100,
+                    "dark": {
+                        "image": "./assets/images/splash.png",
+                        "backgroundColor": "#000000"
+                    },
+                    "resizeMode": "contain"
+                }
+            ],
+
+            [
+                "expo-image-picker",
+                {
+                    "photosPermission": "The app accesses your photos to let you share them with your friends."
+                }
+            ]
+        ],
+        "experiments": {
+            "typedRoutes": true
+        },
+        "extra": {
+            "router": {
+                "origin": false
+            },
+            "eas": {
+                "projectId": "e796d73e-ffe5-427d-9b3e-20f484dadc9d"
+            }
+        },
+        "owner": "victorfaruna"
     }
-  }
 }

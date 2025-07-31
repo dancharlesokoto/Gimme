@@ -1,242 +1,270 @@
-import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import React, { useCallback, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { size } from "@/config/size";
-import BackPage from "@/components/BackPage";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { Path, Svg } from "react-native-svg";
-import { useNavigation } from "@react-navigation/native";
-import { router } from "expo-router";
+import { Href, router } from "expo-router";
 import GenericHeader from "@/components/GenericHeader";
+//Icons...
+import useCurrencyStore from "@/store/currencyStore";
 
+type DataType = {
+    usd: {
+        icon: React.ReactNode;
+        title: string;
+        description: string;
+        link: Href;
+    }[];
+    ngn: {
+        icon: React.ReactNode;
+        title: string;
+        description: string;
+        link: Href;
+    }[];
+    gm: {
+        icon: React.ReactNode;
+        title: string;
+        description: string;
+        link: Href;
+    }[];
+};
+
+const DATA: DataType = {
+    usd: [
+        {
+            icon: (
+                <Svg
+                    // xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    style={{
+                        width: size.getWidthSize(20),
+                        height: size.getHeightSize(20),
+                    }}
+                    strokeWidth="1.8"
+                    stroke="#374BFB"
+                    // class="size-6"
+                >
+                    <Path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    />
+                </Svg>
+            ),
+            title: "Fund via stablecoins",
+            description: "Fund your USD balance with USDC",
+            link: "/screens/(fund)/FundWithCrypto",
+        },
+        {
+            icon: (
+                <Svg
+                    // xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    style={{
+                        width: size.getWidthSize(18),
+                        height: size.getHeightSize(18),
+                    }}
+                    strokeWidth="1.8"
+                    stroke="#374BFB"
+                    // class="size-6"
+                >
+                    <Path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                    />
+                </Svg>
+            ),
+            title: "Fund via conversion",
+            description:
+                "Convert funds from your other wallets to your USD wallet",
+            link: "/screens/(fund)/Convert",
+        },
+        {
+            icon: (
+                <Svg
+                    // xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    style={{
+                        width: size.getWidthSize(15),
+                        height: size.getHeightSize(15),
+                    }}
+                    strokeWidth="1.8"
+                    stroke="#374BFB"
+                >
+                    <Path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m19.5 4.5-15 15m0 0h11.25m-11.25 0V8.25"
+                    />
+                </Svg>
+            ),
+            title: "Request payment",
+            description:
+                "Request payment from other users to fund your USD wallet",
+            link: "/screens/(fund)/Convert",
+        },
+    ],
+    ngn: [
+        {
+            icon: (
+                <Svg
+                    // xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    style={{
+                        width: size.getWidthSize(20),
+                        height: size.getHeightSize(20),
+                    }}
+                    strokeWidth="1.8"
+                    stroke="#374BFB"
+                    // class="size-6"
+                >
+                    <Path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
+                    />
+                </Svg>
+            ),
+            title: "Fund via bank transfer",
+            description:
+                "Fund your NGN wallet through a dedicated virtual bank account",
+            link: "/screens/(fund)/FundWithBankTransfer",
+        },
+        {
+            icon: (
+                <Svg
+                    // xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    style={{
+                        width: size.getWidthSize(18),
+                        height: size.getHeightSize(18),
+                    }}
+                    strokeWidth="1.8"
+                    stroke="#374BFB"
+                    // class="size-6"
+                >
+                    <Path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                    />
+                </Svg>
+            ),
+            title: "Fund via conversion",
+            description:
+                "Convert funds from your other wallets to fund your NGN wallet",
+            link: "/screens/(fund)/Convert",
+        },
+        {
+            icon: (
+                <Svg
+                    // xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    style={{
+                        width: size.getWidthSize(15),
+                        height: size.getHeightSize(15),
+                    }}
+                    strokeWidth="1.8"
+                    stroke="#374BFB"
+                >
+                    <Path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m19.5 4.5-15 15m0 0h11.25m-11.25 0V8.25"
+                    />
+                </Svg>
+            ),
+            title: "Request payment",
+            description:
+                "Request payment from other users to fund your NGN wallet",
+            link: "/screens/(fund)/Convert",
+        },
+    ],
+    gm: [],
+};
 const Fund = () => {
-    const navigation = useNavigation();
+    ///........................................
+    const currency = useCurrencyStore((state) => state.currency);
+
+    //........................................
+    const data = DATA[currency] ?? [];
+
     return (
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
             <View style={styles.container}>
-                <GenericHeader title="Fund Wallet" />
+                <GenericHeader
+                    title={`Fund ${currency && currency.toUpperCase()} wallet`}
+                    showCountry
+                />
                 <View style={{ paddingVertical: size.getHeightSize(24) }}>
-                    <Pressable
-                        onPress={() =>
-                            router.push("/screens/FundWithBankTransfer")
-                        }
-                    >
-                        <View style={styles.fundContainer}>
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                }}
-                            >
-                                <View
-                                    style={{
-                                        backgroundColor: "#EBEFFF",
-                                        borderRadius: 96,
-                                        paddingVertical: size.getHeightSize(13),
-                                        paddingHorizontal:
-                                            size.getWidthSize(13),
-                                        height: size.getHeightSize(40),
-                                        width: size.getWidthSize(40),
-                                    }}
-                                >
-                                    <Svg
-                                        viewBox="0 0 16 14"
-                                        fill="none"
-                                        // xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <Path
-                                            d="M1.25 0.25H14.75C14.9489 0.25 15.1397 0.329018 15.2803 0.46967C15.421 0.610322 15.5 0.801088 15.5 1V13C15.5 13.1989 15.421 13.3897 15.2803 13.5303C15.1397 13.671 14.9489 13.75 14.75 13.75H1.25C1.05109 13.75 0.860322 13.671 0.71967 13.5303C0.579018 13.3897 0.5 13.1989 0.5 13V1C0.5 0.801088 0.579018 0.610322 0.71967 0.46967C0.860322 0.329018 1.05109 0.25 1.25 0.25V0.25ZM14 7H2V12.25H14V7ZM14 4V1.75H2V4H14Z"
-                                            fill="#374BFB"
-                                        />
-                                    </Svg>
-                                </View>
-                                <View
-                                    style={{
-                                        marginLeft: size.getWidthSize(14),
-                                    }}
-                                >
-                                    <Text style={styles.actionText}>
-                                        Fund with Bank Transfer
-                                    </Text>
-                                    <Text style={styles.actionSubText}>
-                                        Top up via your virtual account number.
-                                    </Text>
-                                </View>
-                            </View>
-                            <View
-                                style={{
-                                    alignItems: "center",
-                                    paddingRight: size.getWidthSize(10),
-                                }}
-                            >
-                                <Svg
-                                    width="6"
-                                    height="10"
-                                    viewBox="0 0 6 10"
-                                    fill="none"
-                                    //   xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <Path
-                                        d="M3.79584 4.9992L0.0833435 1.2867L1.14384 0.226196L5.91684 4.9992L1.14384 9.7722L0.0833435 8.7117L3.79584 4.9992Z"
-                                        fill="#525466"
-                                    />
-                                </Svg>
-                            </View>
-                        </View>
-                    </Pressable>
-
-                    <Pressable
-                        onPress={() => router.push("/screens/FundWithAirtime")}
-                    >
-                        <View
-                            style={[
-                                styles.fundContainer,
-                                {
-                                    paddingTop: size.getHeightSize(12),
-                                },
-                            ]}
+                    {data.map((item, index: any) => (
+                        <TouchableOpacity
+                            key={index}
+                            onPress={() => router.push(item.link)}
                         >
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                }}
-                            >
+                            <View style={styles.fundContainer}>
                                 <View
                                     style={{
-                                        backgroundColor: "#FEF4EB",
-                                        borderRadius: 96,
-                                        paddingVertical: size.getHeightSize(13),
-                                        paddingHorizontal:
-                                            size.getWidthSize(13),
-                                        height: size.getHeightSize(40),
-                                        width: size.getWidthSize(40),
+                                        flex: 1,
+                                        flexDirection: "row",
+                                        gap: size.getWidthSize(8),
+                                        alignItems: "center",
                                     }}
                                 >
-                                    <Svg
-                                        viewBox="0 0 14 14"
-                                        fill="none"
-                                        // xmlns="http://www.w3.org/2000/svg"
+                                    <View
+                                        style={{
+                                            borderRadius: 999,
+                                            backgroundColor: "#EBEFFF",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            height: size.getWidthSize(40),
+                                            width: size.getWidthSize(40),
+                                        }}
                                     >
-                                        <Path
-                                            d="M5.0245 6.0115C5.72825 7.24786 6.75214 8.27175 7.9885 8.9755L8.6515 8.047C8.75812 7.8977 8.91576 7.79266 9.0946 7.75175C9.27344 7.71084 9.46108 7.7369 9.622 7.825C10.6827 8.40469 11.8542 8.75333 13.0593 8.848C13.2473 8.8629 13.4229 8.94815 13.5509 9.08674C13.6789 9.22533 13.75 9.40708 13.75 9.59575V12.9423C13.75 13.1279 13.6812 13.3071 13.5568 13.4449C13.4324 13.5828 13.2612 13.6696 13.0765 13.6885C12.679 13.7297 12.2785 13.75 11.875 13.75C5.455 13.75 0.25 8.545 0.25 2.125C0.25 1.7215 0.27025 1.321 0.3115 0.9235C0.330441 0.738773 0.417238 0.567641 0.555092 0.443225C0.692946 0.31881 0.872054 0.24996 1.05775 0.25H4.40425C4.59292 0.249976 4.77467 0.321064 4.91326 0.449088C5.05185 0.577112 5.1371 0.752668 5.152 0.94075C5.24667 2.14584 5.59531 3.31726 6.175 4.378C6.2631 4.53892 6.28916 4.72656 6.24825 4.9054C6.20734 5.08424 6.1023 5.24188 5.953 5.3485L5.0245 6.0115V6.0115ZM3.133 5.51875L4.558 4.501C4.15359 3.62807 3.87651 2.70163 3.73525 1.75H1.7575C1.753 1.8745 1.75075 1.99975 1.75075 2.125C1.75 7.717 6.283 12.25 11.875 12.25C12.0002 12.25 12.1255 12.2477 12.25 12.2425V10.2648C11.2984 10.1235 10.3719 9.84641 9.499 9.442L8.48125 10.867C8.0715 10.7078 7.67351 10.5198 7.29025 10.3045L7.24675 10.2797C5.77568 9.44254 4.55746 8.22432 3.72025 6.75325L3.6955 6.70975C3.48018 6.32649 3.29221 5.9285 3.133 5.51875V5.51875Z"
-                                            fill="#F28B2C"
-                                        />
-                                    </Svg>
+                                        {item.icon}
+                                    </View>
+                                    <View
+                                        style={{
+                                            flex: 1,
+                                        }}
+                                    >
+                                        <Text style={styles.actionText}>
+                                            {item.title}
+                                        </Text>
+                                        <Text style={styles.actionSubText}>
+                                            {item.description}
+                                        </Text>
+                                    </View>
                                 </View>
                                 <View
                                     style={{
-                                        marginLeft: size.getWidthSize(14),
-                                    }}
-                                >
-                                    <Text style={styles.actionText}>
-                                        Fund with Airtime
-                                    </Text>
-                                    <Text style={styles.actionSubText}>
-                                        Use your mobile airtime to get Gimme
-                                        token
-                                    </Text>
-                                </View>
-                            </View>
-                            <View
-                                style={{
-                                    alignItems: "center",
-                                    paddingRight: size.getWidthSize(10),
-                                }}
-                            >
-                                <Svg
-                                    width="6"
-                                    height="10"
-                                    viewBox="0 0 6 10"
-                                    fill="none"
-                                    //   xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <Path
-                                        d="M3.79584 4.9992L0.0833435 1.2867L1.14384 0.226196L5.91684 4.9992L1.14384 9.7722L0.0833435 8.7117L3.79584 4.9992Z"
-                                        fill="#525466"
-                                    />
-                                </Svg>
-                            </View>
-                        </View>
-                    </Pressable>
-
-                    <Pressable
-                        onPress={() =>
-                            router.push("/screens/(fund)/FundWithData")
-                        }
-                    >
-                        <View
-                            style={[
-                                styles.fundContainer,
-                                {
-                                    paddingTop: size.getHeightSize(12),
-                                },
-                            ]}
-                        >
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                }}
-                            >
-                                <View
-                                    style={{
-                                        backgroundColor: "#FFFFFF",
-                                        borderWidth: 1,
-                                        borderColor: "#E2E3E9",
-                                        borderRadius: 96,
-                                        paddingVertical: size.getHeightSize(13),
-                                        paddingHorizontal:
-                                            size.getWidthSize(13),
-                                        height: size.getHeightSize(40),
-                                        width: size.getWidthSize(40),
+                                        alignItems: "center",
+                                        paddingRight: size.getWidthSize(10),
                                     }}
                                 >
                                     <Svg
-                                        viewBox="0 0 14 15"
+                                        width="6"
+                                        height="10"
+                                        viewBox="0 0 6 10"
                                         fill="none"
-                                        // xmlns="http://www.w3.org/2000/svg"
+                                        //   xmlns="http://www.w3.org/2000/svg"
                                     >
                                         <Path
-                                            d="M1.75 7.375C1.75 7.60975 2.09575 8.0185 2.8975 8.41975C3.9355 8.93875 5.40775 9.25 7 9.25C8.59225 9.25 10.0645 8.93875 11.1025 8.41975C11.9042 8.0185 12.25 7.60975 12.25 7.375V5.74675C11.0125 6.51175 9.12025 7 7 7C4.87975 7 2.9875 6.511 1.75 5.74675V7.375ZM12.25 9.49675C11.0125 10.2618 9.12025 10.75 7 10.75C4.87975 10.75 2.9875 10.261 1.75 9.49675V11.125C1.75 11.3597 2.09575 11.7685 2.8975 12.1697C3.9355 12.6887 5.40775 13 7 13C8.59225 13 10.0645 12.6887 11.1025 12.1697C11.9042 11.7685 12.25 11.3597 12.25 11.125V9.49675ZM0.25 11.125V3.625C0.25 1.76125 3.2725 0.25 7 0.25C10.7275 0.25 13.75 1.76125 13.75 3.625V11.125C13.75 12.9887 10.7275 14.5 7 14.5C3.2725 14.5 0.25 12.9887 0.25 11.125ZM7 5.5C8.59225 5.5 10.0645 5.18875 11.1025 4.66975C11.9042 4.2685 12.25 3.85975 12.25 3.625C12.25 3.39025 11.9042 2.9815 11.1025 2.58025C10.0645 2.06125 8.59225 1.75 7 1.75C5.40775 1.75 3.9355 2.06125 2.8975 2.58025C2.09575 2.9815 1.75 3.39025 1.75 3.625C1.75 3.85975 2.09575 4.2685 2.8975 4.66975C3.9355 5.18875 5.40775 5.5 7 5.5Z"
+                                            d="M3.79584 4.9992L0.0833435 1.2867L1.14384 0.226196L5.91684 4.9992L1.14384 9.7722L0.0833435 8.7117L3.79584 4.9992Z"
                                             fill="#525466"
                                         />
                                     </Svg>
                                 </View>
-                                <View
-                                    style={{
-                                        marginLeft: size.getWidthSize(14),
-                                    }}
-                                >
-                                    <Text style={styles.actionText}>
-                                        Fund with Data
-                                    </Text>
-                                    <Text style={styles.actionSubText}>
-                                        use your data bundle to fund your
-                                        account
-                                    </Text>
-                                </View>
                             </View>
-                            <View
-                                style={{
-                                    alignItems: "center",
-                                    paddingRight: size.getWidthSize(10),
-                                }}
-                            >
-                                <Svg
-                                    width="6"
-                                    height="10"
-                                    viewBox="0 0 6 10"
-                                    fill="none"
-                                    //   xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <Path
-                                        d="M3.79584 4.9992L0.0833435 1.2867L1.14384 0.226196L5.91684 4.9992L1.14384 9.7722L0.0833435 8.7117L3.79584 4.9992Z"
-                                        fill="#525466"
-                                    />
-                                </Svg>
-                            </View>
-                        </View>
-                    </Pressable>
+                        </TouchableOpacity>
+                    ))}
                 </View>
             </View>
         </CustomSafeArea>
@@ -258,6 +286,7 @@ const styles = StyleSheet.create({
 
     fundContainer: {
         flexDirection: "row",
+        gap: size.getWidthSize(8),
         alignItems: "center",
         justifyContent: "space-between",
         paddingVertical: size.getHeightSize(17),

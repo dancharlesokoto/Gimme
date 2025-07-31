@@ -1,11 +1,45 @@
-import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import React, { useState } from "react";
 import ErrorNotice from "@/assets/svg/errorNotice.svg";
 import { size } from "@/config/size";
 import CustomRippleButton from "../CustomRippleButton";
-import { router } from "expo-router";
 
-export default function CreateBankAccountCTA() {
+import { toast } from "sonner-native";
+import { createBankAccount } from "@/services/user";
+import { useUserStore } from "@/store/userStore";
+
+export default function CreateBankAccountCTA({
+    onSuccess,
+}: {
+    onSuccess: () => void;
+}) {
+    ///.....
+    const [isLoading, setIsLoading] = useState(false);
+
+    //..
+    const name = useUserStore.getState().user.name;
+    const firstName = name.split(" ")[0];
+    const lastName = name.split(" ")[name.split(" ").length - 1];
+
+    const handleCreateBanknAccount = async () => {
+        try {
+            setIsLoading(true);
+            await createBankAccount({
+                userId: useUserStore.getState().user.userId,
+                email: useUserStore.getState().user.email,
+                phone: useUserStore.getState().user.phone,
+                firstName,
+                lastName,
+            });
+            onSuccess();
+            toast.success("Bank Account created successfully");
+        } catch (error: any) {
+            console.log(error);
+            toast.error(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
     return (
         <View style={styles.container}>
             <ErrorNotice />
@@ -16,7 +50,8 @@ export default function CreateBankAccountCTA() {
 
             <CustomRippleButton
                 rippleColor="#fff"
-                onPress={() => router.push("/screens/(fund)/CreateBankAccount")}
+                disabled={isLoading}
+                onPress={handleCreateBanknAccount}
                 style={{ width: "100%" }}
                 contentContainerStyle={{
                     backgroundColor: "#374BFB",
@@ -27,16 +62,20 @@ export default function CreateBankAccountCTA() {
                     justifyContent: "center",
                 }}
             >
-                <Text
-                    style={{
-                        fontSize: size.fontSize(18),
-                        fontFamily: "Satoshi-Bold",
-                        color: "#ffffff",
-                        marginLeft: size.getWidthSize(10),
-                    }}
-                >
-                    Create account
-                </Text>
+                {isLoading ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                    <Text
+                        style={{
+                            fontSize: size.fontSize(18),
+                            fontFamily: "Satoshi-Bold",
+                            color: "#ffffff",
+                            marginLeft: size.getWidthSize(10),
+                        }}
+                    >
+                        Create account
+                    </Text>
+                )}
             </CustomRippleButton>
         </View>
     );

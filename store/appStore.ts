@@ -5,8 +5,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 interface AppStore {
     isP2PStarted: boolean;
     isMarketStarted: boolean;
+    isCardsStarted: boolean;
+    isBalanceHidden: boolean;
+    setIsBalanceHidden: (isBalanceHidden: boolean) => void;
     setIsP2PStarted: (isP2PStarted: boolean) => void;
     setIsMarketStarted: (isMarketStarted: boolean) => void;
+    setIsCardsStarted: (isCardsStarted: boolean) => void;
 }
 
 export const useAppStore = create(
@@ -14,8 +18,12 @@ export const useAppStore = create(
         (set) => ({
             isP2PStarted: false,
             isMarketStarted: false,
+            isCardsStarted: false,
+            isBalanceHidden: false,
+            setIsBalanceHidden: (isBalanceHidden) => set({ isBalanceHidden }),
             setIsP2PStarted: (isP2PStarted) => set({ isP2PStarted }),
             setIsMarketStarted: (isMarketStarted) => set({ isMarketStarted }),
+            setIsCardsStarted: (isCardsStarted) => set({ isCardsStarted }),
         }),
         {
             name: "app-storage", // name of the item in the storage (must be unique)

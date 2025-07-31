@@ -1,4 +1,33 @@
-import { Dimensions } from "react-native";
-import { sizes } from "@/utils/size";
-const { width, height } = Dimensions.get("window");
-export const size = new sizes(height, width);
+import { Dimensions, PixelRatio, Platform } from "react-native";
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+
+// Reference sizes for scaling (based on iPhone 12)
+const BASE_WIDTH = 393;
+const BASE_HEIGHT = 857;
+
+// Scale based on width
+const scale = (size: number) => (SCREEN_WIDTH / BASE_WIDTH) * size;
+
+// Scale based on height
+const verticalScale = (size: number) => (SCREEN_HEIGHT / BASE_HEIGHT) * size;
+
+// Moderate scale for font sizes (with factor for fine-tuning)
+const moderateScale = (size: number, factor = 0.5) =>
+    size + (scale(size) - size) * factor;
+
+// Font scaling that respects user font settings
+const fontScale = (size: number) =>
+    moderateScale(size, 1) * PixelRatio.getFontScale();
+
+// Exported size utility object
+export const size = {
+    getWidthSize: scale,
+    getHeightSize: verticalScale,
+    fontSize: moderateScale,
+    scale,
+    verticalScale,
+    moderateScale,
+    screenWidth: SCREEN_WIDTH,
+    screenHeight: SCREEN_HEIGHT,
+};

@@ -1,5 +1,7 @@
 import { useUserStore } from "@/store/userStore";
 import { axiosInstance } from "./api";
+import { useAppStore } from "@/store/appStore";
+import { router } from "expo-router";
 
 export const createUser = async ({
     name,
@@ -52,6 +54,7 @@ export const loginUser = async ({ uid, pin }: { uid: string; pin: string }) => {
             pin,
         });
         useUserStore.getState().setUser(request.data);
+        useUserStore.getState().setIsStale(false);
         return request.data;
     } catch (error: any) {
         const errorMessage = error.response?.data?.message || error.message;
@@ -126,5 +129,42 @@ export const createPin = async ({
     } catch (error: any) {
         const errorMessage = error.response?.data?.message || error.message;
         throw new Error(errorMessage);
+    }
+};
+
+export const setUsername = async ({
+    userId,
+    username,
+}: {
+    userId: string;
+    username: string;
+}) => {
+    if (!userId) {
+        throw new Error("Something went wrong");
+    }
+    if (!username) {
+        throw new Error("Pin is required");
+    }
+    try {
+        const request = await axiosInstance.post("/auth/set-username", {
+            userId,
+            username,
+        });
+        return request.data;
+    } catch (error: any) {
+        const errorMessage = error.response?.data?.message || error.message;
+        throw new Error(errorMessage);
+    }
+};
+
+export const logoutUser = async () => {
+    try {
+        useUserStore.getState().resetUser();
+        useAppStore.getState().setIsMarketStarted(false);
+        useAppStore.getState().setIsP2PStarted(false);
+        useAppStore.getState().setIsCardsStarted(false);
+        router.replace("/");
+    } catch (error) {
+        console.log(error);
     }
 };

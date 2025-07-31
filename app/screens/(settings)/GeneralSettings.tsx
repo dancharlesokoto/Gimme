@@ -84,12 +84,12 @@ export default function GeneralSettings() {
     };
 
     return (
-        <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-            >
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+        >
+            <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
                 <View style={{ paddingHorizontal: size.getWidthSize(24) }}>
                     <GenericHeader title="General settings" />
                 </View>
@@ -210,14 +210,15 @@ export default function GeneralSettings() {
                         )}
                     </CustomRippleButton>
                 </ScrollView>
-            </KeyboardAvoidingView>
-        </CustomSafeArea>
+            </CustomSafeArea>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        flexGrow: 1,
         paddingHorizontal: size.getWidthSize(24),
     },
 
@@ -261,6 +262,7 @@ const styles = StyleSheet.create({
 
     input: {
         flex: 1,
+        height: "100%",
         fontFamily: "Satoshi-Regular",
         fontSize: size.fontSize(14),
         lineHeight: size.getHeightSize(20),

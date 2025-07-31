@@ -1,24 +1,37 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, StyleSheet, Image } from "react-native";
 import hide from "@/assets/images/hide.png";
-import { size } from "../config/size";
+import { size } from "../../config/size";
 import { Svg, Path } from "react-native-svg";
 import { router } from "expo-router";
-import Country from "./Country";
-import CustomRippleButton from "./CustomRippleButton";
-import ContentLoader, { Rect, Circle } from "react-content-loader/native";
+import CurrencyToggle, { currencies } from "./CurrencyToggle";
+import CustomRippleButton from "../CustomRippleButton";
+import ContentLoader, { Rect } from "react-content-loader/native";
+import useCurrencyStore from "@/store/currencyStore";
+import { convertCurrency, formatCurrency } from "@/lib/currency";
+import { useAppStore } from "@/store/appStore";
+import CurrencyDisplay from "./CurrencyDisplay";
+import { useUserStore } from "@/store/userStore";
 
-const formatter = new Intl.NumberFormat("en-US", {
-    currency: "NGN",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-});
+type WalletCardType = {
+    amount: string | number | any;
+    isShowing?: boolean;
+    currency: "usd" | "ngn" | "gm";
+};
 
-const WalletCard = ({ balance }: { balance: string | number }) => {
-    const [hideFunds, setHideFunds] = useState(false);
+const WalletCard = ({ amount, currency, isShowing }: WalletCardType) => {
+    ///..........................
+    useEffect(() => {
+        if (isShowing) {
+            useCurrencyStore.setState({ currency: currency });
+        }
+    }, [isShowing]);
+    const isBalanceHidden = useAppStore((state) => state.isBalanceHidden);
+
     const handleSwitch = () => {
-        setHideFunds(!hideFunds);
+        useAppStore.setState({ isBalanceHidden: !isBalanceHidden });
     };
+
     return (
         <View style={styles.mainCard}>
             <View
@@ -27,18 +40,19 @@ const WalletCard = ({ balance }: { balance: string | number }) => {
                     justifyContent: "space-between",
                 }}
             >
-                <Country />
+                {/* <WalletCurrency _currency={currency} /> */}
+                <CurrencyDisplay _currency={currency} />
                 <Pressable
                     style={{
                         paddingVertical: size.getHeightSize(6),
                         paddingHorizontal: size.getWidthSize(6),
-                        backgroundColor: hideFunds ? "#FFFFFF" : "#E2E3E9",
+                        backgroundColor: "#E2E3E9",
                         borderRadius: 100,
                         justifyContent: "center",
                     }}
                     onPress={handleSwitch}
                 >
-                    {hideFunds ? (
+                    {isBalanceHidden ? (
                         <Svg
                             width="17"
                             height="14"
@@ -77,7 +91,7 @@ const WalletCard = ({ balance }: { balance: string | number }) => {
                 >
                     Total Balance
                 </Text>
-                {hideFunds ? (
+                {isBalanceHidden ? (
                     <View
                         style={{
                             justifyContent: "center",
@@ -106,7 +120,7 @@ const WalletCard = ({ balance }: { balance: string | number }) => {
                     </View>
                 ) : (
                     <>
-                        {!balance ? (
+                        {!amount ? (
                             <ContentLoader
                                 style={{
                                     height: size.getHeightSize(36),
@@ -141,27 +155,45 @@ const WalletCard = ({ balance }: { balance: string | number }) => {
                                         fontSize: size.fontSize(16),
                                     }}
                                 >
-                                    ₦
+                                    {currency == "usd"
+                                        ? "$"
+                                        : currency == "ngn"
+                                        ? "₦"
+                                        : ""}
                                 </Text>
                                 <Text
                                     style={{
                                         fontFamily: "Satoshi-Bold",
+                                        lineHeight: size.getHeightSize(42),
                                         fontSize: size.fontSize(36),
                                     }}
                                 >
-                                    {formatter.format(Number(balance))}
+                                    {amount == "0"
+                                        ? "0.00"
+                                        : formatCurrency({
+                                              value: amount,
+                                              currency: currency,
+                                          })}
                                 </Text>
                             </View>
                         )}
 
                         <Text
                             style={{
-                                fontFamily: "Satoshi-Regular",
+                                fontFamily: "Satoshi-Medium",
                                 fontSize: size.fontSize(12),
                                 paddingBottom: size.getHeightSize(24),
                             }}
                         >
-                            {!balance ? (
+                            <Text
+                                style={{
+                                    fontFamily: "ClashDisplay-Medium",
+                                    color: "#868898",
+                                }}
+                            >
+                                ~GM
+                            </Text>{" "}
+                            {!amount ? (
                                 <ContentLoader
                                     style={{
                                         height: size.getHeightSize(10),
@@ -175,19 +207,16 @@ const WalletCard = ({ balance }: { balance: string | number }) => {
                                         y="1"
                                         rx="5"
                                         ry="5"
-                                        width="100"
+                                        width="60"
                                         height="10"
                                     />
                                 </ContentLoader>
                             ) : (
-                                "~GM " +
-                                (Number(balance) / 100).toLocaleString(
-                                    "en-US",
-                                    {
-                                        maximumFractionDigits: 2,
-                                        minimumFractionDigits: 2,
-                                    }
-                                )
+                                convertCurrency({
+                                    value: amount,
+                                    from: currency,
+                                    to: "gm",
+                                })
                             )}
                         </Text>
                     </>
@@ -204,7 +233,11 @@ const WalletCard = ({ balance }: { balance: string | number }) => {
                 <CustomRippleButton
                     style={{ borderRadius: size.getWidthSize(8) }}
                     contentContainerStyle={styles.mainButton}
-                    onPress={() => router.push("/screens/(fund)/FundWallet")}
+                    onPress={() =>
+                        router.push(
+                            `/screens/(fund)/FundWallet?currency=${currency}`
+                        )
+                    }
                 >
                     <Text style={styles.mainButtonText}>Fund wallet</Text>
                 </CustomRippleButton>
@@ -212,7 +245,11 @@ const WalletCard = ({ balance }: { balance: string | number }) => {
                 <CustomRippleButton
                     style={{ borderRadius: size.getWidthSize(8) }}
                     contentContainerStyle={styles.mainButton}
-                    onPress={() => router.push("/screens/(withdraw)/Withdraw")}
+                    onPress={() =>
+                        router.push(
+                            `/screens/(withdraw)/Withdraw?currency=${currency}`
+                        )
+                    }
                 >
                     <Text style={styles.mainButtonText}>Withdraw money</Text>
                 </CustomRippleButton>
@@ -234,6 +271,7 @@ const styles = StyleSheet.create({
     },
 
     amount: {
+        gap: size.getHeightSize(2),
         justifyContent: "center",
         alignItems: "center",
     },
@@ -257,13 +295,15 @@ const styles = StyleSheet.create({
     },
 
     pickContainer: {
+        gap: size.getHeightSize(4),
         flexDirection: "row",
         justifyContent: "space-between",
         backgroundColor: "#E2E3E9",
         paddingHorizontal: size.getHeightSize(4),
+        paddingRight: size.getWidthSize(12),
         paddingVertical: size.getWidthSize(4),
         borderRadius: size.getWidthSize(100),
-        width: size.getWidthSize(86),
+        // width: size.getWidthSize(86),
     },
 
     dropdownButton: {

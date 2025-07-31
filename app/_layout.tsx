@@ -10,7 +10,7 @@ import { PaperProvider } from "react-native-paper";
 import "@/global.css";
 import { Toaster } from "sonner-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Paystack from "paystack-react-native";
+import { size } from "@/config/size";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -20,15 +20,11 @@ export default function RootLayout() {
         "Satoshi-Bold": fonts.BOLD,
         "Satoshi-Regular": fonts.REGULAR,
         "Satoshi-Medium": fonts.MEDIUM,
+        "ClashDisplay-Bold": fonts.CLASH_BOLD,
+        "ClashDisplay-SemiBold": fonts.CLASH_SEMIBOLD,
+        "ClashDisplay-Regular": fonts.CLASH_REGULAR,
+        "ClashDisplay-Medium": fonts.CLASH_MEDIUM,
     });
-
-    useEffect(() => {
-        const initPaystack = async () => {
-            Paystack.init(process.env.PAYSTACK_PUBLIC_KEY!);
-            console.log("Paystack initialized");
-        };
-        initPaystack();
-    }, []);
 
     useEffect(() => {
         if (loaded) {
@@ -70,10 +66,17 @@ export default function RootLayout() {
                                 />
                                 <Stack.Screen name="+not-found" />
                             </Stack>
-                            <StatusBar style="dark" hidden />
+                            <StatusBar style="dark" />
                         </QueryClientProvider>
                     </BottomSheetModalProvider>
-                    <Toaster theme="dark" swipeToDismissDirection="up" />
+                    <Toaster
+                        theme="dark"
+                        autoWiggleOnUpdate="always"
+                        swipeToDismissDirection="left"
+                        style={{
+                            borderRadius: size.getWidthSize(10),
+                        }}
+                    />
                 </PaperProvider>
             </GestureHandlerRootView>
         </>

@@ -15,7 +15,11 @@ export default function P2P() {
         setIsMarketStarted(true);
     };
     return (
-        <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
+        <CustomSafeArea
+            topColor="#ffffff"
+            bgColor="#ffffff"
+            setBottomSafeAreaInset={false}
+        >
             <View style={styles.container}>
                 <MarketPlaceHeader title="Market place" />
 
@@ -302,7 +306,7 @@ export default function P2P() {
                                 backgroundColor: "#374BFB",
                                 height: size.getHeightSize(56),
                                 marginVertical: size.getHeightSize(16),
-                                borderRadius: size.getHeightSize(16),
+                                borderRadius: size.getHeightSize(12),
                                 alignItems: "center",
                                 justifyContent: "center",
                             }}

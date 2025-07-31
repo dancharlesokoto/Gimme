@@ -11,19 +11,16 @@ import {
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { Svg, Path } from "react-native-svg";
 import { size } from "@/config/size";
-import Button from "@/components/Button";
 import BackPage from "@/components/BackPage";
 import { router } from "expo-router";
 import CustomRippleButton from "@/components/CustomRippleButton";
-import { loginUser } from "@/services/auth";
+import GenericHeader from "@/components/GenericHeader";
 
 const Login = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [inputError, setInputError] = useState(false);
     const [emptyInput, setEmptyInput] = useState(false);
-    const [error, setError] = useState(false);
-    const [errorMsg, setErrorMsg] = useState("");
 
     const isPhoneNumberValid = () => {
         if (phoneNumber.trim().length >= 10) {
@@ -61,7 +58,7 @@ const Login = () => {
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={styles.container}>
-                    <BackPage />
+                    <GenericHeader title="" />
 
                     <View style={{ paddingTop: size.getHeightSize(24) }}>
                         <Text style={styles.header}>Welcome back</Text>
@@ -85,8 +82,8 @@ const Login = () => {
                                 inputError && { borderColor: "#DF1C36" },
                                 emptyInput && { borderColor: "#DF1C36" },
                             ]}
-                            keyboardType="phone-pad"
-                            placeholder="e.g 08111222101"
+                            autoCapitalize={"none"}
+                            placeholder="e.g doe@gmail.com"
                             value={phoneNumber}
                             onChangeText={setPhoneNumber}
                         />
@@ -128,7 +125,7 @@ const Login = () => {
                             </View>
                         ) : null}
 
-                        <View style={{ paddingTop: size.getHeightSize(24) }}>
+                        <View>
                             <CustomRippleButton
                                 style={{
                                     borderRadius: size.getWidthSize(16),
@@ -177,11 +174,14 @@ const styles = StyleSheet.create({
     },
 
     header: {
-        fontFamily: "Satoshi-Bold",
-        fontSize: size.fontSize(20),
+        fontFamily: "ClashDisplay-SemiBold",
+        color: "rgba(0, 0, 0, 0.9)",
+        fontSize: size.fontSize(22),
     },
-    subHead: { fontFamily: "Satoshi-Regular", fontSize: size.fontSize(14) },
-
+    subHead: {
+        fontFamily: "Satoshi-Regular",
+        fontSize: size.fontSize(14),
+    },
     label: {
         fontSize: size.fontSize(14),
         fontFamily: "Satoshi-Medium",

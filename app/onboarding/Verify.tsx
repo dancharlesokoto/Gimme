@@ -17,6 +17,8 @@ import { verifyPhone } from "@/services/auth";
 import PinInput from "@/components/PinInupt";
 import CustomRippleButton from "@/components/CustomRippleButton";
 import GenericHeader from "@/components/GenericHeader";
+import ReEnterPin from "./ReEnterPin";
+import ReEnterPinField from "@/components/Onboarding/ReEnterPinField";
 
 const Verify = () => {
     const [code, setCode] = useState("");
@@ -26,15 +28,13 @@ const Verify = () => {
     const [userId, setUserId] = useState(
         useGlobalSearchParams().userId as string
     );
+
     const phoneNumber = `${phone.substring(0, 3)}***${phone.slice(-4)}`;
     const [timeLeft, setTimeLeft] = useState(59);
     const [isTimeGone, setIsTimeGone] = useState(false);
 
     useEffect(() => {
         if (timeLeft <= 0) return;
-        if (timeLeft == 1) {
-            setIsTimeGone(true);
-        }
         const interval = setInterval(() => {
             setTimeLeft((time) => {
                 if (time <= 1) {
@@ -69,7 +69,10 @@ const Verify = () => {
                 duration: 2000,
                 dismissible: true,
             });
-            router.push(`/onboarding/KYC?userId=${userId}&phone=${phone}`);
+            router.push(
+                `/onboarding/SetUsername?userId=${userId}&phone=${phone}&email=${email}`
+            );
+
             // router.push(`/onboarding/SetPin?userId=${userId}&phone=${phone}`);
         } catch (error: any) {
             toast.error(error.message, {
@@ -89,35 +92,28 @@ const Verify = () => {
                     <View style={{ paddingTop: size.getHeightSize(24) }}>
                         <Text style={styles.header}>Account Verification</Text>
                         <Text style={styles.subHead}>
-                            Please enter the verification code sent to ({email})
+                            Please enter the verification code sent to {`\n`}
+                            <Text
+                                style={{
+                                    color: "#0A0B14",
+                                    fontFamily: "Satoshi-Medium",
+                                }}
+                            >
+                                ({email})
+                            </Text>
                         </Text>
                     </View>
                     <View style={styles.textContainer}>
-                        {/* {pin.map((_, index) => (
-                            <View
-                                key={index}
-                                style={[
-                                    styles.box,
-                                    index === 0 && styles.firstBox,
-                                    index === pin.length - 1 && styles.lastBox,
-                                ]}
-                            >
-                                <TextInput
-                                    style={styles.input}
-                                    keyboardType="numeric"
-                                    maxLength={1}
-                                    ref={(ref) =>
-                                        (inputRefs.current[index] = ref)
-                                    }
-                                    onChangeText={(text) =>
-                                        handleChange(text, index)
-                                    }
-                                    onKeyPress={(e) => handleKeyPress(e, index)}
-                                    value={pin[index]}
-                                />
-                            </View>
-                        ))} */}
-                        <PinInput code={code} onChange={setCode} />
+                        {/* <PinInput
+                            code={code}
+                            onChange={setCode}
+                            editable={true}
+                        /> */}
+                        <ReEnterPinField
+                            code={code}
+                            onChange={setCode}
+                            editable={true}
+                        />
                     </View>
                     <View style={styles.countdown}>
                         <Svg
@@ -141,12 +137,13 @@ const Verify = () => {
                         disabled={isLoading}
                         style={{
                             borderRadius: size.getWidthSize(16),
-                            height: size.getHeightSize(56),
-                            backgroundColor: "#374BFB",
                             alignSelf: "flex-start",
                         }}
                         contentContainerStyle={{
                             padding: size.getWidthSize(14),
+                            backgroundColor: "#374BFB",
+                            paddingHorizontal: size.getWidthSize(16),
+                            paddingVertical: size.getHeightSize(16),
                             alignItems: "center",
                             justifyContent: "center",
                         }}
@@ -156,10 +153,22 @@ const Verify = () => {
                                 fontSize: size.fontSize(18),
                                 fontFamily: "Satoshi-Bold",
                                 color: "#ffffff",
+                                opacity: isLoading ? 0 : 1,
                             }}
                         >
                             Verify Code
                         </Text>
+                        {isLoading && (
+                            <ActivityIndicator
+                                style={{
+                                    width: "100%",
+                                    position: "absolute",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }}
+                                color={"#fff"}
+                            />
+                        )}
                     </CustomRippleButton>
                     {isTimeGone && (
                         <CustomRippleButton
@@ -189,13 +198,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: size.getWidthSize(24),
     },
     header: {
-        fontFamily: "Satoshi-Bold",
-        fontSize: size.fontSize(28),
+        fontFamily: "ClashDisplay-SemiBold",
+        fontSize: size.fontSize(22),
     },
     subHead: {
         fontFamily: "Satoshi-Regular",
         fontSize: size.fontSize(14),
         maxWidth: size.getWidthSize(345),
+        color: "#8E8E93",
         flexWrap: "wrap",
     },
     textContainer: {

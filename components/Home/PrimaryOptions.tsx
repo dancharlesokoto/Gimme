@@ -8,7 +8,7 @@ export default function PrimaryOptions() {
     return (
         <View
             style={{
-                paddingTop: size.getHeightSize(24),
+                paddingBottom: size.getHeightSize(24),
                 flexDirection: "row",
                 justifyContent: "space-between",
                 marginHorizontal: size.getWidthSize(24),
@@ -57,11 +57,13 @@ export default function PrimaryOptions() {
                         alignItems: "flex-start",
                     }}
                 >
-                    <Text style={styles.featureText}>Send Gimme to others</Text>
+                    <Text style={styles.featureText}>
+                        Send money to other Gimme users
+                    </Text>
                 </View>
             </Pressable>
             <Pressable
-                onPress={() => router.push("/(tabs)/p2p")}
+                onPress={() => router.push("/screens/(fund)/Convert")}
                 style={[
                     styles.featureCard,
                     { marginLeft: size.getWidthSize(12), flex: 1 },
@@ -104,7 +106,7 @@ export default function PrimaryOptions() {
                     }}
                 >
                     <Text style={styles.featureText}>
-                        Swap Gimme with our P2P platform
+                        Convert your NGN, USD and GM coupons
                     </Text>
                 </View>
             </Pressable>

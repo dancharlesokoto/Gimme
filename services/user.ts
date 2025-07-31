@@ -17,20 +17,23 @@ export const fetchUser = async (userId: string) => {
 };
 
 export const updateUser = async ({
+    pin,
     username,
     phone,
     email,
 }: {
-    username: string;
-    phone: string;
-    email: string;
+    pin?: string;
+    username?: string;
+    phone?: string;
+    email?: string;
 }) => {
-    if (phone.substring(0, 1) === "0") {
+    if (phone?.substring(0, 1) === "0") {
         phone = phone.slice(1);
     }
     try {
         const request = await axiosInstance.patch(`/user/update`, {
             userId: useUserStore.getState().user.userId,
+            pin,
             username,
             phone,
             email,
@@ -52,11 +55,13 @@ export const createBankAccount = async ({
     email,
     firstName,
     lastName,
+    phone,
 }: {
     userId: string;
     email: string;
     firstName: string;
     lastName: string;
+    phone: string;
 }) => {
     try {
         const { data } = await axiosInstance.post("/user/bank-account", {
@@ -64,6 +69,7 @@ export const createBankAccount = async ({
             email,
             firstName,
             lastName,
+            phone,
         });
         return data;
     } catch (error: any) {
@@ -84,7 +90,19 @@ export const getBankAccountStatus = async () => {
 
 export const getBankAccount = async () => {
     try {
-        const { data } = await axiosInstance.get("/user/bank-account");
+        const { data } = await axiosInstance.get("/user/bank-account?");
+        return data;
+    } catch (error: any) {
+        const errorMessage = error.response?.data?.message || error.message;
+        throw new Error(errorMessage);
+    }
+};
+
+export const getWithdrawalBankAccounts = async () => {
+    try {
+        const { data } = await axiosInstance.get(
+            "/user/withdrawal-bank-account"
+        );
         return data;
     } catch (error: any) {
         const errorMessage = error.response?.data?.message || error.message;

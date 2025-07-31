@@ -17,8 +17,8 @@ import { fetchUser } from "@/services/user";
 import { IMAGE_URL } from "@/services/api";
 import PageLoader from "@/components/PageLoader";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner-native";
 import { useAppStore } from "@/store/appStore";
+import { logoutUser } from "@/services/auth";
 
 export default function Profile() {
     const { user } = useUserStore();
@@ -41,11 +41,12 @@ export default function Profile() {
         isLoading,
         refetch,
     } = useQuery({
-        queryKey: ["getUser"],
+        queryKey: ["getUser", userId],
         queryFn: async () => await fetchUser(userId),
         refetchOnWindowFocus: true,
         refetchOnMount: true,
         refetchOnReconnect: true,
+        retryOnMount: true,
     });
 
     useFocusEffect(
@@ -61,14 +62,7 @@ export default function Profile() {
 
     //Logout logic..........................
     const handleLogout = async () => {
-        try {
-            useUserStore.getState().resetUser();
-            useAppStore.getState().setIsMarketStarted(false);
-            useAppStore.getState().setIsP2PStarted(false);
-            router.replace("/");
-        } catch (error) {
-            console.log(error);
-        }
+        await logoutUser();
     };
 
     if (isLoading || isError) {
@@ -80,7 +74,11 @@ export default function Profile() {
     }
 
     return (
-        <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
+        <CustomSafeArea
+            topColor="#ffffff"
+            bgColor="#ffffff"
+            setBottomSafeAreaInset={false}
+        >
             <View style={styles.container}>
                 <View style={styles.headerContainer}>
                     <Text
@@ -105,21 +103,35 @@ export default function Profile() {
                     showsVerticalScrollIndicator={false}
                 >
                     <View style={styles.mainInfo}>
-                        <Image
-                            source={{
-                                uri:
-                                    IMAGE_URL +
-                                    "/profile/" +
-                                    userData.profileImage,
-                            }}
-                            alt=""
-                            style={{
-                                width: size.getWidthSize(88),
-                                height: size.getHeightSize(88),
-                                borderRadius: size.getWidthSize(1000),
-                            }}
-                        />
-                        <View style={{ gap: size.getWidthSize(1) }}>
+                        {userData.profileImage == "default.png" ||
+                        userData.profileImage == "" ? (
+                            <Image
+                                source={require("@/assets/images/user.png")}
+                                alt=""
+                                style={{
+                                    width: size.getWidthSize(88),
+                                    height: size.getHeightSize(88),
+                                    borderRadius: size.getWidthSize(1000),
+                                }}
+                            />
+                        ) : (
+                            <Image
+                                loadingIndicatorSource={require("@/assets/images/user.png")}
+                                source={{
+                                    uri:
+                                        IMAGE_URL +
+                                        "/profile/" +
+                                        userData.profileImage,
+                                }}
+                                alt=""
+                                style={{
+                                    width: size.getWidthSize(88),
+                                    height: size.getHeightSize(88),
+                                    borderRadius: size.getWidthSize(1000),
+                                }}
+                            />
+                        )}
+                        <View style={{ gap: size.getWidthSize(1), flex: 1 }}>
                             {userData.fullName ? (
                                 <Text
                                     style={{
@@ -128,7 +140,7 @@ export default function Profile() {
                                         color: "#0B0A14",
                                     }}
                                 >
-                                    {userData.fullName}
+                                    {userData.fullName}{" "}
                                 </Text>
                             ) : (
                                 <Text
@@ -312,7 +324,7 @@ export default function Profile() {
                             style={styles.optionItem}
                             onPress={() =>
                                 router.push(
-                                    "/screens/(settings)/SecuritySettings"
+                                    `/screens/(settings)/SecuritySettings?userId=${userData.userId}&pin=${userData.pin}`
                                 )
                             }
                         >

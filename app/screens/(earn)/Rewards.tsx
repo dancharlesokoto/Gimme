@@ -6,7 +6,7 @@ import {
     Modal,
     TouchableOpacity,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import GenericHeader from "@/components/GenericHeader";
 import { size } from "@/config/size";
@@ -15,13 +15,37 @@ import CustomRippleButton from "@/components/CustomRippleButton";
 import Tasks from "@/components/Rewards/Tasks";
 import RecentActivities from "@/components/Rewards/RecentActivities";
 import Svg, { Path } from "react-native-svg";
+import {
+    BottomSheetBackdrop,
+    BottomSheetModal,
+    BottomSheetView,
+} from "@gorhom/bottom-sheet";
 
 export default function Rewards() {
-    const [modalVisible, setModalVisible] = useState(false);
-
-    const handleModalClose = () => {
-        setModalVisible(false);
+    /////.......
+    const snapPoints = useMemo(() => [350], []);
+    //...
+    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+    //...
+    const handleModalToggle = async () => {
+        bottomSheetModalRef.current?.present();
     };
+    //...
+    const handleModalClose = () => {
+        bottomSheetModalRef.current?.close();
+    };
+    /////.....
+    const renderBackdrop = useCallback(
+        (props: any) => (
+            <BottomSheetBackdrop
+                {...props}
+                disappearsOnIndex={-1} // Backdrop disappears when sheet is fully closed
+                appearsOnIndex={0} // Backdrop appears when sheet is opened
+                opacity={0.5} // Adjust transparency here
+            />
+        ),
+        []
+    );
     return (
         <>
             <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
@@ -73,7 +97,7 @@ export default function Rewards() {
                                 style={styles.pageCardBottom}
                             >
                                 <CustomRippleButton
-                                    onPress={() => setModalVisible(true)}
+                                    onPress={handleModalToggle}
                                     contentContainerStyle={
                                         styles.pageCardBottomButton
                                     }
@@ -92,84 +116,87 @@ export default function Rewards() {
                     </ScrollView>
                 </View>
             </CustomSafeArea>
-            <Modal
-                visible={modalVisible}
-                animationType="slide"
-                presentationStyle="overFullScreen"
-                transparent={true}
-                onRequestClose={() => setModalVisible(false)}
+
+            <BottomSheetModal
+                enableDynamicSizing={false}
+                enablePanDownToClose
+                ref={bottomSheetModalRef}
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}
+                backgroundStyle={{
+                    borderRadius: size.getWidthSize(20),
+                    flex: 1,
+                }}
             >
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
-                        <View
+                <View style={styles.modalContent}>
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        <Text
+                            style={{
+                                fontFamily: "Satoshi-Bold",
+                                fontSize: size.fontSize(18),
+                                lineHeight: size.getHeightSize(24),
+                                color: "#0A0B14",
+                            }}
+                        >
+                            Withdraw reward
+                        </Text>
+                        <TouchableOpacity
+                            onPress={handleModalClose}
                             style={{
                                 flexDirection: "row",
-                                justifyContent: "space-between",
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    fontFamily: "Satoshi-Bold",
-                                    fontSize: size.fontSize(18),
-                                    lineHeight: size.getHeightSize(24),
-                                    color: "#0A0B14",
-                                }}
-                            >
-                                Withdraw reward
-                            </Text>
-                            <TouchableOpacity
-                                onPress={handleModalClose}
-                                style={{
-                                    flexDirection: "row",
-                                    gap: size.getWidthSize(2),
-                                    alignItems: "center",
-                                    borderRadius: size.getWidthSize(8),
-                                    padding: size.getWidthSize(6),
-                                    borderWidth: 1,
-                                    borderColor: "#E2E3E9",
-                                }}
-                            >
-                                <Svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 20 20"
-                                    fill="none"
-                                    // xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <Path
-                                        d="M10.0001 8.93955L13.7126 5.22705L14.7731 6.28755L11.0606 10.0001L14.7731 13.7126L13.7126 14.7731L10.0001 11.0606L6.28755 14.7731L5.22705 13.7126L8.93955 10.0001L5.22705 6.28755L6.28755 5.22705L10.0001 8.93955Z"
-                                        fill="#525466"
-                                    />
-                                </Svg>
-
-                                <Text>Close</Text>
-                            </TouchableOpacity>
-                        </View>
-
-                        {/* space */}
-                        <CustomRippleButton
-                            contentContainerStyle={{
-                                borderRadius: size.getWidthSize(16),
-                                padding: size.getWidthSize(16),
-                                backgroundColor: "#374BFB",
+                                gap: size.getWidthSize(2),
                                 alignItems: "center",
-                                justifyContent: "center",
+                                borderRadius: size.getWidthSize(8),
+                                padding: size.getWidthSize(6),
+                                borderWidth: 1,
+                                borderColor: "#E2E3E9",
                             }}
                         >
-                            <Text
-                                style={{
-                                    fontFamily: "Satoshi-Bold",
-                                    fontSize: size.fontSize(18),
-                                    lineHeight: size.getHeightSize(24),
-                                    color: "#FFFFFF",
-                                }}
+                            <Svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                // xmlns="http://www.w3.org/2000/svg"
                             >
-                                Withdraw
-                            </Text>
-                        </CustomRippleButton>
+                                <Path
+                                    d="M10.0001 8.93955L13.7126 5.22705L14.7731 6.28755L11.0606 10.0001L14.7731 13.7126L13.7126 14.7731L10.0001 11.0606L6.28755 14.7731L5.22705 13.7126L8.93955 10.0001L5.22705 6.28755L6.28755 5.22705L10.0001 8.93955Z"
+                                    fill="#525466"
+                                />
+                            </Svg>
+
+                            <Text>Close</Text>
+                        </TouchableOpacity>
                     </View>
+
+                    {/* space */}
+                    <CustomRippleButton
+                        contentContainerStyle={{
+                            borderRadius: size.getWidthSize(16),
+                            padding: size.getWidthSize(16),
+                            backgroundColor: "#374BFB",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Text
+                            style={{
+                                fontFamily: "Satoshi-Bold",
+                                fontSize: size.fontSize(18),
+                                lineHeight: size.getHeightSize(24),
+                                color: "#FFFFFF",
+                            }}
+                        >
+                            Withdraw
+                        </Text>
+                    </CustomRippleButton>
                 </View>
-            </Modal>
+            </BottomSheetModal>
         </>
     );
 }

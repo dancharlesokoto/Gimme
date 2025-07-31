@@ -11,9 +11,16 @@ import {
 interface PinInput {
     code: string;
     onChange: (value: string) => void;
+    editable?: boolean;
+    protectedField?: boolean;
 }
 
-export default function PinInput({ code, onChange }: PinInput) {
+export default function PinInput({
+    code,
+    onChange,
+    editable = false,
+    protectedField = false,
+}: PinInput) {
     const CELL_COUNT = 4;
     const ref = useBlurOnFulfill({ value: code, cellCount: CELL_COUNT });
     const [props, getCellOnLayoutHandler] = useClearByFocusCell({
@@ -23,7 +30,7 @@ export default function PinInput({ code, onChange }: PinInput) {
 
     return (
         <CodeField
-            ref={ref}
+            editable={editable}
             {...props}
             value={code}
             onChangeText={(value) => onChange(value)}
@@ -49,7 +56,15 @@ export default function PinInput({ code, onChange }: PinInput) {
                     ]}
                     onLayout={getCellOnLayoutHandler(index)}
                 >
-                    {symbol || (isFocused ? <Cursor /> : null)}
+                    {symbol ? (
+                        protectedField ? (
+                            "·"
+                        ) : (
+                            symbol
+                        )
+                    ) : isFocused ? (
+                        <Cursor />
+                    ) : null}
                 </Text>
             )}
         />
@@ -71,6 +86,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         fontFamily: "Satoshi-Bold",
+        height: size.getHeightSize(64),
         lineHeight: size.getHeightSize(64),
         fontSize: size.fontSize(24),
         borderWidth: size.getWidthSize(1),
