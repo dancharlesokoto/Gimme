@@ -67,7 +67,7 @@ const DATA: DataType = {
                         height: size.getHeightSize(18),
                     }}
                     strokeWidth="1.8"
-                    stroke="#374BFB"
+                    stroke="#525466"
                     // class="size-6"
                 >
                     <Path
@@ -93,7 +93,7 @@ const DATA: DataType = {
                         height: size.getHeightSize(15),
                     }}
                     strokeWidth="1.8"
-                    stroke="#374BFB"
+                    stroke="#2D9F70"
                 >
                     <Path
                         strokeLinecap="round"
@@ -146,7 +146,7 @@ const DATA: DataType = {
                         height: size.getHeightSize(18),
                     }}
                     strokeWidth="1.8"
-                    stroke="#374BFB"
+                    stroke="#525466"
                     // class="size-6"
                 >
                     <Path
@@ -172,7 +172,7 @@ const DATA: DataType = {
                         height: size.getHeightSize(15),
                     }}
                     strokeWidth="1.8"
-                    stroke="#374BFB"
+                    stroke="#2D9F70"
                 >
                     <Path
                         strokeLinecap="round"
@@ -184,7 +184,7 @@ const DATA: DataType = {
             title: "Request payment",
             description:
                 "Request payment from other users to fund your NGN wallet",
-            link: "/screens/(fund)/Convert",
+            link: "/screens/(fund)/RequestPayment",
         },
     ],
     gm: [],
@@ -221,7 +221,17 @@ const Fund = () => {
                                     <View
                                         style={{
                                             borderRadius: 999,
-                                            backgroundColor: "#EBEFFF",
+                                            backgroundColor:
+                                                index == 0
+                                                    ? "#EBEFFF"
+                                                    : index == 1
+                                                    ? "#FFFFFF"
+                                                    : "#EFFAF5",
+                                            borderWidth:
+                                                index == 1
+                                                    ? size.getWidthSize(1)
+                                                    : 0,
+                                            borderColor: "#E2E3E9",
                                             alignItems: "center",
                                             justifyContent: "center",
                                             height: size.getWidthSize(40),

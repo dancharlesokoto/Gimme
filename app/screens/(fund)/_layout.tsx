@@ -40,6 +40,11 @@ export default function FundLayout() {
                 name="Convert"
                 options={{ headerShown: false, animation: "ios_from_right" }}
             />
+
+            <Stack.Screen
+                name="RequestPayment"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
         </Stack>
     );
 }

@@ -4,8 +4,8 @@ import axios from "axios";
 // const BASE_URL = "http://localhost:3000/api/v1";
 // export const IMAGE_URL = "http://localhost:3000/api/v1/image";
 
-export const BASE_URL = "http://192.168.190.127:3000/api/v1";
-export const IMAGE_URL = "http://192.168.190.127:3000/api/v1/image";
+export const BASE_URL = "http://192.168.249.127:3000/api/v1";
+export const IMAGE_URL = "http://192.168.249.127:3000/api/v1/image";
 
 // export const BASE_URL = "https://gimme-api.vercel.app/api/v1";
 // export const IMAGE_URL = "https://gimme-api.vercel.app/api/v1/image";

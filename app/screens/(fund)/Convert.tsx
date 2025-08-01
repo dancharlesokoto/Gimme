@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
 
     subButtonText: {
         fontFamily: "Satoshi-Medium",
-        fontSize: size.fontSize(12),
+        fontSize: size.fontSize(10),
         color: "#525466",
     },
 

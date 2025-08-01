@@ -67,7 +67,7 @@ const DATA: DataType = {
                         height: size.getHeightSize(18),
                     }}
                     strokeWidth="1.8"
-                    stroke="#374BFB"
+                    stroke="#525466"
                     // class="size-6"
                 >
                     <Path
@@ -121,7 +121,7 @@ const DATA: DataType = {
                         height: size.getHeightSize(18),
                     }}
                     strokeWidth="1.8"
-                    stroke="#374BFB"
+                    stroke="#525466"
                     // class="size-6"
                 >
                     <Path
@@ -147,7 +147,7 @@ const DATA: DataType = {
                         height: size.getHeightSize(17),
                     }}
                     strokeWidth="1.8"
-                    stroke="#374BFB"
+                    stroke="#F18B2C"
                     // class="size-6"
                 >
                     <Path
@@ -198,7 +198,17 @@ const Withdraw = () => {
                                     <View
                                         style={{
                                             borderRadius: 999,
-                                            backgroundColor: "#EBEFFF",
+                                            backgroundColor:
+                                                index == 0
+                                                    ? "#EBEFFF"
+                                                    : index == 1
+                                                    ? "#FFFFFF"
+                                                    : "#FEF4EB",
+                                            borderWidth:
+                                                index == 1
+                                                    ? size.getWidthSize(1)
+                                                    : 0,
+                                            borderColor: "#E2E3E9",
                                             alignItems: "center",
                                             justifyContent: "center",
                                             height: size.getWidthSize(40),

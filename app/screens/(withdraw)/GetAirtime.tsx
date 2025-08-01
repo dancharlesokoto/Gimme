@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import {
     View,
@@ -15,6 +15,10 @@ import { router } from "expo-router";
 import GenericHeader from "@/components/GenericHeader";
 
 const GetAirtime = () => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [amount, setAmount] = useState("");
+
+    const handleNext = async () => {};
     return (
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -130,7 +134,7 @@ const GetAirtime = () => {
                         </View>
                     </View>
                     <Pressable
-                        onPress={() => router.push("/screens/Receipt")}
+                        onPress={handleNext}
                         style={{
                             backgroundColor: "#374BFB",
                             height: size.getHeightSize(56),

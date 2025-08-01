@@ -20,6 +20,7 @@ import { useUserStore } from "@/store/userStore";
 import { useQuery } from "@tanstack/react-query";
 import { fetchUser } from "@/services/user";
 import PageLoader from "@/components/PageLoader";
+import { toast } from "sonner-native";
 
 const FundAirtime = () => {
     ///....
@@ -39,7 +40,12 @@ const FundAirtime = () => {
             setScreenRefreshing(false);
         }, 500);
     };
-    const handleFundAccount = () => {};
+    const handleFundAccount = () => {
+        toast.info("This feature is not available yet", {
+            duration: 2000,
+            dismissible: true,
+        });
+    };
 
     //...
     const {
