@@ -282,6 +282,7 @@ const styles = StyleSheet.create({
     actionText: { fontFamily: "Satoshi-Bold", fontSize: size.fontSize(16) },
     actionSubText: {
         fontFamily: "Satoshi-Regular",
+        color: "#525466",
         fontSize: size.fontSize(12),
     },
 });

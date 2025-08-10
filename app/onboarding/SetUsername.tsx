@@ -20,7 +20,6 @@ import { setUsername as setUsernameApi } from "@/services/auth";
 
 export default function SetUsername() {
     const { userId, phone, email }: any = useGlobalSearchParams();
-    console.log(userId, phone, email);
 
     //.....................................
     const [isLoading, setIsLoading] = useState(false);
@@ -68,9 +67,7 @@ export default function SetUsername() {
     //......................................
     const handleSkip = () => {
         try {
-            router.push(
-                `/onboarding/Verify?userId=${userId}&phone=${phone}&email=${email}`
-            );
+            router.push(`/onboarding/KYC?userId=${userId}&phone=${phone}`);
         } catch (error: any) {
             toast.error(error.message, {
                 duration: 2000,
@@ -222,7 +219,7 @@ const styles = StyleSheet.create({
 
     pageButtonText: {
         fontFamily: "Satoshi-Bold",
-        fontSize: size.fontSize(18),
+        fontSize: size.fontSize(14),
         lineHeight: size.getHeightSize(24),
         color: "#ffffff",
     },

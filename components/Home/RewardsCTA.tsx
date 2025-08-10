@@ -46,7 +46,7 @@ export default function RewardsCTA() {
                             fill="white"
                         />
                     </Svg>
-                    <View style={{ flex: 1 }}>
+                    <View style={{ flex: 1, gap: size.getHeightSize(4) }}>
                         <Text
                             style={{
                                 fontFamily: "Satoshi-Medium",

@@ -1,10 +1,9 @@
 import { size } from "@/config/size";
-import { useState } from "react";
-import { Platform, StyleSheet, Text, TextInput } from "react-native";
+import React from "react";
+import { StyleSheet, Text, TextInput } from "react-native";
 import {
     CodeField,
     Cursor,
-    useBlurOnFulfill,
     useClearByFocusCell,
 } from "react-native-confirmation-code-field";
 
@@ -13,53 +12,51 @@ interface PinInput {
     onChange: (value: string) => void;
     editable?: boolean;
 }
+const CELL_COUNT = 4;
 
-export default function ReEnterPinField({
-    code,
-    onChange,
-    editable = true,
-}: PinInput) {
-    const CELL_COUNT = 4;
-    const ref = useBlurOnFulfill({ value: code, cellCount: CELL_COUNT });
-    const [props, getCellOnLayoutHandler] = useClearByFocusCell({
-        value: code,
-        setValue: () => {},
-    });
+const ReEnterPinField: React.FC<PinInput> = React.memo(
+    ({ code, onChange, editable = true }) => {
+        // const ref = useBlurOnFulfill({ value: code, cellCount: CELL_COUNT });
+        const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+            value: code,
+            setValue: () => {},
+        });
 
-    return (
-        <CodeField
-            {...props}
-            editable={editable}
-            value={code}
-            onChangeText={(value) => onChange(value)}
-            cellCount={CELL_COUNT}
-            rootStyle={styles.codeFieldRoot}
-            keyboardType="number-pad"
-            InputComponent={TextInput}
-            testID="my-code-input"
-            renderCell={({ index, symbol, isFocused }) => (
-                <Text
-                    key={index}
-                    style={[
-                        styles.cell,
-                        isFocused && styles.focusCell,
-                        {
-                            borderTopLeftRadius: index === 0 ? 12 : 0,
-                            borderBottomLeftRadius: index === 0 ? 12 : 0,
-                            borderTopRightRadius:
-                                index === CELL_COUNT - 1 ? 12 : 0,
-                            borderBottomRightRadius:
-                                index === CELL_COUNT - 1 ? 12 : 0,
-                        },
-                    ]}
-                    onLayout={getCellOnLayoutHandler(index)}
-                >
-                    {symbol ? "·" : isFocused ? <Cursor /> : null}
-                </Text>
-            )}
-        />
-    );
-}
+        return (
+            <CodeField
+                {...props}
+                editable={editable}
+                value={code}
+                onChangeText={(value) => onChange(value)}
+                cellCount={CELL_COUNT}
+                rootStyle={styles.codeFieldRoot}
+                keyboardType="number-pad"
+                InputComponent={TextInput}
+                testID="my-code-input"
+                renderCell={({ index, symbol, isFocused }) => (
+                    <Text
+                        key={index}
+                        style={[
+                            styles.cell,
+                            isFocused && styles.focusCell,
+                            {
+                                borderTopLeftRadius: index === 0 ? 12 : 0,
+                                borderBottomLeftRadius: index === 0 ? 12 : 0,
+                                borderTopRightRadius:
+                                    index === CELL_COUNT - 1 ? 12 : 0,
+                                borderBottomRightRadius:
+                                    index === CELL_COUNT - 1 ? 12 : 0,
+                            },
+                        ]}
+                        // onLayout={getCellOnLayoutHandler(index)}
+                    >
+                        {symbol && "·"}
+                    </Text>
+                )}
+            />
+        );
+    }
+);
 
 const styles = StyleSheet.create({
     codeFieldRoot: {
@@ -88,3 +85,5 @@ const styles = StyleSheet.create({
         borderColor: "#0A0B14",
     },
 });
+
+export default ReEnterPinField;

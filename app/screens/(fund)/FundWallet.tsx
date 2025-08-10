@@ -80,7 +80,7 @@ const DATA: DataType = {
             title: "Fund via conversion",
             description:
                 "Convert funds from your other wallets to your USD wallet",
-            link: "/screens/(fund)/Convert",
+            link: "/screens/(fund)/Convert?currency=usd",
         },
         {
             icon: (
@@ -159,7 +159,7 @@ const DATA: DataType = {
             title: "Fund via conversion",
             description:
                 "Convert funds from your other wallets to fund your NGN wallet",
-            link: "/screens/(fund)/Convert",
+            link: "/screens/(fund)/Convert?currency=ngn",
         },
         {
             icon: (
@@ -305,6 +305,7 @@ const styles = StyleSheet.create({
     actionText: { fontFamily: "Satoshi-Bold", fontSize: size.fontSize(16) },
     actionSubText: {
         fontFamily: "Satoshi-Regular",
+        color: "#525466",
         fontSize: size.fontSize(12),
     },
 });

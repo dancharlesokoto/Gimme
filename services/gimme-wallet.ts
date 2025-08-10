@@ -45,3 +45,49 @@ export const sendMoney = async ({
         throw new Error(errorMessage);
     }
 };
+
+export const getBanks = async () => {
+    try {
+        const { data } = await axiosInstance.get("/gimme-wallet/get-banks");
+        return data;
+    } catch (error: Error | any) {
+        console.log(error);
+        const errorMessage = error.response?.data?.message || error.message;
+        throw new Error(errorMessage);
+    }
+};
+
+export const withdrawFiat = async ({
+    amount,
+    remark,
+    bankCode,
+    accountName,
+    bankName,
+    accountNumber,
+}: {
+    amount: string;
+    remark?: string;
+    bankCode: string;
+    accountName: string;
+    bankName: string;
+    accountNumber: string;
+}) => {
+    try {
+        const { data } = await axiosInstance.post(
+            "/gimme-wallet/withdraw-fiat",
+            {
+                amount,
+                remark,
+                bankCode,
+                accountName,
+                bankName,
+                accountNumber,
+            }
+        );
+        return data;
+    } catch (error: Error | any) {
+        console.log(error);
+        const errorMessage = error.response?.data?.message || error.message;
+        throw new Error(errorMessage);
+    }
+};

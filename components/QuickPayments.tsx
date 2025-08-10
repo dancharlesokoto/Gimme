@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from "react";
-import {
-    View,
-    Text,
-    Image,
-    StyleSheet,
-    FlatList,
-    Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
 import { size } from "../config/size";
 import { router } from "expo-router";
 import { axiosInstance, IMAGE_URL } from "@/services/api";
+import { useQuery } from "@tanstack/react-query";
+import { useUserStore } from "@/store/userStore";
+import { Image } from "expo-image";
+import AvatarInitials from "./AvatarInitials";
 
 type Data = {
     receiver: DataItem[];
@@ -21,33 +18,36 @@ type DataItem = {
     profileIMage: any;
 };
 
-export default function QuickPayments() {
-    const [data, setData] = useState<Data | any>([]);
-    const [isLoading, setIsLoading] = useState(true);
+export default function QuickPayments({ data: passedData }: { data: Data[] }) {
+    const { user } = useUserStore();
+    const userId = user?.userId;
+    const [data, setData] = useState<Data[]>(passedData ?? []);
+
+    const { data: fetchedData } = useQuery({
+        refetchOnMount: true,
+        refetchOnWindowFocus: true,
+        refetchOnReconnect: true,
+        retry: true,
+        queryKey: ["quick-payments", userId],
+        queryFn: async () => {
+            const response = await axiosInstance.get(
+                "/transaction/quick-payments"
+            );
+            return response.data.data;
+        },
+    });
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setIsLoading(true);
-                const response = await axiosInstance.get(
-                    "/transaction/quick-payments"
-                );
-                const { data } = response.data;
-                setData(data);
-                setIsLoading(false);
-            } catch (error) {
-                console.log(error);
-            }
-        };
+        fetchedData && setData(fetchedData);
+    }, [fetchedData]);
 
-        fetchData();
-    }, []);
-    if (data.length === 0) {
+    if (!data && !fetchedData) {
         return;
     }
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Quick payments</Text>
+            {/* <Text>{JSON.stringify(data)}</Text> */}
             <FlatList
                 data={data}
                 renderItem={({ item }: { item: any }) => (
@@ -61,15 +61,18 @@ export default function QuickPayments() {
                         }
                         style={styles.avatarContainer}
                     >
-                        <Image
-                            source={{
-                                uri:
-                                    IMAGE_URL +
-                                    "/profile/" +
-                                    item.receiver?.profileImage,
-                            }}
-                            style={styles.avatar}
-                        />
+                        {item.receiver?.profileImage &&
+                        item.receiver?.profileImage !== "default.png" ? (
+                            <Image
+                                source={`${IMAGE_URL}/profile/${item.receiver?.profileImage}`}
+                                style={styles.avatar}
+                            />
+                        ) : (
+                            <AvatarInitials
+                                style={styles.avatar}
+                                name={item.receiver?.fullName}
+                            />
+                        )}
                         <Text style={styles.name}>
                             {item.receiver?.fullName}
                         </Text>

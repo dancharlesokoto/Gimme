@@ -9,7 +9,7 @@ import CustomRippleButton from "@/components/CustomRippleButton";
 import { useAppStore } from "@/store/appStore";
 // import P2PMarket from "@/components/P2PMarket";
 
-export default function P2P() {
+const Market = React.memo(() => {
     const { isMarketStarted, setIsMarketStarted } = useAppStore();
     const handleStartShopping = () => {
         setIsMarketStarted(true);
@@ -303,7 +303,7 @@ export default function P2P() {
                             onPress={handleStartShopping}
                             style={{ borderRadius: size.getWidthSize(16) }}
                             contentContainerStyle={{
-                                backgroundColor: "#374BFB",
+                                backgroundColor: "#000",
                                 height: size.getHeightSize(56),
                                 marginVertical: size.getHeightSize(16),
                                 borderRadius: size.getHeightSize(12),
@@ -313,8 +313,8 @@ export default function P2P() {
                         >
                             <Text
                                 style={{
-                                    fontSize: size.fontSize(18),
-                                    fontFamily: "Satoshi-Bold",
+                                    fontSize: size.fontSize(14),
+                                    fontFamily: "ClashDisplay-Medium",
                                     color: "#ffffff",
                                     marginLeft: size.getWidthSize(10),
                                 }}
@@ -327,7 +327,7 @@ export default function P2P() {
             </View>
         </CustomSafeArea>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -379,3 +379,5 @@ const styles = StyleSheet.create({
         fontSize: size.fontSize(14),
     },
 });
+
+export default Market;

@@ -4,49 +4,93 @@ import {
     StyleSheet,
     ScrollView,
     TextInput,
-    ActivityIndicator,
     TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import Svg, { Path } from "react-native-svg";
 import GenericHeader from "@/components/GenericHeader";
-import { convertCurrency } from "@/lib/currency";
+import { convertCurrency, formatCurrency } from "@/lib/currency";
 import ConvertCurrencyDisplay from "@/components/Convert/ConvertCurrencyDisplay";
-import CurrencyInput from "react-native-currency-input";
-import CustomRippleButton from "@/components/CustomRippleButton";
 import { toast } from "sonner-native";
+import GenericButton from "@/components/GenericButton";
+import { CurrencyType } from "@/lib/types";
+import { fetchUser } from "@/services/user";
+import { useQuery } from "@tanstack/react-query";
+import { useUserStore } from "@/store/userStore";
+import { useLocalSearchParams } from "expo-router";
+import PageLoader from "@/components/PageLoader";
 
 export default function Convert() {
-    const [isLoading, setIsLoading] = useState(false);
-    const [fromAmount, setFromAmount] = useState("");
+    ///......................................
+    const optionalBaseCurrency = useLocalSearchParams()
+        .currency as CurrencyType;
+    const { userId } = useUserStore().user;
+    ///......................................
+    const [fromAmount, setFromAmount] = useState<string | any>("");
     const [toAmount, setToAmount] = useState("");
-    const [fromCurrency, setFromCurrency] = useState<"usd" | "ngn" | "gm">(
-        "ngn"
+    const [fromCurrency, setFromCurrency] = useState<CurrencyType>(
+        optionalBaseCurrency ?? "ngn"
     );
-    const [toCurrency, setToCurrency] = useState<"usd" | "ngn" | "gm">("gm");
+    const [toCurrency, setToCurrency] = useState<CurrencyType>("gm");
 
+    ///......................................
+    const {
+        data: userData,
+        isLoading,
+        isError,
+    } = useQuery({
+        queryKey: ["getUser", userId],
+        queryFn: async () => await fetchUser(userId),
+        refetchOnWindowFocus: true,
+        refetchOnMount: true,
+        refetchOnReconnect: true,
+        retryOnMount: true,
+        retry: true,
+    });
+
+    ///......................................
+    const convertedAmount = useMemo(() => {
+        return convertCurrency({
+            value: fromCurrency == "gm" ? fromAmount : +fromAmount * 100,
+            from: fromCurrency,
+            to: toCurrency,
+        });
+    }, [fromAmount, fromCurrency, toCurrency]);
+
+    ///......................................
     useEffect(() => {
-        setToAmount(
-            convertCurrency({
-                value: fromCurrency == "gm" ? fromAmount : +fromAmount * 100,
-                from: fromCurrency,
-                to: toCurrency,
-            })
-        );
+        setToAmount(convertedAmount);
     }, [fromAmount]);
 
     useEffect(() => {
-        setToAmount(
-            convertCurrency({
-                value: fromCurrency == "gm" ? fromAmount : +fromAmount * 100,
-                from: fromCurrency,
-                to: toCurrency,
-            })
-        );
+        setFromAmount(null);
     }, [toCurrency, fromCurrency]);
 
+    const setMax = () => {
+        const _amount =
+            fromCurrency == "ngn"
+                ? userData.ngnBalance
+                : fromCurrency == "usd"
+                ? userData.usdcBalance
+                : userData.gmBalance;
+        const _formatted =
+            fromCurrency == "gm" ? _amount : (+_amount / 100).toString();
+        setFromAmount(_formatted);
+    };
+
+    const setHalf = () => {
+        const _amount =
+            fromCurrency == "ngn"
+                ? userData.ngnBalance
+                : fromCurrency == "usd"
+                ? userData.usdcBalance
+                : userData.gmBalance;
+        const _formatted =
+            fromCurrency == "gm" ? _amount : (+_amount / 100).toString();
+        setFromAmount((+_formatted / 2).toString());
+    };
     const handleNext = async () => {
         toast.info("This feature is not available yet", {
             duration: 2000,
@@ -55,113 +99,153 @@ export default function Convert() {
     };
 
     return (
-        <CustomSafeArea
-            topColor="#ffffff"
-            bgColor="#ffffff"
-            setBottomSafeAreaInset={false}
-        >
+        <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
             <View style={{ paddingHorizontal: size.getWidthSize(24) }}>
-                <GenericHeader title="Convert assets" />
+                <GenericHeader title="" />
             </View>
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.container}
-            >
-                <View style={styles.conversionContainer}>
-                    <View style={styles.conversionItem}>
-                        <View style={styles.left}>
-                            <Text style={styles.title}>You pay</Text>
-                            <TextInput
-                                placeholder="0"
-                                value={fromAmount}
-                                keyboardType="phone-pad"
-                                onChangeText={(value: any) =>
-                                    setFromAmount(value)
-                                }
-                                style={styles.input}
-                            />
-                            <Text></Text>
+            {isLoading || isError ? (
+                <PageLoader />
+            ) : (
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.container}
+                >
+                    <View>
+                        <Text style={styles.header}>Convert assets</Text>
+                        <Text style={styles.subHead}>
+                            Convert assets from one wallet to another
+                        </Text>
+                    </View>
+
+                    <View style={styles.conversionContainer}>
+                        <View style={styles.conversionItem}>
+                            <View style={styles.left}>
+                                <Text style={styles.title}>
+                                    Amount to convert
+                                </Text>
+                                <TextInput
+                                    placeholder="0"
+                                    value={fromAmount}
+                                    keyboardType="phone-pad"
+                                    onChangeText={(value: any) =>
+                                        setFromAmount(value)
+                                    }
+                                    style={styles.input}
+                                />
+                                <Text style={styles.title}>
+                                    Bal:{" "}
+                                    {fromCurrency == "usd"
+                                        ? "$" +
+                                          formatCurrency({
+                                              value: userData.usdcBalance,
+                                              currency: "usd",
+                                          })
+                                        : fromCurrency == "ngn"
+                                        ? "₦" +
+                                          formatCurrency({
+                                              value: userData.ngnBalance,
+                                              currency: "ngn",
+                                          })
+                                        : formatCurrency({
+                                              value: userData.gmBalance,
+                                              currency: "gm",
+                                          }) + " GM"}
+                                </Text>
+                            </View>
+                            <View style={styles.right}>
+                                <ConvertCurrencyDisplay
+                                    onChange={setFromCurrency}
+                                    currency={fromCurrency}
+                                />
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                        gap: size.getWidthSize(4),
+                                    }}
+                                >
+                                    <TouchableOpacity
+                                        onPress={setHalf}
+                                        style={styles.subButton}
+                                    >
+                                        <Text style={styles.subButtonText}>
+                                            50%
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={setMax}
+                                        style={styles.subButton}
+                                    >
+                                        <Text style={styles.subButtonText}>
+                                            Max
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
                         </View>
-                        <View style={styles.right}>
-                            <ConvertCurrencyDisplay
-                                onChange={setFromCurrency}
-                                currency={fromCurrency}
-                            />
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    gap: size.getWidthSize(4),
-                                }}
-                            >
-                                <TouchableOpacity style={styles.subButton}>
-                                    <Text style={styles.subButtonText}>
-                                        50%
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.subButton}>
-                                    <Text style={styles.subButtonText}>
-                                        Max
-                                    </Text>
-                                </TouchableOpacity>
+                        {/* <View style={styles.iconWrapper}>
+                            <View style={styles.iconInner}>
+                                <Svg
+                                    // xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    style={{
+                                        width: size.getWidthSize(16),
+                                        height: size.getHeightSize(16),
+                                    }}
+                                    strokeWidth="3"
+                                    stroke="#525466"
+                                    // class="size-6"
+                                >
+                                    <Path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                                    />
+                                </Svg>
+                            </View>
+                        </View> */}
+                        <View style={styles.conversionItem}>
+                            <View style={styles.left}>
+                                <Text style={styles.title}>
+                                    Amount you'll receive
+                                </Text>
+                                <TextInput
+                                    editable={false}
+                                    placeholder="0"
+                                    value={toAmount}
+                                    onChangeText={setToAmount}
+                                    style={styles.input}
+                                />
+                                <Text></Text>
+                            </View>
+                            <View style={styles.right}>
+                                <ConvertCurrencyDisplay
+                                    onChange={setToCurrency}
+                                    currency={toCurrency}
+                                />
                             </View>
                         </View>
                     </View>
-                    <View style={styles.iconWrapper}>
-                        <View style={styles.iconInner}>
-                            <Svg
-                                // xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                style={{
-                                    width: size.getWidthSize(18),
-                                    height: size.getHeightSize(18),
-                                }}
-                                strokeWidth="3.5"
-                                stroke="#fff"
-                                // class="size-6"
-                            >
-                                <Path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-                                />
-                            </Svg>
-                        </View>
-                    </View>
-                    <View style={styles.conversionItem}>
-                        <View style={styles.left}>
-                            <Text style={styles.title}>You receive</Text>
-                            <TextInput
-                                editable={false}
-                                placeholder="0"
-                                value={toAmount}
-                                onChangeText={setToAmount}
-                                style={styles.input}
-                            />
-                            <Text></Text>
-                        </View>
-                        <View style={styles.right}>
-                            <ConvertCurrencyDisplay
-                                onChange={setToCurrency}
-                                currency={toCurrency}
-                            />
-                        </View>
-                    </View>
-                </View>
 
-                <CustomRippleButton
-                    onPress={handleNext}
-                    contentContainerStyle={styles.pageButton}
-                    disabled={isLoading}
-                >
-                    {isLoading ? (
-                        <ActivityIndicator color="#fff" />
-                    ) : (
-                        <Text style={styles.pageButtonText}>Continue</Text>
-                    )}
-                </CustomRippleButton>
-            </ScrollView>
+                    <View
+                        style={{
+                            flex: 1,
+                            justifyContent: "flex-end",
+                            paddingVertical: size.getHeightSize(24),
+                        }}
+                    >
+                        <GenericButton
+                            onPress={handleNext}
+                            text="Continue"
+                            textColor={+toAmount > 0 ? "#fff" : "#525466"}
+                            buttonColor={+toAmount > 0 ? "#3366FF" : "#E2E3E9"}
+                            isLoading={isLoading}
+                            disabled={isLoading || +toAmount <= 0}
+                        />
+                    </View>
+                </ScrollView>
+            )}
         </CustomSafeArea>
     );
 }
@@ -169,15 +253,20 @@ export default function Convert() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: size.getWidthSize(24),
-        justifyContent: "space-between",
+        paddingHorizontal: size.getWidthSize(24),
+        gap: size.getHeightSize(24),
+        // justifyContent: "space-between",
     },
 
-    headerContainer: {
-        flexDirection: "row",
-        paddingVertical: size.getHeightSize(16),
-        justifyContent: "space-between",
-        alignItems: "center",
+    header: {
+        fontFamily: "ClashDisplay-SemiBold",
+        color: "rgba(0, 0, 0, 0.9)",
+        fontSize: size.fontSize(22),
+    },
+    subHead: {
+        fontFamily: "Satoshi-Regular",
+        fontSize: size.fontSize(14),
+        color: "#525466",
     },
 
     page: {
@@ -189,9 +278,9 @@ const styles = StyleSheet.create({
     },
 
     iconWrapper: {
-        width: size.getWidthSize(50),
-        height: size.getHeightSize(50),
-        borderRadius: size.getWidthSize(999),
+        width: size.getWidthSize(45),
+        height: size.getHeightSize(45),
+        borderRadius: size.getWidthSize(10),
         backgroundColor: "#fff",
         position: "relative",
         zIndex: 2,
@@ -202,16 +291,16 @@ const styles = StyleSheet.create({
     },
 
     iconInner: {
-        backgroundColor: "#6495ED",
+        backgroundColor: "#f6f6fa",
         width: size.getWidthSize(30),
-        borderRadius: size.getWidthSize(999),
+        borderRadius: size.getWidthSize(5),
         height: size.getHeightSize(30),
         alignItems: "center",
         justifyContent: "center",
     },
 
     conversionItem: {
-        borderRadius: size.getWidthSize(12),
+        borderRadius: size.getWidthSize(8),
         flexDirection: "row",
         minHeight: size.getHeightSize(120),
         backgroundColor: "#F6F6FA",
@@ -231,8 +320,8 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        fontFamily: "Satoshi-Bold",
-        fontSize: size.fontSize(16),
+        fontFamily: "Satoshi-Medium",
+        fontSize: size.fontSize(14),
         color: "#525466",
     },
 
@@ -244,7 +333,7 @@ const styles = StyleSheet.create({
 
     pageButton: {
         height: size.getHeightSize(56),
-        borderRadius: size.getWidthSize(12),
+        borderRadius: size.getWidthSize(16),
         marginTop: size.getHeightSize(24),
         padding: size.getWidthSize(16),
         backgroundColor: "#374BFB",
@@ -266,8 +355,8 @@ const styles = StyleSheet.create({
     },
 
     pageButtonText: {
-        fontFamily: "Satoshi-Bold",
-        fontSize: size.fontSize(18),
+        fontFamily: "Cabinet-Medium",
+        fontSize: size.fontSize(14),
         lineHeight: size.getHeightSize(24),
         color: "#ffffff",
     },

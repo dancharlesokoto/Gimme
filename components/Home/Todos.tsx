@@ -33,8 +33,8 @@ export default function Todos() {
                 }}
             >
                 <Svg
-                    width="44"
-                    height="44"
+                    width={size.getWidthSize(44)}
+                    height={size.getHeightSize(44)}
                     viewBox="0 0 44 44"
                     style={{ flexShrink: 0 }}
                     fill="none"
@@ -46,10 +46,10 @@ export default function Todos() {
                         fill="#0A0B14"
                     />
                 </Svg>
-                <View style={{ flex: 1 }}>
+                <View style={{ flex: 1, gap: size.getHeightSize(4) }}>
                     <Text
                         style={{
-                            fontFamily: "Satoshi-Medium",
+                            fontFamily: "ClashDisplay-Medium",
                             fontSize: size.fontSize(14),
                             lineHeight: size.getHeightSize(20),
                             color: "#0A0B14",
@@ -73,7 +73,7 @@ export default function Todos() {
                         router.push("/screens/(settings)/AccountTier")
                     }
                     contentContainerStyle={{
-                        padding: size.getWidthSize(6),
+                        padding: size.getWidthSize(8),
                         borderRadius: size.getWidthSize(8),
                         backgroundColor: "#374BFB",
                     }}

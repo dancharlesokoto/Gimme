@@ -9,15 +9,17 @@ const GenericHeader = ({
     title,
     showCountry = false,
     currency,
+    showBackButton = true,
 }: {
     title: string;
     showCountry?: boolean;
     currency?: string;
+    showBackButton?: boolean;
 }) => {
     return (
         <View style={styles.headerContainer}>
             <View style={styles.left}>
-                <BackPage />
+                {showBackButton && <BackPage />}
                 <Text style={styles.pageName}>{title}</Text>
             </View>
 
@@ -39,7 +41,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingVertical: size.getHeightSize(14),
+        height: size.getHeightSize(70),
+        // paddingVertical: size.getHeightSize(14),
     },
 
     left: {

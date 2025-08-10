@@ -3,7 +3,6 @@ import {
     Text,
     StyleSheet,
     Pressable,
-    Image,
     ScrollView,
     RefreshControl,
 } from "react-native";
@@ -17,10 +16,11 @@ import { fetchUser } from "@/services/user";
 import { IMAGE_URL } from "@/services/api";
 import PageLoader from "@/components/PageLoader";
 import { useQuery } from "@tanstack/react-query";
-import { useAppStore } from "@/store/appStore";
 import { logoutUser } from "@/services/auth";
+import { Image } from "expo-image";
+import AvatarInitials from "@/components/AvatarInitials";
 
-export default function Profile() {
+const Profile = React.memo(() => {
     const { user } = useUserStore();
     const { userId } = user;
 
@@ -57,8 +57,8 @@ export default function Profile() {
 
     //Error reactive logic..........................
     useEffect(() => {
-        isError && handleLogout();
-    }, [error]);
+        isError && logoutUser();
+    }, [isError]);
 
     //Logout logic..........................
     const handleLogout = async () => {
@@ -105,24 +105,16 @@ export default function Profile() {
                     <View style={styles.mainInfo}>
                         {userData.profileImage == "default.png" ||
                         userData.profileImage == "" ? (
-                            <Image
-                                source={require("@/assets/images/user.png")}
-                                alt=""
+                            <AvatarInitials
                                 style={{
                                     width: size.getWidthSize(88),
                                     height: size.getHeightSize(88),
-                                    borderRadius: size.getWidthSize(1000),
                                 }}
+                                name={userData.fullName}
                             />
                         ) : (
                             <Image
-                                loadingIndicatorSource={require("@/assets/images/user.png")}
-                                source={{
-                                    uri:
-                                        IMAGE_URL +
-                                        "/profile/" +
-                                        userData.profileImage,
-                                }}
+                                source={`${IMAGE_URL}/profile/${userData.profileImage}`}
                                 alt=""
                                 style={{
                                     width: size.getWidthSize(88),
@@ -132,28 +124,24 @@ export default function Profile() {
                             />
                         )}
                         <View style={{ gap: size.getWidthSize(1), flex: 1 }}>
-                            {userData.fullName ? (
-                                <Text
-                                    style={{
-                                        fontSize: size.fontSize(18),
-                                        fontFamily: "Satoshi-Bold",
-                                        color: "#0B0A14",
-                                    }}
-                                >
-                                    {userData.fullName}{" "}
-                                </Text>
-                            ) : (
-                                <Text
-                                    style={{
-                                        fontSize: size.fontSize(18),
-                                        fontFamily: "Satoshi-Regular",
-                                        color: "#0B0A14",
-                                    }}
-                                >
-                                    ~Your name~
-                                </Text>
-                            )}
-
+                            <Text
+                                style={{
+                                    fontSize: size.fontSize(18),
+                                    fontFamily: "Satoshi-Bold",
+                                    color: "#0B0A14",
+                                }}
+                            >
+                                {userData.fullName}{" "}
+                            </Text>
+                            <Text
+                                style={{
+                                    fontSize: size.fontSize(12),
+                                    fontFamily: "Satoshi-Regular",
+                                    color: "#535266",
+                                }}
+                            >
+                                (+234) {userData.phone}
+                            </Text>
                             <Text
                                 style={{
                                     fontSize: size.fontSize(12),
@@ -165,7 +153,7 @@ export default function Profile() {
                             </Text>
                         </View>
                     </View>
-                    <View style={styles.contactInfoContainer}>
+                    {/* <View style={styles.contactInfoContainer}>
                         <View style={styles.contactInfo}>
                             <Svg
                                 width="20"
@@ -213,15 +201,15 @@ export default function Profile() {
                                 {userData.email}
                             </Text>
                         </View>
-                    </View>
+                    </View> */}
                     <View style={styles.options}>
                         <Pressable
                             style={[
                                 styles.optionItem,
                                 {
                                     marginVertical: size.getHeightSize(20),
-                                    backgroundColor: "#FEF4EB",
-                                    borderColor: "#FFDFC2",
+                                    // backgroundColor: "#FEF4EB",
+                                    // borderColor: "#FFDFC2",
                                 },
                             ]}
                             onPress={() =>
@@ -239,7 +227,7 @@ export default function Profile() {
                                     width="40"
                                     height="40"
                                     rx="16"
-                                    fill="#FFDFC2"
+                                    fill="#FEF4EB"
                                 />
                                 <Path
                                     d="M20 16.2508C21.5913 16.2508 23.1174 16.8829 24.2426 18.0081C25.3679 19.1333 26 20.6595 26 22.2508C26 23.842 25.3679 25.3682 24.2426 26.4934C23.1174 27.6186 21.5913 28.2507 20 28.2507C18.4087 28.2507 16.8826 27.6186 15.7574 26.4934C14.6321 25.3682 14 23.842 14 22.2508C14 20.6595 14.6321 19.1333 15.7574 18.0081C16.8826 16.8829 18.4087 16.2508 20 16.2508ZM20 17.7508C18.8065 17.7508 17.6619 18.2249 16.818 19.0688C15.9741 19.9127 15.5 21.0573 15.5 22.2508C15.5 23.4442 15.9741 24.5888 16.818 25.4327C17.6619 26.2766 18.8065 26.7507 20 26.7507C21.1935 26.7507 22.3381 26.2766 23.182 25.4327C24.0259 24.5888 24.5 23.4442 24.5 22.2508C24.5 21.0573 24.0259 19.9127 23.182 19.0688C22.3381 18.2249 21.1935 17.7508 20 17.7508ZM20 18.8758L20.9922 20.8858L23.21 21.2083L21.605 22.772L21.9838 24.9815L20 23.9383L18.0162 24.9807L18.395 22.772L16.79 21.2075L19.0078 20.885L20 18.8758ZM24.5 12.5008V14.7508L23.4777 15.6042C22.6295 15.1592 21.7033 14.8819 20.75 14.7875V12.5008H24.5ZM19.25 12.5V14.7875C18.297 14.8817 17.3711 15.1588 16.523 15.6035L15.5 14.7508V12.5008L19.25 12.5Z"
@@ -264,7 +252,7 @@ export default function Profile() {
                             >
                                 <Path
                                     d="M10.7162 9.99882L7.375 6.65757L8.32945 5.70312L12.6251 9.99882L8.32945 14.2945L7.375 13.3401L10.7162 9.99882Z"
-                                    fill="#525466"
+                                    fill="#6E3B0C"
                                 />
                             </Svg>
                         </Pressable>
@@ -450,7 +438,7 @@ export default function Profile() {
             </View>
         </CustomSafeArea>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -512,3 +500,5 @@ const styles = StyleSheet.create({
         fontSize: size.fontSize(11),
     },
 });
+
+export default Profile;

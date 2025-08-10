@@ -56,13 +56,13 @@ export default CurrencyDisplay;
 
 const styles = StyleSheet.create({
     pickContainer: {
-        gap: size.getHeightSize(4),
+        gap: size.getHeightSize(0),
         flexDirection: "row",
         justifyContent: "space-between",
         backgroundColor: "#E2E3E9",
-        paddingHorizontal: size.getHeightSize(4),
+        paddingHorizontal: size.getWidthSize(8),
         paddingRight: size.getWidthSize(12),
-        paddingVertical: size.getWidthSize(4),
+        paddingVertical: size.getHeightSize(8),
         borderRadius: size.getWidthSize(100),
         // width: size.getWidthSize(86),
     },

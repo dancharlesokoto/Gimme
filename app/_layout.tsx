@@ -66,12 +66,12 @@ export default function RootLayout() {
                                 />
                                 <Stack.Screen name="+not-found" />
                             </Stack>
-                            <StatusBar style="dark" />
+                            <StatusBar style="dark" hidden />
                         </QueryClientProvider>
                     </BottomSheetModalProvider>
                     <Toaster
                         theme="dark"
-                        autoWiggleOnUpdate="always"
+                        autoWiggleOnUpdate="never"
                         swipeToDismissDirection="left"
                         style={{
                             borderRadius: size.getWidthSize(10),

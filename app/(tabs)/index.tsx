@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
@@ -17,21 +17,19 @@ import { router, useFocusEffect } from "expo-router";
 import { fetchUser, getBankAccount } from "@/services/user";
 import { useUserStore } from "@/store/userStore";
 import { useQuery } from "@tanstack/react-query";
-import RewardsIcon from "@/assets/svg/rewardsIcon.svg";
 import PrimaryOptions from "@/components/Home/PrimaryOptions";
 import Todos from "@/components/Home/Todos";
 import RewardsCTA from "@/components/Home/RewardsCTA";
+import QrIcon from "@/assets/svg/qrIcon.svg";
 import NotificationsIcon from "@/assets/svg/notificationsIcon.svg";
-import useCurrencyStore from "@/store/currencyStore";
+import RewardsIcon from "@/assets/svg/rewardsIcon.svg";
 import Transactions from "@/components/Home/Transactions";
 import WalletCarousel from "@/components/Home/WalletCarousel";
 import { IMAGE_URL } from "@/services/api";
-import ContentLoader, { Rect } from "react-content-loader/native";
-import { toast } from "sonner-native";
+import Svg, { Path } from "react-native-svg";
 
-const HomeScreen = () => {
+const HomeScreen = React.memo(() => {
     const [screenRefreshing, setScreenRefreshing] = useState(false);
-    const currency = useCurrencyStore((state: any) => state.currency);
     //Fetch logic..........................
     const { userId } = useUserStore().user;
     const {
@@ -66,12 +64,7 @@ const HomeScreen = () => {
     };
 
     //Preloading this data to cache and to avoid long times
-    const {
-        data: accountDetails,
-        error: accountError,
-        isError: accountIsError,
-        isLoading: accountIsLoading,
-    } = useQuery({
+    const dva_prefetch = useQuery({
         retry: true,
         queryKey: ["getBankAccount", userId],
         queryFn: getBankAccount,
@@ -94,6 +87,7 @@ const HomeScreen = () => {
                         }}
                     >
                         <TouchableOpacity
+                            style={{ display: "none" }}
                             hitSlop={size.getWidthSize(20)}
                             onPress={() => router.push(`/(tabs)/profile`)}
                         >
@@ -130,29 +124,7 @@ const HomeScreen = () => {
                             )}
                         </TouchableOpacity>
 
-                        <Text style={styles.welcomeText}>
-                            {!isLoading && !isError ? (
-                                "Welcome, " + userData.fullName.split(" ")[0]
-                            ) : (
-                                <ContentLoader
-                                    style={{
-                                        height: size.getHeightSize(15),
-                                        paddingVertical: size.getHeightSize(5),
-                                    }}
-                                    viewBox="0 0 100 15"
-                                    foregroundColor="#fff"
-                                    backgroundColor="#E2E3E9"
-                                >
-                                    <Rect
-                                        y="1"
-                                        rx="5"
-                                        ry="5"
-                                        width="90"
-                                        height="15"
-                                    />
-                                </ContentLoader>
-                            )}
-                        </Text>
+                        <Text style={styles.welcomeText}>Welcome back</Text>
                     </View>
                     <View
                         style={{
@@ -161,21 +133,43 @@ const HomeScreen = () => {
                             alignItems: "center",
                         }}
                     >
-                        {/* <Pressable
+                        <Pressable
                             hitSlop={20}
                             onPress={() =>
                                 router.push("/screens/(earn)/Rewards")
                             }
                         >
-                            <RewardsIcon />
-                        </Pressable> */}
+                            <Svg
+                                // xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth="1"
+                                stroke="#525466"
+                                width={size.getWidthSize(30)}
+                                height={size.getHeightSize(30)}
+                            >
+                                <Path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z"
+                                />
+                                <Path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75v-.75ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z"
+                                />
+                            </Svg>
+                        </Pressable>
                         <Pressable
                             hitSlop={20}
                             onPress={() =>
                                 router.push("/screens/Notifications")
                             }
                         >
-                            <NotificationsIcon />
+                            <NotificationsIcon
+                                width={size.getWidthSize(40)}
+                                height={size.getHeightSize(40)}
+                            />
                         </Pressable>
                     </View>
                 </View>
@@ -197,13 +191,17 @@ const HomeScreen = () => {
                     />
 
                     <Todos />
-                    <QuickPayments />
+                    <QuickPayments
+                        data={
+                            isLoading || isError ? [] : userData.quickPayments
+                        }
+                    />
                     <PrimaryOptions />
 
                     <View
                         style={{
-                            borderRadius: "20px",
-                            padding: size.getHeightSize(24),
+                            borderRadius: size.getWidthSize(16),
+                            paddingHorizontal: size.getHeightSize(24),
                             paddingBottom: 0,
                         }}
                     >
@@ -217,7 +215,7 @@ const HomeScreen = () => {
             </View>
         </CustomSafeArea>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -236,13 +234,14 @@ const styles = StyleSheet.create({
 
     welcomeText: {
         flex: 1,
-        fontSize: size.fontSize(18),
-        fontFamily: "Satoshi-Medium",
+        fontSize: size.fontSize(16),
+        fontFamily: "Satoshi-Bold",
+        color: "rgba(0, 0, 0, 0.8)",
     },
 
     iconButton: {
         padding: size.getWidthSize(12),
-        borderRadius: 16,
+        borderRadius: size.getWidthSize(16),
         borderWidth: 1,
         borderColor: "#E2E3E9",
         justifyContent: "center",
@@ -251,7 +250,7 @@ const styles = StyleSheet.create({
 
     featureCard: {
         backgroundColor: "#F7F7F7",
-        borderRadius: 15,
+        borderRadius: size.getWidthSize(15),
         paddingVertical: size.getHeightSize(12),
         paddingHorizontal: size.getWidthSize(12),
         width: size.getWidthSize(160.5),
@@ -259,15 +258,15 @@ const styles = StyleSheet.create({
 
     iconContainer: {
         backgroundColor: "#E0E0E0",
-        borderRadius: 30,
-        padding: 10,
-        marginBottom: 10,
+        borderRadius: size.getWidthSize(30),
+        padding: size.getWidthSize(10),
+        marginBottom: size.getWidthSize(10),
     },
     cardText: {
-        fontSize: 16,
+        fontSize: size.fontSize(16),
         fontWeight: "bold",
         textAlign: "center",
-        marginTop: 10,
+        marginTop: size.getHeightSize(10),
     },
 
     badge: {

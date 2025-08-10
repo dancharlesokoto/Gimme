@@ -184,50 +184,16 @@ export default function Signup() {
 
                         <View style={{ paddingTop: size.getHeightSize(8) }}>
                             <CustomRippleButton
-                                style={{
-                                    borderRadius: size.getWidthSize(16),
-                                    alignSelf: "flex-start",
-                                }}
-                                contentContainerStyle={{
-                                    backgroundColor: "#374BFB",
-                                    paddingHorizontal: size.getWidthSize(16),
-                                    paddingVertical: size.getHeightSize(16),
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
+                                contentContainerStyle={styles.pageButton}
                                 onPress={handleCreateAccount}
-                                disabled={isLoading}
                             >
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        gap: size.getWidthSize(8),
-                                    }}
-                                >
-                                    <Text
-                                        style={{
-                                            color: "#fff",
-                                            fontFamily: "Satoshi-Bold",
-                                            fontSize: size.fontSize(18),
-                                            opacity: isLoading ? 0 : 1,
-                                        }}
-                                    >
-                                        Create Account
+                                {isLoading ? (
+                                    <ActivityIndicator color={"#fff"} />
+                                ) : (
+                                    <Text style={styles.pageButtonText}>
+                                        Continue
                                     </Text>
-                                    {isLoading && (
-                                        <ActivityIndicator
-                                            style={{
-                                                width: "100%",
-                                                position: "absolute",
-                                                left: 0,
-                                                justifyContent: "center",
-                                                alignItems: "center",
-                                            }}
-                                            color={"#fff"}
-                                        />
-                                    )}
-                                </View>
+                                )}
                             </CustomRippleButton>
                         </View>
                     </View>
@@ -263,7 +229,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         width: "100%",
         flexDirection: "row",
-        height: size.getHeightSize(48),
+        height: size.getHeightSize(54),
         alignItems: "center",
         borderColor: "#E2E3E9",
         borderWidth: 1,
@@ -307,5 +273,23 @@ const styles = StyleSheet.create({
         padding: size.getWidthSize(8),
         borderRadius: size.getWidthSize(8),
         gap: size.getWidthSize(8),
+    },
+
+    pageButton: {
+        width: size.getWidthSize(140),
+        height: size.getHeightSize(54),
+        borderRadius: size.getWidthSize(16),
+        padding: size.getWidthSize(16),
+        marginTop: size.getHeightSize(12),
+        backgroundColor: "#374BFB",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+
+    pageButtonText: {
+        fontFamily: "ClashDisplay-Medium",
+        fontSize: size.fontSize(16),
+        lineHeight: size.getHeightSize(24),
+        color: "#ffffff",
     },
 });

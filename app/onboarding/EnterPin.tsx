@@ -5,7 +5,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     Image,
-    ActivityIndicator,
+    Pressable,
 } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
 import { size } from "@/config/size";
@@ -17,8 +17,9 @@ import { router, useGlobalSearchParams } from "expo-router";
 import { loginUser } from "@/services/auth";
 import { toast } from "sonner-native";
 import ReEnterPinField from "@/components/Onboarding/ReEnterPinField";
-import CustomRippleButton from "@/components/CustomRippleButton";
 import GenericHeader from "@/components/GenericHeader";
+import GenericButton from "@/components/GenericButton";
+import LoadingBottomSheet from "@/components/Onboarding/LoadingBottomSheet";
 
 const EnterPin = () => {
     const [pin, setPin] = useState("");
@@ -74,9 +75,10 @@ const EnterPin = () => {
                 uid: uid,
                 pin: pin,
             });
-            toast.success(res.message, {
-                duration: 2000,
-                dismissible: true,
+            await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(true);
+                }, 500);
             });
             router.push("/");
         } catch (error: any) {
@@ -88,6 +90,12 @@ const EnterPin = () => {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (pin.length === 4) {
+            handleNext();
+        }
+    }, [pin]);
 
     const authenticateBiometrics = async () => {
         if (isBiometricSupported) {
@@ -117,7 +125,7 @@ const EnterPin = () => {
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
             <View style={styles.container}>
                 <View>
-                    <GenericHeader title="" />
+                    <GenericHeader title="" showBackButton={false} />
                     <View style={{ alignItems: "center" }}>
                         <Image source={User} style={styles.user} />
                         <Text style={styles.title}>Welcome Back</Text>
@@ -139,7 +147,7 @@ const EnterPin = () => {
                         </View>
                     </View>
                 </View>
-                <View>
+                <View style={{ flex: 1, justifyContent: "center" }}>
                     <View style={styles.keypadContainer}>
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, null, 0, ""].map(
                             (value, index) => {
@@ -155,16 +163,15 @@ const EnterPin = () => {
                                     );
                                 } else if (value === "") {
                                     return (
-                                        <TouchableOpacity
+                                        <View
                                             key={index}
                                             style={[
                                                 styles.keypadButton,
                                                 { opacity: 0.4 },
                                             ]}
-                                            onPress={authenticateBiometrics}
                                         >
                                             <Finger />
-                                        </TouchableOpacity>
+                                        </View>
                                     );
                                 } else {
                                     return (
@@ -182,18 +189,27 @@ const EnterPin = () => {
                             }
                         )}
                     </View>
-                    <CustomRippleButton
-                        onPress={handleNext}
-                        contentContainerStyle={styles.pageButton}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text style={styles.pageButtonText}>Proceed</Text>
-                        )}
-                    </CustomRippleButton>
                 </View>
+
+                {/* <GenericButton
+                    text="Continue"
+                    onPress={handleNext}
+                    isLoading={isLoading}
+                /> */}
+                <TouchableOpacity onPress={() => router.back()}>
+                    <Text style={styles.goBackText}>
+                        Not you?{" "}
+                        <Text
+                            style={{
+                                textDecorationLine: "underline",
+                                fontFamily: "Satoshi-Bold",
+                            }}
+                        >
+                            Go back
+                        </Text>
+                    </Text>
+                </TouchableOpacity>
+                <LoadingBottomSheet isLoading={isLoading} />
             </View>
         </CustomSafeArea>
     );
@@ -202,6 +218,8 @@ const EnterPin = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        gap: size.getHeightSize(24),
+        paddingBottom: size.getHeightSize(48),
         paddingHorizontal: size.getWidthSize(24),
         justifyContent: "space-between",
     },
@@ -211,21 +229,22 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: size.fontSize(20),
-        fontFamily: "Satoshi-Bold",
-        textAlign: "center",
-        marginTop: 8,
+        fontFamily: "ClashDisplay-SemiBold",
+        // textAlign: "center",
+        marginTop: size.getHeightSize(8),
+        color: "#0A0B14",
     },
     subtitle: {
         fontSize: size.fontSize(14),
         fontFamily: "Satoshi-Regular",
-        textAlign: "center",
-        paddingTop: size.getHeightSize(8),
+        // textAlign: "center",
+        paddingTop: size.getHeightSize(1),
     },
 
     pinContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingVertical: size.getHeightSize(32),
+        paddingVertical: size.getHeightSize(24),
         gap: size.getWidthSize(8),
     },
 
@@ -242,19 +261,19 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
         justifyContent: "space-between",
-        paddingHorizontal: size.getWidthSize(0),
+        paddingHorizontal: size.getWidthSize(12),
     },
 
     keypadButton: {
         width: "30%",
-        height: size.getHeightSize(70),
+        height: size.getHeightSize(80),
         justifyContent: "center",
         alignItems: "center",
     },
 
     keypadText: {
         fontSize: size.fontSize(20),
-        fontFamily: "ClashDisplay-Medium",
+        fontFamily: "ClashDisplay-SemiBold",
     },
     firstPinBox: {
         borderTopLeftRadius: 16,
@@ -285,9 +304,9 @@ const styles = StyleSheet.create({
     },
     user: {
         alignSelf: "center",
-        width: 72,
-        height: 72,
-        marginTop: size.getHeightSize(32),
+        width: size.getWidthSize(72),
+        height: size.getWidthSize(72),
+        marginTop: size.getHeightSize(24),
     },
 
     pageButton: {
@@ -305,6 +324,14 @@ const styles = StyleSheet.create({
         fontSize: size.fontSize(18),
         lineHeight: size.getHeightSize(24),
         color: "#ffffff",
+    },
+
+    goBackText: {
+        fontFamily: "Satoshi-Regular",
+        textAlign: "center",
+        paddingBottom: size.getHeightSize(12),
+        color: "rgba(0, 0, 0, 0.8)",
+        fontSize: size.fontSize(16),
     },
 });
 

@@ -37,195 +37,207 @@ export const currencies = [
     },
 ];
 
-export default function CurrencyToggle({
-    toggle = false,
-    hidden = false,
-}: {
-    toggle?: any | null;
-    hidden?: boolean;
-}) {
-    ///....
+const CurrencyToggle = React.memo(
+    ({
+        toggle = false,
+        hidden = false,
+    }: {
+        toggle?: any | null;
+        hidden?: boolean;
+    }) => {
+        ///....
 
-    const _currencyState = useCurrencyStore((state: any) => state.currency);
-    const [currencyState, setCurrecyState] = useState(_currencyState);
-    //...
-    const snapPoints = useMemo(() => ["60%", "100%"], []);
-    //...
-    const changeCurrencyState = useCurrencyStore(
-        (state: any) => state.setCurrency
-    );
-    //...
-    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-    //...
-    const handleChangeCurrency = (value: string) => {
-        setCurrecyState(value);
-        changeCurrencyState(value);
-    };
-    // callbacks..
-    const handleModalToggle = async () => {
-        bottomSheetModalRef.current?.present();
-    };
-    useEffect(() => {
-        if (toggle) {
-            handleModalToggle();
-        }
-    }, [toggle]);
+        const _currencyState = useCurrencyStore((state: any) => state.currency);
+        const [currencyState, setCurrecyState] = useState(_currencyState);
+        //...
+        const snapPoints = useMemo(() => ["40%/"], []);
+        //...
+        const changeCurrencyState = useCurrencyStore(
+            (state: any) => state.setCurrency
+        );
+        //...
+        const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+        //...
+        const handleChangeCurrency = (value: string) => {
+            setCurrecyState(value);
+            changeCurrencyState(value);
+        };
+        // callbacks..
+        const handleModalToggle = async () => {
+            bottomSheetModalRef.current?.present();
+        };
+        useEffect(() => {
+            if (toggle) {
+                handleModalToggle();
+            }
+        }, [toggle]);
 
-    ///....
-    const renderBackdrop = useCallback(
-        (props: any) => (
-            <BottomSheetBackdrop
-                {...props}
-                disappearsOnIndex={-1} // Backdrop disappears when sheet is fully closed
-                appearsOnIndex={0} // Backdrop appears when sheet is opened
-                opacity={0.5} // Adjust transparency here
-            />
-        ),
-        []
-    );
-
-    return (
-        <>
-            <Pressable
-                style={[styles.pickContainer, hidden && { display: "none" }]}
-                onPress={handleModalToggle}
-            >
-                <Image
-                    source={
-                        currencies.find((item) => item.value === currencyState)
-                            ?.icon
-                    }
-                    style={{
-                        borderRadius: 1000,
-                        width: size.getWidthSize(20),
-                        height: size.getWidthSize(20),
-                    }}
+        ///....
+        const renderBackdrop = useCallback(
+            (props: any) => (
+                <BottomSheetBackdrop
+                    {...props}
+                    disappearsOnIndex={-1} // Backdrop disappears when sheet is fully closed
+                    appearsOnIndex={0} // Backdrop appears when sheet is opened
+                    opacity={0.5} // Adjust transparency here
                 />
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text style={styles.selectedText}>
-                        {
+            ),
+            []
+        );
+
+        return (
+            <>
+                <Pressable
+                    style={[
+                        styles.pickContainer,
+                        hidden && { display: "none" },
+                    ]}
+                    onPress={handleModalToggle}
+                >
+                    <Image
+                        source={
                             currencies.find(
                                 (item) => item.value === currencyState
-                            )?.label
+                            )?.icon
                         }
-                    </Text>
-                    <Svg
-                        width="21"
-                        height="20"
-                        viewBox="0 0 21 20"
-                        fill="none"
-                        //   xmlns="http://www.w3.org/2000/svg"
+                        style={{
+                            borderRadius: 1000,
+                            width: size.getWidthSize(20),
+                            height: size.getWidthSize(20),
+                        }}
+                    />
+                    <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
                     >
-                        <Path
-                            d="M10.5001 10.879L14.2126 7.1665L15.2731 8.227L10.5001 13L5.72705 8.227L6.78755 7.1665L10.5001 10.879Z"
-                            fill="#525466"
-                        />
-                    </Svg>
-                </View>
-            </Pressable>
+                        <Text style={styles.selectedText}>
+                            {
+                                currencies.find(
+                                    (item) => item.value === currencyState
+                                )?.label
+                            }
+                        </Text>
+                        <Svg
+                            width="21"
+                            height="20"
+                            viewBox="0 0 21 20"
+                            fill="none"
+                            //   xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <Path
+                                d="M10.5001 10.879L14.2126 7.1665L15.2731 8.227L10.5001 13L5.72705 8.227L6.78755 7.1665L10.5001 10.879Z"
+                                fill="#525466"
+                            />
+                        </Svg>
+                    </View>
+                </Pressable>
 
-            <BottomSheetModal
-                enableDynamicSizing={false}
-                enablePanDownToClose
-                ref={bottomSheetModalRef}
-                snapPoints={snapPoints}
-                backdropComponent={renderBackdrop}
-                backgroundStyle={{
-                    borderRadius: size.getWidthSize(20),
-                    flex: 1,
-                }}
-            >
-                <BottomSheetView
-                    style={{
+                <BottomSheetModal
+                    enableDynamicSizing={false}
+                    enablePanDownToClose
+                    ref={bottomSheetModalRef}
+                    snapPoints={snapPoints}
+                    backdropComponent={renderBackdrop}
+                    backgroundStyle={{
+                        borderRadius: size.getWidthSize(20),
                         flex: 1,
-                        paddingHorizontal: size.getWidthSize(20),
-                        paddingVertical: size.getHeightSize(8),
                     }}
                 >
-                    <BottomSheetFlatList
-                        data={currencies}
-                        keyExtractor={(item) => item.value}
-                        contentContainerStyle={{
+                    <BottomSheetView
+                        style={{
                             flex: 1,
-                            gap: size.getWidthSize(24),
+                            paddingHorizontal: size.getWidthSize(20),
+                            paddingVertical: size.getHeightSize(8),
                         }}
-                        renderItem={({ item }) => (
-                            <Pressable
-                                onPress={() => handleChangeCurrency(item.value)}
-                                style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    gap: size.getWidthSize(8),
-                                }}
-                            >
-                                <Image
-                                    source={item.icon}
+                    >
+                        <BottomSheetFlatList
+                            data={currencies}
+                            keyExtractor={(item) => item.value}
+                            contentContainerStyle={{
+                                flex: 1,
+                                gap: size.getWidthSize(24),
+                            }}
+                            renderItem={({ item }) => (
+                                <Pressable
+                                    onPress={() =>
+                                        handleChangeCurrency(item.value)
+                                    }
                                     style={{
-                                        borderRadius: 1000,
-                                        width: size.getWidthSize(40),
-                                        height: size.getHeightSize(40),
-                                    }}
-                                />
-                                <View
-                                    style={{
-                                        flex: 1,
                                         flexDirection: "row",
                                         alignItems: "center",
-                                        justifyContent: "space-between",
+                                        gap: size.getWidthSize(8),
                                     }}
                                 >
-                                    <View>
-                                        <Text
-                                            style={{
-                                                fontFamily: "Satoshi-Bold",
-                                                fontSize: size.fontSize(14),
-                                            }}
-                                        >
-                                            {item.label}
-                                        </Text>
-                                        <Text
-                                            style={{
-                                                fontFamily: "Satoshi-Regular",
-                                                color: "#868898",
-                                                fontSize: size.fontSize(12),
-                                            }}
-                                        >
-                                            {item.name}
-                                        </Text>
-                                    </View>
-
+                                    <Image
+                                        source={item.icon}
+                                        style={{
+                                            borderRadius: 1000,
+                                            width: size.getWidthSize(40),
+                                            height: size.getHeightSize(40),
+                                        }}
+                                    />
                                     <View
                                         style={{
-                                            width: size.getWidthSize(24),
-                                            height: size.getWidthSize(24),
-                                            borderRadius:
-                                                size.getWidthSize(1000),
-                                            backgroundColor:
-                                                item.value === currencyState
-                                                    ? "blue"
-                                                    : "#E2E3E9",
-                                            borderColor: "#E2E3E9",
-                                            borderWidth: size.getWidthSize(8),
+                                            flex: 1,
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
                                         }}
-                                    ></View>
-                                </View>
-                            </Pressable>
-                        )}
-                    />
-                </BottomSheetView>
-            </BottomSheetModal>
-        </>
-    );
-}
+                                    >
+                                        <View>
+                                            <Text
+                                                style={{
+                                                    fontFamily: "Satoshi-Bold",
+                                                    fontSize: size.fontSize(14),
+                                                }}
+                                            >
+                                                {item.label}
+                                            </Text>
+                                            <Text
+                                                style={{
+                                                    fontFamily:
+                                                        "Satoshi-Regular",
+                                                    color: "#868898",
+                                                    fontSize: size.fontSize(12),
+                                                }}
+                                            >
+                                                {item.name}
+                                            </Text>
+                                        </View>
+
+                                        <View
+                                            style={{
+                                                width: size.getWidthSize(24),
+                                                height: size.getWidthSize(24),
+                                                borderRadius:
+                                                    size.getWidthSize(1000),
+                                                backgroundColor:
+                                                    item.value === currencyState
+                                                        ? "blue"
+                                                        : "#E2E3E9",
+                                                borderColor: "#E2E3E9",
+                                                borderWidth:
+                                                    size.getWidthSize(8),
+                                            }}
+                                        ></View>
+                                    </View>
+                                </Pressable>
+                            )}
+                        />
+                    </BottomSheetView>
+                </BottomSheetModal>
+            </>
+        );
+    }
+);
 
 const styles = StyleSheet.create({
     pickContainer: {
-        gap: size.getHeightSize(4),
+        gap: size.getHeightSize(0),
         flexDirection: "row",
         justifyContent: "space-between",
         backgroundColor: "#E2E3E9",
-        paddingHorizontal: size.getHeightSize(4),
-        paddingVertical: size.getWidthSize(4),
+        paddingHorizontal: size.getWidthSize(8),
+        paddingVertical: size.getHeightSize(8),
         borderRadius: size.getWidthSize(100),
         // width: size.getWidthSize(86),
     },
@@ -261,3 +273,5 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
 });
+
+export default CurrencyToggle;

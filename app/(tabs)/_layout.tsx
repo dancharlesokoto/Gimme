@@ -1,7 +1,7 @@
 import { size } from "@/config/size";
-import { Redirect, router, Tabs, usePathname } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
-import { AppState, Image, TouchableOpacity, View } from "react-native";
+import { Redirect, Tabs } from "expo-router";
+import React, { useEffect, useRef } from "react";
+import { AppState, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HomeIcon from "@/assets/svg/tabs/home.svg";
@@ -16,6 +16,7 @@ import ActiveMarket from "../../assets/svg/tabs/activeMarket.svg";
 import ActiveActivities from "../../assets/svg/tabs/activeActivities.svg";
 import { useUserStore } from "@/store/userStore";
 import { IMAGE_URL } from "@/services/api";
+import { Image } from "expo-image";
 
 export default function TabLayout() {
     const user = useUserStore((state) => state.user);
@@ -64,9 +65,12 @@ export default function TabLayout() {
         <Tabs
             screenOptions={{
                 headerShown: false,
-                tabBarActiveTintColor: Colors.text,
+                tabBarActiveTintColor: "#374BFB",
                 tabBarInactiveTintColor: Colors.lightText,
-                animation: "shift",
+                tabBarLabelStyle: {
+                    fontFamily: "Satoshi-Medium",
+                    fontSize: size.fontSize(11),
+                },
                 tabBarButton: (props: any) => (
                     <TouchableOpacity activeOpacity={0.3} {...props} />
                 ),
@@ -124,7 +128,7 @@ export default function TabLayout() {
                 name="market"
                 options={{
                     headerShown: false,
-                    title: "Market Place",
+                    title: "Marketplace",
                     tabBarIcon({ focused }: { focused: boolean }) {
                         return focused ? (
                             <ActiveMarket
@@ -165,36 +169,67 @@ export default function TabLayout() {
                 options={{
                     headerShown: false,
                     title: "Profile",
-                    tabBarIcon(props) {
+                    tabBarIcon({ focused }) {
                         if (
                             !user.profileImage ||
                             user.profileImage === "default.png"
                         ) {
                             return (
-                                <Image
-                                    source={require("@/assets/images/user.png")}
+                                <View
                                     style={{
-                                        width: size.getWidthSize(28),
-                                        height: size.getHeightSize(28),
-                                        borderRadius: size.getWidthSize(14),
+                                        width: size.getWidthSize(30),
+                                        height: size.getHeightSize(30),
+                                        borderWidth: size.getWidthSize(1),
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        borderRadius: size.getWidthSize(100),
+                                        borderColor: focused
+                                            ? "#374BFB"
+                                            : "#E2E3E9",
                                     }}
-                                />
+                                >
+                                    <Image
+                                        source={require("@/assets/images/user.png")}
+                                        contentFit="cover"
+                                        style={{
+                                            width: size.getWidthSize(22),
+                                            height: size.getHeightSize(22),
+                                            borderRadius:
+                                                size.getWidthSize(100),
+                                        }}
+                                    />
+                                </View>
                             );
                         } else {
                             return (
-                                <Image
-                                    source={{
-                                        uri:
+                                <View
+                                    style={{
+                                        width: size.getWidthSize(30),
+                                        height: size.getHeightSize(30),
+                                        borderWidth: size.getWidthSize(1),
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        borderRadius: size.getWidthSize(100),
+                                        borderColor: focused
+                                            ? "#374BFB"
+                                            : "#E2E3E9",
+                                    }}
+                                >
+                                    <Image
+                                        source={
                                             IMAGE_URL +
                                             "/profile/" +
-                                            user.profileImage,
-                                    }}
-                                    style={{
-                                        width: size.getWidthSize(28),
-                                        height: size.getHeightSize(28),
-                                        borderRadius: size.getWidthSize(14),
-                                    }}
-                                />
+                                            user.profileImage
+                                        }
+                                        contentFit="cover"
+                                        style={{
+                                            width: size.getWidthSize(22),
+                                            height: size.getHeightSize(22),
+                                            borderRadius:
+                                                size.getWidthSize(100),
+                                        }}
+                                    />
+                                </View>
                             );
                         }
                     },

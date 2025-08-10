@@ -1,15 +1,16 @@
-import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import Svg, { Path, Rect } from "react-native-svg";
-import CustomRippleButton from "@/components/CustomRippleButton";
+
 import { useAppStore } from "@/store/appStore";
 import PageLoader from "@/components/PageLoader";
 import { toast } from "sonner-native";
+import { Image } from "expo-image";
 // import P2PMarket from "@/components/P2PMarket";
 
-export default function Cards() {
+const Cards = React.memo(() => {
     const { isCardsStarted, setIsCardsStarted } = useAppStore();
     const handleStartCards = () => {
         toast.info("This feature is coming soon", {
@@ -39,23 +40,23 @@ export default function Cards() {
                 {isCardsStarted ? (
                     <PageLoader />
                 ) : (
-                    <ScrollView
-                        keyboardShouldPersistTaps="handled"
-                        contentContainerStyle={{
+                    <View
+                        style={{
+                            flex: 1,
                             paddingHorizontal: size.getWidthSize(24),
                             gap: size.getHeightSize(20),
                         }}
                     >
                         <View style={styles.topContent}>
                             <Image
-                                source={require("@/assets/images/cardsStack.png")}
+                                source={require("@/assets/images/cards-ttp.webp")}
+                                contentFit="contain"
                                 style={{
-                                    width: size.getWidthSize(150),
-                                    height: size.getHeightSize(150),
-                                    objectFit: "contain",
+                                    width: "100%",
+                                    height: "100%",
                                 }}
                             />
-
+                            {/* 
                             <Text
                                 style={{
                                     fontSize: size.fontSize(18),
@@ -74,7 +75,7 @@ export default function Cards() {
                             >
                                 Manage your virtual and physical cards in one
                                 place.
-                            </Text>
+                            </Text> */}
                         </View>
 
                         <View style={styles.lineDash}></View>
@@ -158,36 +159,36 @@ export default function Cards() {
                             </View>
                         </View>
 
-                        <CustomRippleButton
+                        {/* <CustomRippleButton
                             rippleColor="#fff"
                             onPress={handleStartCards}
                             style={{ borderRadius: size.getWidthSize(16) }}
                             contentContainerStyle={{
-                                backgroundColor: "#374BFB",
+                                backgroundColor: "#000",
                                 height: size.getHeightSize(56),
                                 marginVertical: size.getHeightSize(16),
-                                borderRadius: size.getHeightSize(12),
+                                borderRadius: size.getHeightSize(16),
                                 alignItems: "center",
                                 justifyContent: "center",
                             }}
                         >
                             <Text
                                 style={{
-                                    fontSize: size.fontSize(18),
-                                    fontFamily: "Satoshi-Bold",
+                                    fontSize: size.fontSize(14),
+                                    fontFamily: "ClashDisplay-Medium",
                                     color: "#ffffff",
                                     marginLeft: size.getWidthSize(10),
                                 }}
                             >
                                 Get Started
                             </Text>
-                        </CustomRippleButton>
-                    </ScrollView>
+                        </CustomRippleButton> */}
+                    </View>
                 )}
             </View>
         </CustomSafeArea>
     );
-}
+});
 
 const styles = StyleSheet.create({
     container: {
@@ -200,6 +201,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     topContent: {
+        flex: 1,
         justifyContent: "center",
         alignItems: "center",
         gap: size.getHeightSize(10),
@@ -212,7 +214,9 @@ const styles = StyleSheet.create({
         borderColor: "#CDCED5",
     },
 
-    mainContent: {},
+    mainContent: {
+        paddingBottom: size.getHeightSize(24),
+    },
 
     item: {
         flexDirection: "row",
@@ -244,3 +248,5 @@ const styles = StyleSheet.create({
         fontSize: size.fontSize(14),
     },
 });
+
+export default Cards;

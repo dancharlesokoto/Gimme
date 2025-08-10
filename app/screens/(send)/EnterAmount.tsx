@@ -2,30 +2,37 @@ import {
     View,
     Text,
     StyleSheet,
-    Image,
     TextInput,
     ScrollView,
-    ActivityIndicator,
     Pressable,
 } from "react-native";
-import React, { useState } from "react";
-import CurrencyInput from "react-native-currency-input";
+import React, { useEffect, useState } from "react";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import { router, useLocalSearchParams } from "expo-router";
 import GenericHeader from "@/components/GenericHeader";
 import { IMAGE_URL } from "@/services/api";
-import CustomRippleButton from "@/components/CustomRippleButton";
 import { toast } from "sonner-native";
 import Checkbox from "expo-checkbox";
-import useCurrencyStore from "@/store/currencyStore";
 import { convertCurrency, formatCurrency } from "@/lib/currency";
+import GenericButton from "@/components/GenericButton";
+import GenericInputError from "@/components/GenericInputError";
+import AvatarInitials from "@/components/AvatarInitials";
+import { Image } from "expo-image";
 export default function EnterAmount() {
     //...
     const [amount, setAmount] = useState<"ngn" | "usd" | "gm" | any>(null);
     const [remark, setRemark] = useState("");
     const [isChecked, setIsChecked] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [activeInput, setActiveInput] = useState<number | any>(0);
+    const [emptyAmount, setEmptyAmount] = useState(false);
+
+    useEffect(() => {
+        if (amount) {
+            setEmptyAmount(false);
+        }
+    }, [amount]);
     // const currency = useCurrencyStore((state: any) => state.currency);
     const currency = "ngn"; //Hardcoded for now
 
@@ -36,28 +43,26 @@ export default function EnterAmount() {
     //...
     const handleNext = async () => {
         if (!amount) {
-            toast.error("Please enter an amount", {
-                duration: 2000,
-                dismissible: true,
-            });
+            setEmptyAmount(true);
+
             return;
         }
         if (amount < 1000) {
-            toast.error("Amount must be at least NGN1,000", {
+            toast.info("Amount must be at least NGN1,000", {
                 duration: 2000,
                 dismissible: true,
             });
             return;
         }
         if (amount > +senderData.ngnBalance / 100) {
-            toast.error("Insufficient funds", {
+            toast.info("Insufficient funds", {
                 duration: 2000,
                 dismissible: true,
             });
             return;
         }
         if (amount > 99000) {
-            toast.error("Amount must be at most NGN99,000", {
+            toast.info("Amount must be at most NGN99,000", {
                 duration: 2000,
                 dismissible: true,
             });
@@ -124,24 +129,24 @@ export default function EnterAmount() {
                     >
                         {recipientData.profileImage == "default.png" ||
                         recipientData.profileImage == "" ? (
-                            <Image
-                                source={require("@/assets/images/user.png")}
-                                alt=""
+                            <AvatarInitials
+                                name={recipientData.fullName}
                                 style={{
                                     width: size.getWidthSize(40),
                                     height: size.getHeightSize(40),
                                     borderRadius: size.getWidthSize(1000),
                                 }}
+                                textStyle={{
+                                    fontSize: size.fontSize(14),
+                                }}
                             />
                         ) : (
                             <Image
-                                loadingIndicatorSource={require("@/assets/images/user.png")}
-                                source={{
-                                    uri:
-                                        IMAGE_URL +
-                                        "/profile/" +
-                                        recipientData.profileImage,
-                                }}
+                                source={
+                                    IMAGE_URL +
+                                    "/profile/" +
+                                    recipientData.profileImage
+                                }
                                 alt=""
                                 style={{
                                     width: size.getWidthSize(40),
@@ -196,14 +201,21 @@ export default function EnterAmount() {
                                 })}
                             </Text>
                         </View>
-                        <CurrencyInput
-                            style={styles.input}
+                        <TextInput
+                            onFocus={() => setActiveInput(1)}
+                            onBlur={() => setActiveInput(0)}
+                            style={[
+                                styles.input,
+                                activeInput == 1 && styles.activeInput,
+                                emptyAmount && { borderColor: "#FAA0A0" },
+                            ]}
                             value={amount}
-                            precision={0}
-                            delimiter=","
-                            onChangeValue={(value: any) => setAmount(value)}
+                            onChangeText={(value: any) => setAmount(value)}
                             placeholder="1000 - 99,000"
                         />
+                        {emptyAmount && (
+                            <GenericInputError text="Enter a valid amount" />
+                        )}
                         <Text
                             style={{
                                 fontFamily: "Satoshi-Regular",
@@ -232,9 +244,14 @@ export default function EnterAmount() {
                             <Text style={styles.label}>Remark</Text>
                         </View>
                         <TextInput
+                            onFocus={() => setActiveInput(2)}
+                            onBlur={() => setActiveInput(0)}
                             value={remark}
                             onChangeText={setRemark}
-                            style={styles.input}
+                            style={[
+                                styles.input,
+                                activeInput == 2 && styles.activeInput,
+                            ]}
                             placeholder="Reason for sending"
                         />
                     </View>
@@ -246,6 +263,13 @@ export default function EnterAmount() {
                         }}
                     >
                         <Checkbox
+                            style={{
+                                width: size.getWidthSize(20),
+                                height: size.getWidthSize(20),
+                                borderWidth: size.getWidthSize(2),
+                                borderRadius: size.getWidthSize(4),
+                            }}
+                            color="#374BFB"
                             // style={styles.checkbox}
                             value={isChecked}
                             onValueChange={setIsChecked}
@@ -257,17 +281,12 @@ export default function EnterAmount() {
                         </Pressable>
                     </View>
 
-                    <CustomRippleButton
+                    <GenericButton
                         onPress={handleNext}
-                        contentContainerStyle={styles.pageButton}
+                        text="Proceed"
                         disabled={isLoading}
-                    >
-                        {isLoading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text style={styles.pageButtonText}>Proceed</Text>
-                        )}
-                    </CustomRippleButton>
+                        isLoading={isLoading}
+                    />
                 </View>
             </ScrollView>
         </CustomSafeArea>
@@ -317,6 +336,10 @@ const styles = StyleSheet.create({
         marginBottom: size.getHeightSize(6),
         fontFamily: "Satoshi-Medium",
         fontSize: size.fontSize(14),
+    },
+
+    activeInput: {
+        borderColor: "#3366FF",
     },
 
     pageButton: {

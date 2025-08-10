@@ -72,7 +72,7 @@ export default function FundWithCrypto() {
     return (
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
             <View style={{ paddingHorizontal: size.getWidthSize(24) }}>
-                <GenericHeader title="Fund with stablecoin" />
+                <GenericHeader title="" currency="usd" />
             </View>
 
             {isLoading || isError ? (
@@ -88,8 +88,14 @@ export default function FundWithCrypto() {
                         />
                     }
                 >
+                    <View>
+                        <Text style={styles.header}>Fund with crypto</Text>
+                        <Text style={styles.subHead}>
+                            Send funds to your USD wallet through crypto
+                        </Text>
+                    </View>
                     <SimpleNotify
-                        title="Funding with crypto"
+                        title="Note"
                         description={`Only send USDC on the Ethereum network to this address`}
                     />
 
@@ -183,9 +189,20 @@ export default function FundWithCrypto() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
         gap: size.getHeightSize(32),
         paddingHorizontal: size.getWidthSize(24),
+    },
+
+    header: {
+        fontFamily: "ClashDisplay-SemiBold",
+        color: "rgba(0, 0, 0, 0.9)",
+        fontSize: size.fontSize(22),
+    },
+    subHead: {
+        fontFamily: "Satoshi-Regular",
+        fontSize: size.fontSize(14),
+        color: "#525466",
     },
 
     qrContainer: {

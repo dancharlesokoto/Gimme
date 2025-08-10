@@ -11,7 +11,6 @@ import {
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { Svg, Path } from "react-native-svg";
 import { size } from "@/config/size";
-import BackPage from "@/components/BackPage";
 import { router } from "expo-router";
 import CustomRippleButton from "@/components/CustomRippleButton";
 import GenericHeader from "@/components/GenericHeader";
@@ -127,37 +126,16 @@ const Login = () => {
 
                         <View>
                             <CustomRippleButton
-                                style={{
-                                    borderRadius: size.getWidthSize(16),
-                                    alignSelf: "flex-start",
-                                }}
-                                contentContainerStyle={{
-                                    backgroundColor: "#374BFB",
-                                    paddingHorizontal: size.getWidthSize(16),
-                                    paddingVertical: size.getHeightSize(16),
-                                }}
+                                contentContainerStyle={styles.pageButton}
                                 onPress={handleLogin}
                             >
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        gap: size.getWidthSize(8),
-                                    }}
-                                >
-                                    <Text
-                                        style={{
-                                            fontFamily: "Satoshi-Bold",
-                                            fontSize: size.fontSize(18),
-                                            color: "#fff",
-                                        }}
-                                    >
+                                {isLoading ? (
+                                    <ActivityIndicator color={"#fff"} />
+                                ) : (
+                                    <Text style={styles.pageButtonText}>
                                         Continue
                                     </Text>
-                                    {isLoading && (
-                                        <ActivityIndicator color={"#fff"} />
-                                    )}
-                                </View>
+                                )}
                             </CustomRippleButton>
                         </View>
                     </View>
@@ -185,7 +163,7 @@ const styles = StyleSheet.create({
     label: {
         fontSize: size.fontSize(14),
         fontFamily: "Satoshi-Medium",
-        lineHeight: 20,
+        lineHeight: size.getHeightSize(20),
     },
 
     input: {
@@ -193,9 +171,9 @@ const styles = StyleSheet.create({
         borderColor: "#E2E3E9",
         fontFamily: "Satoshi-Regular",
         borderWidth: 1,
-        borderRadius: 12,
-        paddingLeft: 10,
-        marginBottom: 16,
+        borderRadius: size.getWidthSize(12),
+        paddingLeft: size.getWidthSize(10),
+        marginBottom: size.getHeightSize(16),
         fontSize: size.fontSize(14),
     },
 
@@ -228,6 +206,24 @@ const styles = StyleSheet.create({
         backgroundColor: "#FDEDEF",
         padding: size.getWidthSize(8),
         borderRadius: 8,
+    },
+
+    pageButton: {
+        width: size.getWidthSize(120),
+        height: size.getHeightSize(54),
+        borderRadius: size.getWidthSize(16),
+        padding: size.getWidthSize(16),
+        marginTop: size.getHeightSize(12),
+        backgroundColor: "#374BFB",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+
+    pageButtonText: {
+        fontFamily: "ClashDisplay-Medium",
+        fontSize: size.fontSize(16),
+        lineHeight: size.getHeightSize(24),
+        color: "#ffffff",
     },
 });
 

@@ -1,55 +1,54 @@
-import {
-    View,
-    Text,
-    ScrollView,
-    Image,
-    TouchableOpacity,
-    ActivityIndicator,
-} from "react-native";
-import React, { useEffect, useState } from "react";
-import CustomSafeArea from "@/shared/CustomSafeArea";
-import { size } from "@/config/size";
+import React, { useState, useEffect, useCallback } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
-import { StyleSheet } from "react-native";
-import { useUserStore } from "@/store/userStore";
-import ReEnterPinField from "@/components/Onboarding/ReEnterPinField";
-import { IMAGE_URL } from "@/services/api";
-import Svg, { Path } from "react-native-svg";
-import { toast } from "sonner-native";
+import { size } from "@/config/size";
+import CustomSafeArea from "@/shared/CustomSafeArea";
+import Cancel from "@/assets/svg/cancel.svg";
+import Finger from "@/assets/svg/finger.svg";
+import User from "@/assets/images/user.png";
 import { router } from "expo-router";
-import { loginUser, logoutUser } from "@/services/auth";
-import { Modal } from "react-native";
-import CustomRippleButton from "@/components/CustomRippleButton";
+import { loginUser } from "@/services/auth";
+import { toast } from "sonner-native";
+import ReEnterPinField from "@/components/Onboarding/ReEnterPinField";
+import GenericHeader from "@/components/GenericHeader";
+import { useUserStore } from "@/store/userStore";
+import LoadingBottomSheet from "@/components/Onboarding/LoadingBottomSheet";
 
-export default function ReEnterPin() {
-    const user = useUserStore((state) => state.user);
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [isBiometricSupported, setIsBiometricSupported] = useState(false);
+const ReEnterPin = () => {
+    ///....................................
     const [pin, setPin] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-
-    useEffect(() => {
-        (async () => {
-            const hasHardware = await LocalAuthentication.hasHardwareAsync();
-            const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+    const [isBiometricSupported, setIsBiometricSupported] = useState(false);
+    ///....................................
+    const { user } = useUserStore();
+    ///....................................
+    const hasHardware = useCallback(async () => {
+        const hasHardware = await LocalAuthentication.hasHardwareAsync();
+        const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+        if (hasHardware) {
             console.log(hasHardware);
-            if (hasHardware) {
-                console.log(hasHardware);
-            }
-            setIsBiometricSupported(hasHardware);
-        })();
+        }
+        setIsBiometricSupported(hasHardware);
+    }, []);
+    ///....................................
+    useEffect(() => {
+        hasHardware();
     }, []);
 
-    const handleNext = async (withBiometrics = false) => {
-        if (!pin && withBiometrics === false) {
-            toast.error("Please enter a pin", {
-                duration: 2000,
-                dismissible: true,
-            });
+    const handlePress = (value: any) => {
+        pin.length < 4 && setPin((prevPin) => prevPin + value);
+    };
+
+    const handleDelete = () => {
+        if (pin.length == 0) {
             return;
         }
-        if (pin.length !== 4 && withBiometrics === false) {
-            toast.error("Pin must be 4 digits", {
+        setPin((prevPin) => prevPin.slice(0, -1));
+    };
+
+    const handleNext = async () => {
+        if (pin.length !== 4) {
+            toast.error("Please enter a four-digit pin", {
                 duration: 2000,
                 dismissible: true,
             });
@@ -61,13 +60,15 @@ export default function ReEnterPin() {
                 uid: user.email,
                 pin: pin,
             });
-            toast.success("Login Successful", {
-                duration: 2000,
-                dismissible: true,
+            await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(true);
+                }, 500);
             });
             router.replace("/");
-        } catch (error: any | Error) {
-            toast.error(error.message, {
+        } catch (error: any) {
+            setPin("");
+            toast.error("An error occurred while logging in", {
                 duration: 2000,
                 dismissible: true,
             });
@@ -77,12 +78,11 @@ export default function ReEnterPin() {
     };
 
     useEffect(() => {
-        if (pin.length === 4) {
+        if (pin.length === 4 && !isLoading) {
             handleNext();
         }
     }, [pin]);
 
-    //...
     const authenticateBiometrics = async () => {
         if (isBiometricSupported) {
             const result = await LocalAuthentication.authenticateAsync({
@@ -94,10 +94,6 @@ export default function ReEnterPin() {
             });
 
             if (result.success) {
-                toast.success("Login Successful", {
-                    duration: 2000,
-                    dismissible: true,
-                });
                 useUserStore.getState().setIsStale(false);
                 router.replace("/");
             } else {
@@ -107,185 +103,203 @@ export default function ReEnterPin() {
                     result.error
                 );
             }
-            setIsLoading(false);
         } else {
-            toast.error("Biometrics not available", {
-                duration: 2000,
-                dismissible: true,
-            });
             console.log("Biometrics not available", "Please enter your PIN.");
         }
     };
+
     return (
-        <>
-            <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
-                <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    keyboardShouldPersistTaps="handled"
-                    contentContainerStyle={styles.container}
-                >
-                    {user.profileImage == "default.png" ||
-                    user.profileImage == "" ? (
-                        <Image
-                            source={require("@/assets/images/user.png")}
-                            alt=""
-                            style={{
-                                width: size.getWidthSize(60),
-                                height: size.getHeightSize(60),
-                                borderRadius: size.getWidthSize(1000),
-                            }}
-                        />
-                    ) : (
-                        <Image
-                            loadingIndicatorSource={require("@/assets/images/user.png")}
-                            source={{
-                                uri:
-                                    IMAGE_URL + "/profile/" + user.profileImage,
-                            }}
-                            alt=""
-                            style={{
-                                width: size.getWidthSize(88),
-                                height: size.getHeightSize(88),
-                                borderRadius: size.getWidthSize(1000),
-                            }}
-                        />
-                    )}
-                    <View
-                        style={{
-                            gap: size.getHeightSize(4),
-                            alignItems: "center",
-                        }}
-                    >
-                        <Text style={styles.heading}>
+        <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
+            <View style={styles.container}>
+                <View>
+                    <GenericHeader title="" showBackButton={false} />
+                    <View style={{ alignItems: "center" }}>
+                        <Image source={User} style={styles.user} />
+                        <Text style={styles.title}>
                             Welcome Back, {user.name.split(" ")[0]}
                         </Text>
-                        <Text style={styles.text}>Enter your 4-Digit PIN</Text>
+                        <Text style={styles.subtitle}>
+                            Enter your pin below to enter Gimme
+                        </Text>
+
+                        <View style={styles.pinContainer}>
+                            <ReEnterPinField
+                                code={pin}
+                                onChange={setPin}
+                                editable={false}
+                            />
+                            {/* <PinInput
+                            code={pin}
+                            onChange={setPin}
+                            protectedField={true}
+                        /> */}
+                        </View>
                     </View>
-                    <ReEnterPinField code={pin} onChange={setPin} />
-                    <View
-                        style={{
-                            width: "100%",
-                            flex: 1,
-                            paddingVertical: size.getHeightSize(60),
-                            justifyContent: "flex-end",
-                            alignItems: "center",
-                            gap: size.getHeightSize(16),
-                            paddingTop: size.getHeightSize(24),
-                        }}
-                    >
+                </View>
+                <View style={{ flex: 1, justifyContent: "center" }}>
+                    <View style={styles.keypadContainer}>
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, null, 0, ""].map(
+                            (value, index) => {
+                                if (value === null) {
+                                    return (
+                                        <TouchableOpacity
+                                            key={index}
+                                            style={styles.keypadButton}
+                                            onPress={handleDelete}
+                                        >
+                                            <Cancel />
+                                        </TouchableOpacity>
+                                    );
+                                } else if (value === "") {
+                                    return (
+                                        <TouchableOpacity
+                                            key={index}
+                                            style={[styles.keypadButton]}
+                                            onPress={authenticateBiometrics}
+                                        >
+                                            <Finger />
+                                        </TouchableOpacity>
+                                    );
+                                } else {
+                                    return (
+                                        <TouchableOpacity
+                                            key={index}
+                                            style={styles.keypadButton}
+                                            onPress={() => handlePress(value)}
+                                        >
+                                            <Text style={styles.keypadText}>
+                                                {value}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                }
+                            }
+                        )}
+                    </View>
+                </View>
+
+                {/* <GenericButton
+                    text="Continue"
+                    onPress={handleNext}
+                    isLoading={isLoading}
+                /> */}
+                <TouchableOpacity onPress={() => router.back()}>
+                    <Text style={styles.goBackText}>
+                        Not you?{" "}
                         <Text
                             style={{
-                                fontFamily: "Satoshi-Regular",
-                                color: "#0A0B14",
-                                fontSize: size.fontSize(14),
-                                textAlign: "center",
+                                textDecorationLine: "underline",
+                                fontFamily: "Satoshi-Bold",
                             }}
                         >
-                            Log in using biometrics
+                            Go back
                         </Text>
-                        <TouchableOpacity
-                            style={{
-                                borderWidth: 1,
-                                borderColor: "rgb(180, 180, 210)",
-                                width: size.getWidthSize(80),
-                                height: size.getWidthSize(80),
-                                borderRadius: "100%",
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                            onPress={authenticateBiometrics}
-                        >
-                            <Svg
-                                // xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth="1"
-                                stroke="#374BFB"
-                                style={{
-                                    width: size.getWidthSize(50),
-                                    height: size.getHeightSize(50),
-                                }}
-                            >
-                                <Path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M7.864 4.243A7.5 7.5 0 0 1 19.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 0 0 4.5 10.5a7.464 7.464 0 0 1-1.15 3.993m1.989 3.559A11.209 11.209 0 0 0 8.25 10.5a3.75 3.75 0 1 1 7.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 0 1-3.6 9.75m6.633-4.596a18.666 18.666 0 0 1-2.485 5.33"
-                                />
-                            </Svg>
-                        </TouchableOpacity>
-                        <CustomRippleButton
-                            onPress={handleNext}
-                            style={{ width: "100%" }}
-                            contentContainerStyle={styles.pageButton}
-                            disabled={isLoading}
-                        >
-                            {isLoading ? (
-                                <ActivityIndicator color="#fff" />
-                            ) : (
-                                <Text style={styles.pageButtonText}>
-                                    Continue
-                                </Text>
-                            )}
-                        </CustomRippleButton>
-                        <TouchableOpacity onPress={logoutUser}>
-                            <Text style={styles.biometricsText}>
-                                Not you?{" "}
-                                <Text
-                                    style={{
-                                        textDecorationLine: "underline",
-                                        fontFamily: "Satoshi-Bold",
-                                    }}
-                                >
-                                    Log out
-                                </Text>
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                </ScrollView>
-            </CustomSafeArea>
-        </>
+                    </Text>
+                </TouchableOpacity>
+                <LoadingBottomSheet isLoading={isLoading} />
+            </View>
+        </CustomSafeArea>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: "center",
-        paddingTop: size.getHeightSize(32),
+        gap: size.getHeightSize(24),
+        paddingBottom: size.getHeightSize(48),
         paddingHorizontal: size.getWidthSize(24),
-        gap: size.getHeightSize(18),
+        justifyContent: "space-between",
     },
 
-    heading: {
-        textAlign: "center",
-        fontFamily: "Satoshi-Bold",
-        lineHeight: size.getHeightSize(22),
-        color: "rgba(0, 0, 0, 0.9)",
-        fontSize: size.fontSize(22),
+    backButton: {
+        alignSelf: "flex-start",
     },
-
-    subHeading: {
-        fontFamily: "Satoshi-Regular",
-        color: "rgba(0, 0, 0, 0.7)",
-        fontSize: size.fontSize(18),
+    title: {
+        fontSize: size.fontSize(20),
+        fontFamily: "ClashDisplay-SemiBold",
+        // textAlign: "center",
+        marginTop: size.getHeightSize(8),
+        color: "#0A0B14",
     },
-
-    text: {
-        fontFamily: "Satoshi-Regular",
-        color: "rgba(0, 0, 0, 0.7)",
+    subtitle: {
         fontSize: size.fontSize(14),
+        fontFamily: "Satoshi-Regular",
+        // textAlign: "center",
+        paddingTop: size.getHeightSize(1),
     },
 
-    biometricsText: {
-        fontFamily: "Satoshi-Regular",
-        color: "rgba(0, 0, 0, 0.8)",
-        fontSize: size.fontSize(16),
+    pinContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingVertical: size.getHeightSize(24),
+        gap: size.getWidthSize(8),
+    },
+
+    pinBox: {
+        flex: 1,
+        height: size.getHeightSize(64),
+        justifyContent: "center",
+        alignItems: "center",
+        borderWidth: 1,
+        borderColor: "#E2E3E9",
+    },
+
+    keypadContainer: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "space-between",
+        paddingHorizontal: size.getWidthSize(12),
+    },
+
+    keypadButton: {
+        width: "30%",
+        height: size.getHeightSize(80),
+        justifyContent: "center",
+        alignItems: "center",
+    },
+
+    keypadText: {
+        fontSize: size.fontSize(20),
+        fontFamily: "ClashDisplay-SemiBold",
+    },
+    firstPinBox: {
+        borderTopLeftRadius: 16,
+        borderBottomLeftRadius: 16,
+    },
+
+    lastPinBox: {
+        borderTopRightRadius: 16,
+        borderBottomRightRadius: 16,
+    },
+
+    pinText: {
+        fontSize: 24,
+        fontWeight: "bold",
+    },
+
+    continueButton: {
+        backgroundColor: "#3366FF",
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        // marginTop: size.getHeightSize(32),
+    },
+
+    continueText: {
+        color: "#fff",
+        fontSize: 16,
+    },
+    user: {
+        alignSelf: "center",
+        width: size.getWidthSize(72),
+        height: size.getWidthSize(72),
+        marginTop: size.getHeightSize(24),
     },
 
     pageButton: {
-        width: "100%",
         height: size.getHeightSize(56),
         borderRadius: size.getWidthSize(12),
+        marginVertical: size.getHeightSize(24),
         padding: size.getWidthSize(16),
         backgroundColor: "#374BFB",
         justifyContent: "center",
@@ -298,4 +312,14 @@ const styles = StyleSheet.create({
         lineHeight: size.getHeightSize(24),
         color: "#ffffff",
     },
+
+    goBackText: {
+        fontFamily: "Satoshi-Regular",
+        textAlign: "center",
+        paddingBottom: size.getHeightSize(12),
+        color: "rgba(0, 0, 0, 0.8)",
+        fontSize: size.fontSize(16),
+    },
 });
+
+export default ReEnterPin;

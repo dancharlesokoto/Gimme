@@ -11,7 +11,7 @@ const Send = () => {
     return (
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
             <View style={styles.container}>
-                <GenericHeader title={"Send Gimme"} />
+                <GenericHeader title={"Send funds"} />
                 <View style={{ paddingVertical: size.getHeightSize(24) }}>
                     <Pressable
                         onPress={() =>

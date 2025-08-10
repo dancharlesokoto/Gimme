@@ -37,7 +37,6 @@ export default function SimpleNotify({
         <Animated.View
             style={{
                 height: _height,
-                paddingTop: size.getHeightSize(8),
             }}
         >
             {isShown && (

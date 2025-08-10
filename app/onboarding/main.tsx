@@ -30,11 +30,12 @@ const OnboardingScreen = () => {
                     >
                         <Text
                             style={{
+                                width: size.getWidthSize(280),
                                 fontSize: size.fontSize(28),
-                                // fontWeight: "700",
+                                lineHeight: size.getHeightSize(32),
                                 textAlign: "center",
                                 fontFamily: "ClashDisplay-Medium",
-                                color: Colors.text,
+                                color: "#0A0B14",
                             }}
                         >
                             Make transactions faster with Gimme
@@ -59,7 +60,7 @@ const OnboardingScreen = () => {
                             rippleColor="#fff"
                             contentContainerStyle={{
                                 backgroundColor: "#374BFB",
-                                paddingHorizontal: size.getWidthSize(16),
+                                paddingHorizontal: size.getWidthSize(18),
                                 paddingVertical: size.getHeightSize(16),
                             }}
                             style={{
@@ -70,7 +71,7 @@ const OnboardingScreen = () => {
                                 style={{
                                     color: "#ffffff",
                                     fontSize: size.fontSize(18),
-                                    fontFamily: "Satoshi-Bold",
+                                    fontFamily: "ClashDisplay-Medium",
                                 }}
                             >
                                 Create account

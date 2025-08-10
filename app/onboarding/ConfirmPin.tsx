@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     },
     keypadText: {
         fontSize: size.fontSize(20),
-        fontFamily: "ClashDisplay-Medium",
+        fontFamily: "ClashDisplay-SemiBold",
     },
 
     firstPinBox: {
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
 
     pageButtonText: {
         fontFamily: "Satoshi-Bold",
-        fontSize: size.fontSize(18),
+        fontSize: size.fontSize(14),
         lineHeight: size.getHeightSize(24),
         color: "#ffffff",
     },

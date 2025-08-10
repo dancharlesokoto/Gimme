@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
     View,
     Text,
@@ -24,9 +24,9 @@ const SetPin = () => {
     );
 
     const [phone, setPhone] = useState(useGlobalSearchParams().phone as string);
-    const handlePress = (value: any) => {
+    const handlePress = useCallback((value: any) => {
         pin.length < 4 && setPin((prevPin) => prevPin + value);
-    };
+    }, []);
 
     const handleDelete = () => {
         setPin((prevPin) => {
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
 
     keypadText: {
         fontSize: size.fontSize(20),
-        fontFamily: "ClashDisplay-Medium",
+        fontFamily: "ClashDisplay-SemiBold",
     },
     firstPinBox: {
         borderTopLeftRadius: 16,
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
 
     pageButtonText: {
         fontFamily: "Satoshi-Bold",
-        fontSize: size.fontSize(18),
+        fontSize: size.fontSize(14),
         lineHeight: size.getHeightSize(24),
         color: "#ffffff",
     },

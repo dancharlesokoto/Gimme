@@ -6,12 +6,13 @@ import { useQuery } from "@tanstack/react-query";
 import { getTransactions } from "@/services/transactions";
 import { useUserStore } from "@/store/userStore";
 import { useFocusEffect } from "expo-router";
-import { formatter } from "./WalletCard";
 
 //Icons......
+import WithdrawIcon from "@/assets/svg/withdrawIcon.svg"; //...
 import DepositIcon from "@/assets/svg/depositIcon.svg";
 import SendIcon from "@/assets/svg/sendIcon.svg";
 import ReceivedIcon from "@/assets/svg/receivedIcon.svg";
+//........
 import { formatCurrency } from "@/lib/currency";
 
 export default function Transactions({
@@ -79,6 +80,7 @@ export default function Transactions({
                         alignItems: "center",
                     }}
                 >
+                    {item.type == "withdrawal" && <WithdrawIcon />}
                     {item.type == "deposit" && <DepositIcon />}
                     {item.type == "transfer" && item.senderId == userId && (
                         <SendIcon />
@@ -101,6 +103,7 @@ export default function Transactions({
                             }}
                         >
                             {item.type == "deposit" && "Funded wallet"}
+                            {item.type == "withdrawal" && "Withdrawal"}
                             {item.type == "transfer" &&
                                 item.senderId == userId &&
                                 "Sent money"}
@@ -163,6 +166,7 @@ export default function Transactions({
                             }}
                         >
                             {item.type == "deposit" && "+"}
+                            {item.type == "withdrawal" && "-"}
                             {item.type == "transfer" &&
                                 item.senderId == userId &&
                                 "-"}
