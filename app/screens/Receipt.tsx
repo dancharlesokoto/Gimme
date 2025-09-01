@@ -39,7 +39,8 @@ const Receipt = () => {
                     </View>
                     <Text style={styles.success}>
                         {data.type == "transfer" && "Sent"}
-                        {data.type == "deposit" && "Funded with"} NGN{" "}
+                        {data.type == "deposit" && "Funded with"}{" "}
+                        {data.currency ?? "NGN"}{" "}
                         {formatCurrency({
                             value: data.amount,
                             currency: "ngn",
@@ -77,7 +78,7 @@ const Receipt = () => {
                     >
                         <Text style={styles.convertText}>Amount</Text>
                         <Text style={styles.convertAmount}>
-                            ₦{" "}
+                            {data.currency == "ngn" ? "₦" : "$"}{" "}
                             {formatCurrency({
                                 value: data.amount,
                                 currency: "ngn",
@@ -157,7 +158,7 @@ const Receipt = () => {
                         </Text>
                     </Pressable>
                     <Pressable
-                        onPress={() => router.replace("/(tabs)")}
+                        onPress={() => router.replace("/")}
                         style={{
                             backgroundColor: "#F6F6FA",
                             height: size.getHeightSize(56),

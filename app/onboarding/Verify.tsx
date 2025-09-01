@@ -14,38 +14,29 @@ import { Svg, Path } from "react-native-svg";
 import { router, useGlobalSearchParams } from "expo-router";
 import { toast } from "sonner-native";
 import { verifyPhone } from "@/services/auth";
-import PinInput from "@/components/PinInupt";
 import CustomRippleButton from "@/components/CustomRippleButton";
 import GenericHeader from "@/components/GenericHeader";
-import ReEnterPin from "./ReEnterPin";
 import ReEnterPinField from "@/components/Onboarding/ReEnterPinField";
 
 const Verify = () => {
     const [code, setCode] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [phone, setPhone] = useState(useGlobalSearchParams().phone as string);
-    const [email, setEmail] = useState(useGlobalSearchParams().email as string);
-    const [userId, setUserId] = useState(
-        useGlobalSearchParams().userId as string
-    );
-
+    const { phone, email, userId }: any = useGlobalSearchParams();
     const phoneNumber = `${phone.substring(0, 3)}***${phone.slice(-4)}`;
     const [timeLeft, setTimeLeft] = useState(59);
-    const [isTimeGone, setIsTimeGone] = useState(false);
 
     useEffect(() => {
         if (timeLeft <= 0) return;
         const interval = setInterval(() => {
-            setTimeLeft((time) => {
-                if (time <= 1) {
+            setTimeLeft((prevTime) => {
+                if (prevTime <= 1) {
                     clearInterval(interval);
                     return 0;
                 }
 
-                return time - 1;
+                return prevTime - 1;
             });
         }, 1000);
-
         return () => clearInterval(interval);
     }, [timeLeft]);
 
@@ -83,6 +74,12 @@ const Verify = () => {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (code.length === 4) {
+            handleVerify();
+        }
+    }, [code]);
 
     return (
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
@@ -170,7 +167,7 @@ const Verify = () => {
                             />
                         )}
                     </CustomRippleButton>
-                    {isTimeGone && (
+                    {timeLeft <= 0 && (
                         <CustomRippleButton
                             disabled={isLoading}
                             onPress={handleResendCode}

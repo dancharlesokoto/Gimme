@@ -1,7 +1,7 @@
 import { size } from "@/config/size";
 import { Redirect, Tabs } from "expo-router";
-import React, { useEffect, useRef } from "react";
-import { AppState, TouchableOpacity, View } from "react-native";
+import React from "react";
+import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HomeIcon from "@/assets/svg/tabs/home.svg";
@@ -17,41 +17,13 @@ import ActiveActivities from "../../assets/svg/tabs/activeActivities.svg";
 import { useUserStore } from "@/store/userStore";
 import { IMAGE_URL } from "@/services/api";
 import { Image } from "expo-image";
+import useSessionTimeout from "@/hooks/useSessionTimeout";
+import AvatarInitials from "@/components/AvatarInitials";
 
 export default function TabLayout() {
     const user = useUserStore((state) => state.user);
-    const isStale = useUserStore((state) => state.isStale);
     const insets = useSafeAreaInsets();
-    const appState = useRef(AppState.currentState);
-
-    useEffect(() => {
-        const subscription = AppState.addEventListener(
-            "change",
-            (nextAppState) => {
-                console.log("Current state:", appState.current);
-                console.log("Next state:", nextAppState);
-
-                if (
-                    appState.current === "active" &&
-                    nextAppState.match(/inactive|background/)
-                ) {
-                    useUserStore.getState().setIsStale(true);
-                    console.log("🔒 App is going to background or closed");
-                    // You can trigger logout, save data, or other cleanup here
-                }
-
-                if (nextAppState === "active") {
-                    console.log("📲 App has come to the foreground");
-                }
-
-                appState.current = nextAppState;
-            }
-        );
-
-        return () => {
-            subscription.remove();
-        };
-    }, []);
+    const { isStale } = useSessionTimeout();
 
     if (!user.userId) {
         return <Redirect href="/onboarding/main" />;
@@ -72,7 +44,7 @@ export default function TabLayout() {
                     fontSize: size.fontSize(11),
                 },
                 tabBarButton: (props: any) => (
-                    <TouchableOpacity activeOpacity={0.3} {...props} />
+                    <TouchableOpacity activeOpacity={0.9} {...props} />
                 ),
                 tabBarStyle: {
                     height: size.getHeightSize(80) + insets.bottom,
@@ -82,6 +54,7 @@ export default function TabLayout() {
                     paddingBottom: insets.bottom,
                     justifyContent: "center",
                 },
+                lazy: false,
             }}
         >
             <Tabs.Screen
@@ -188,14 +161,14 @@ export default function TabLayout() {
                                             : "#E2E3E9",
                                     }}
                                 >
-                                    <Image
-                                        source={require("@/assets/images/user.png")}
-                                        contentFit="cover"
+                                    <AvatarInitials
+                                        name={user.name}
+                                        textStyle={{
+                                            fontSize: size.fontSize(12),
+                                        }}
                                         style={{
                                             width: size.getWidthSize(22),
                                             height: size.getHeightSize(22),
-                                            borderRadius:
-                                                size.getWidthSize(100),
                                         }}
                                     />
                                 </View>

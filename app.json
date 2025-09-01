@@ -5,7 +5,7 @@
         "version": "1.0.0",
         "jsEngine": "hermes",
         "orientation": "portrait",
-        "icon": "./assets/images/icon.png",
+        "icon": "./assets/images/gimme.png",
         "scheme": "myapp",
         "userInterfaceStyle": "automatic",
         "newArchEnabled": true,
@@ -18,8 +18,8 @@
         },
         "android": {
             "adaptiveIcon": {
-                "foregroundImage": "./assets/images/icon.png",
-                "backgroundColor": "#374BFB"
+                "foregroundImage": "./assets/images/gimme.png",
+                "backgroundColor": "#000"
             },
             "package": "com.anonymous.gimme",
             "permissions": ["android.permission.RECORD_AUDIO"]
@@ -31,6 +31,14 @@
         },
         "plugins": [
             "expo-router",
+            [
+                "expo-camera",
+                {
+                    "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+                    "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+                    "recordAudioAndroid": true
+                }
+            ],
             [
                 "expo-splash-screen",
                 {

@@ -8,7 +8,7 @@ export default function RewardsCTA() {
     return (
         <View
             style={{
-                padding: size.getWidthSize(24),
+                paddingHorizontal: size.getWidthSize(24),
             }}
         >
             <View

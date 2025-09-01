@@ -1,12 +1,11 @@
-import CreateBankAccountCTA from "@/components/Fund/CreateBankAccountCTA";
 import GenericHeader from "@/components/GenericHeader";
 import SimpleNotify from "@/components/Global/SimpleNotify";
 import PageLoader from "@/components/PageLoader";
 import { size } from "@/config/size";
-import { getBankAccount, getBankAccountStatus } from "@/services/user";
+import { getBankAccount } from "@/services/user";
 import CustomSafeArea from "@/shared/CustomSafeArea";
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { toast } from "sonner-native";
@@ -80,7 +79,10 @@ export default function FundWithBankTransfer() {
                                         <Text style={styles.listLabel}>
                                             Account Name
                                         </Text>
-                                        <Text style={styles.listText}>
+                                        <Text
+                                            selectable
+                                            style={styles.listText}
+                                        >
                                             {
                                                 accountDetails.data.data
                                                     .account_name
@@ -94,7 +96,10 @@ export default function FundWithBankTransfer() {
                                         <Text style={styles.listLabel}>
                                             Account Number
                                         </Text>
-                                        <Text style={styles.listText}>
+                                        <Text
+                                            selectable
+                                            style={styles.listText}
+                                        >
                                             {
                                                 accountDetails.data.data
                                                     .account_number
@@ -130,7 +135,10 @@ export default function FundWithBankTransfer() {
                                         <Text style={styles.listLabel}>
                                             Bank Name
                                         </Text>
-                                        <Text style={styles.listText}>
+                                        <Text
+                                            selectable
+                                            style={styles.listText}
+                                        >
                                             {accountDetails.data.data.bank.name}
                                         </Text>
                                     </View>
@@ -143,19 +151,23 @@ export default function FundWithBankTransfer() {
                                             gap: size.getWidthSize(4),
                                             justifyContent: "flex-start",
                                             width: "100%",
-                                            paddingLeft: size.getWidthSize(3),
                                         },
                                     ]}
                                 >
-                                    <Text
-                                        style={{
-                                            fontFamily: "ClashDisplay-Medium",
-                                            fontSize: size.fontSize(14),
-                                            color: "#374BFB",
-                                        }}
+                                    <TouchableOpacity
+                                        hitSlop={size.getWidthSize(20)}
                                     >
-                                        Share Details
-                                    </Text>
+                                        <Text
+                                            style={{
+                                                fontFamily:
+                                                    "ClashDisplay-Medium",
+                                                fontSize: size.fontSize(14),
+                                                color: "#374BFB",
+                                            }}
+                                        >
+                                            Share Details
+                                        </Text>
+                                    </TouchableOpacity>
                                     <Svg
                                         // xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 16 16"

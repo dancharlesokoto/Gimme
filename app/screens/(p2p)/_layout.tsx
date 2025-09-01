@@ -2,57 +2,57 @@ import React from "react";
 import { Stack } from "expo-router";
 
 export default function p2pLayout() {
-  return (
-    <Stack>
-      <Stack.Screen
-        name="Orders"
-        options={{ headerShown: false, animation: "ios_from_right" }}
-      />
+    return (
+        <Stack>
+            <Stack.Screen
+                name="Orders"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
 
-      <Stack.Screen
-        name="BuyOrder"
-        options={{ headerShown: false, animation: "ios_from_right" }}
-      />
+            <Stack.Screen
+                name="BuyOrder"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
 
-      <Stack.Screen
-        name="ProcessBuyOrder"
-        options={{ headerShown: false, animation: "ios_from_right" }}
-      />
+            <Stack.Screen
+                name="ProcessBuyOrder"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
 
-      <Stack.Screen
-        name="SellOrder"
-        options={{ headerShown: false, animation: "ios_from_right" }}
-      />
+            <Stack.Screen
+                name="SellOrder"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
 
-      <Stack.Screen
-        name="ProcessSellOrder"
-        options={{ headerShown: false, animation: "ios_from_right" }}
-      />
+            <Stack.Screen
+                name="ProcessSellOrder"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
 
-      <Stack.Screen
-        name="MyAds"
-        options={{ headerShown: false, animation: "ios_from_right" }}
-      />
+            <Stack.Screen
+                name="MyAds"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
 
-      <Stack.Screen
-        name="CreateAd"
-        options={{ headerShown: false, animation: "ios_from_right" }}
-      />
+            <Stack.Screen
+                name="CreateAd"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
 
-      <Stack.Screen
-        name="Chats"
-        options={{ headerShown: false, animation: "ios_from_right" }}
-      />
+            <Stack.Screen
+                name="Chats"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
 
-      <Stack.Screen
-        name="ChatConversation"
-        options={{ headerShown: false, animation: "ios_from_right" }}
-      />
+            <Stack.Screen
+                name="ChatConversation"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
 
-      <Stack.Screen
-        name="CancelOrder"
-        options={{ headerShown: false, animation: "ios_from_right" }}
-      />
-    </Stack>
-  );
+            <Stack.Screen
+                name="CancelOrder"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
+        </Stack>
+    );
 }

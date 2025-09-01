@@ -1,4 +1,4 @@
-import { Text } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
     BottomSheetBackdrop,
@@ -6,14 +6,21 @@ import {
     BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { size } from "@/config/size";
-import Loader from "@/assets/svg/loadingInfinity.svg";
-import { ActivityIndicator } from "react-native-paper";
+import { Image } from "expo-image";
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    Easing,
+    withRepeat,
+    withTiming,
+} from "react-native-reanimated";
 
 type LoadingBottomSheetProps = {
     isLoading: boolean;
+    text?: string;
 };
 const LoadingBottomSheet = React.memo(
-    ({ isLoading }: LoadingBottomSheetProps) => {
+    ({ isLoading, text }: LoadingBottomSheetProps) => {
         ///.......................
         const snapPoints = useMemo(() => ["40%"], []);
         const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -25,6 +32,26 @@ const LoadingBottomSheet = React.memo(
                 bottomSheetModalRef.current?.close();
             }
         }, [isLoading]);
+
+        const scale = useSharedValue(1);
+
+        useEffect(() => {
+            scale.value = withRepeat(
+                withTiming(1.2, {
+                    duration: 400,
+                    easing: Easing.inOut(Easing.ease),
+                }),
+                -1, // -1 = infinite loop
+                true // reverse (goes back to 1)
+            );
+        }, []);
+
+        // Animated style
+        const animatedStyle = useAnimatedStyle(() => {
+            return {
+                transform: [{ scale: scale.value }],
+            };
+        });
         ///.......................
 
         const renderBackdrop = useCallback(
@@ -47,7 +74,7 @@ const LoadingBottomSheet = React.memo(
                 snapPoints={snapPoints}
                 backdropComponent={renderBackdrop}
                 backgroundStyle={{
-                    borderRadius: size.getWidthSize(30),
+                    borderRadius: size.getWidthSize(20),
                     flex: 1,
                 }}
             >
@@ -55,7 +82,7 @@ const LoadingBottomSheet = React.memo(
                     style={{
                         height: "100%",
                         display: "flex",
-                        gap: size.getHeightSize(8),
+                        gap: size.getHeightSize(16),
                         flexDirection: "column",
                         paddingHorizontal: size.getWidthSize(20),
                         paddingVertical: size.getHeightSize(8),
@@ -63,10 +90,17 @@ const LoadingBottomSheet = React.memo(
                         alignItems: "center",
                     }}
                 >
-                    <ActivityIndicator
-                        color="#374BFB"
-                        size={size.getHeightSize(40)}
-                    />
+                    <Animated.View style={animatedStyle}>
+                        <Image
+                            contentFit="contain"
+                            source={require("@/assets/images/logo.png")}
+                            style={{
+                                width: size.getWidthSize(40),
+                                height: size.getHeightSize(40),
+                            }}
+                        />
+                    </Animated.View>
+
                     <Text
                         style={{
                             fontSize: size.fontSize(16),
@@ -74,7 +108,7 @@ const LoadingBottomSheet = React.memo(
                             textAlign: "center",
                         }}
                     >
-                        Signing you in.
+                        {text ? text : "Signing you in."}
                     </Text>
                 </BottomSheetView>
             </BottomSheetModal>

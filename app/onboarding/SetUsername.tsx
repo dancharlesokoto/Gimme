@@ -17,6 +17,7 @@ import { router } from "expo-router";
 import Svg, { Path } from "react-native-svg";
 import CustomRippleButton from "@/components/CustomRippleButton";
 import { setUsername as setUsernameApi } from "@/services/auth";
+import GenericButton from "@/components/GenericButton";
 
 export default function SetUsername() {
     const { userId, phone, email }: any = useGlobalSearchParams();
@@ -129,36 +130,12 @@ export default function SetUsername() {
                             justifyContent: "flex-end",
                         }}
                     >
-                        <CustomRippleButton
-                            onPress={handleNext}
-                            contentContainerStyle={styles.pageButton}
-                            disabled={isLoading}
-                        >
-                            {isLoading ? (
-                                <ActivityIndicator color="#fff" />
-                            ) : (
-                                <Text style={styles.pageButtonText}>
-                                    Proceed
-                                </Text>
-                            )}
-                        </CustomRippleButton>
-                        <CustomRippleButton
+                        <GenericButton onPress={handleNext} text="Proceed" />
+                        <GenericButton
                             onPress={handleSkip}
-                            contentContainerStyle={[
-                                styles.pageButton,
-                                { backgroundColor: "#E2E3E9" },
-                            ]}
-                            disabled={isLoading}
-                        >
-                            <Text
-                                style={[
-                                    styles.pageButtonText,
-                                    { color: "rgb(99, 102, 110)" },
-                                ]}
-                            >
-                                Skip
-                            </Text>
-                        </CustomRippleButton>
+                            text="Skip"
+                            active={false}
+                        />
                     </View>
                 </View>
             </TouchableWithoutFeedback>

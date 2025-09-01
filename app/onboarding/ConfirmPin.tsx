@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     View,
     Text,
@@ -16,39 +16,28 @@ import { createPin, loginUser } from "@/services/auth";
 import GenericHeader from "@/components/GenericHeader";
 import CustomRippleButton from "@/components/CustomRippleButton";
 import ReEnterPinField from "@/components/Onboarding/ReEnterPinField";
+import { Image } from "expo-image";
+import User from "@/assets/images/user.png";
+import LoadingBottomSheet from "@/components/Onboarding/LoadingBottomSheet";
 
 const EnterPin = () => {
     const [pin, setPin] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [userId, setUserId] = useState(
-        useGlobalSearchParams().userId as string
-    );
 
-    const { phone }: { phone: string } = useGlobalSearchParams();
-    const { pinConfirm } = useGlobalSearchParams();
+    const { userId, phone, pinConfirm }: any = useGlobalSearchParams();
 
     const handlePress = (value: any) => {
         pin.length < 4 && setPin((prevPin) => prevPin + value);
     };
 
     const handleDelete = () => {
-        setPin((prevPin) => {
-            let newPin = prevPin;
-            const index = newPin.lastIndexOf("");
-
-            if (index === -1) {
-                newPin = newPin.slice(0, -1);
-            } else {
-                newPin =
-                    newPin.substring(0, index - 1) +
-                    "" +
-                    newPin.substring(index);
-            }
-            return newPin;
-        });
+        if (pin.length == 0) {
+            return;
+        }
+        setPin((prevPin) => prevPin.slice(0, -1));
     };
 
-    const handleNext = async () => {
+    const handleNext = useCallback(async () => {
         if (pin.length !== 4) {
             toast.error("Please enter a four-digit pin", {
                 duration: 2000,
@@ -65,7 +54,7 @@ const EnterPin = () => {
         }
         try {
             setIsLoading(true);
-            const res = await createPin({
+            await createPin({
                 userId: userId as string,
                 pin: pin,
             });
@@ -74,9 +63,10 @@ const EnterPin = () => {
                 uid: phone,
                 pin: pin,
             });
-            toast.success(res.message, {
-                duration: 2000,
-                dismissible: true,
+            await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(true);
+                }, 500);
             });
             router.replace("/");
         } catch (error: any) {
@@ -85,17 +75,32 @@ const EnterPin = () => {
                 dismissible: true,
             });
         } finally {
+            await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(true);
+                }, 500);
+            });
             setIsLoading(false);
         }
-    };
+    }, [pin, userId, phone]);
+
+    useEffect(() => {
+        if (pin.length === 4) {
+            handleNext();
+        }
+    }, [pin]);
 
     return (
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
             <View style={styles.container}>
                 <View>
-                    <GenericHeader title="" />
+                    <GenericHeader title="" showBackButton={false} />
                     <View style={{ alignItems: "center" }}>
+                        <Image source={User} style={styles.user} />
                         <Text style={styles.title}>Confirm pin</Text>
+                        <Text style={styles.subtitle}>
+                            Comfirm your a pin below to continue
+                        </Text>
 
                         <View style={styles.pinContainer}>
                             <ReEnterPinField
@@ -105,62 +110,75 @@ const EnterPin = () => {
                             />
                             {/* <PinInput
                             code={pin}
-                            protectedField={true}
                             onChange={setPin}
+                            protectedField={true}
                         /> */}
                         </View>
                     </View>
                 </View>
-
-                <View>
+                <View style={{ flex: 1, justifyContent: "center" }}>
                     <View style={styles.keypadContainer}>
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, null, 0, ""].map(
-                            (value, index) =>
-                                value === null ? (
-                                    <TouchableOpacity
-                                        key={index}
-                                        style={styles.keypadButton}
-                                        onPress={handleDelete}
-                                    >
-                                        <Cancel />
-                                    </TouchableOpacity>
-                                ) : value === "" ? (
-                                    <TouchableOpacity
-                                        key={index}
-                                        disabled={true}
-                                        style={[
-                                            styles.keypadButton,
-                                            { opacity: 0.4 },
-                                        ]}
-                                        onPress={() => {}}
-                                    >
-                                        <Finger />
-                                    </TouchableOpacity>
-                                ) : (
-                                    <TouchableOpacity
-                                        key={index}
-                                        style={styles.keypadButton}
-                                        onPress={() => handlePress(value)}
-                                    >
-                                        <Text style={styles.keypadText}>
-                                            {value}
-                                        </Text>
-                                    </TouchableOpacity>
-                                )
+                            (value, index) => {
+                                if (value === null) {
+                                    return (
+                                        <TouchableOpacity
+                                            key={index}
+                                            style={styles.keypadButton}
+                                            onPress={handleDelete}
+                                        >
+                                            <Cancel />
+                                        </TouchableOpacity>
+                                    );
+                                } else if (value === "") {
+                                    return (
+                                        <View
+                                            key={index}
+                                            style={[
+                                                styles.keypadButton,
+                                                { opacity: 0.4 },
+                                            ]}
+                                        >
+                                            <Finger />
+                                        </View>
+                                    );
+                                } else {
+                                    return (
+                                        <TouchableOpacity
+                                            key={index}
+                                            style={styles.keypadButton}
+                                            onPress={() => handlePress(value)}
+                                        >
+                                            <Text style={styles.keypadText}>
+                                                {value}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                }
+                            }
                         )}
                     </View>
-                    <CustomRippleButton
-                        onPress={handleNext}
-                        contentContainerStyle={styles.pageButton}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text style={styles.pageButtonText}>Continue</Text>
-                        )}
-                    </CustomRippleButton>
                 </View>
+
+                {/* <GenericButton
+                    text="Continue"
+                    onPress={handleNext}
+                    isLoading={isLoading}
+                /> */}
+                <TouchableOpacity onPress={() => router.back()}>
+                    <Text style={styles.goBackText}>
+                        Something went wrong?{" "}
+                        <Text
+                            style={{
+                                textDecorationLine: "underline",
+                                fontFamily: "Satoshi-Bold",
+                            }}
+                        >
+                            Go back
+                        </Text>
+                    </Text>
+                </TouchableOpacity>
+                <LoadingBottomSheet isLoading={isLoading} />
             </View>
         </CustomSafeArea>
     );
@@ -169,6 +187,8 @@ const EnterPin = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        gap: size.getHeightSize(24),
+        paddingBottom: size.getHeightSize(48),
         paddingHorizontal: size.getWidthSize(24),
         justifyContent: "space-between",
     },
@@ -178,21 +198,22 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: size.fontSize(20),
-        fontFamily: "Satoshi-Bold",
-        textAlign: "center",
-        marginTop: size.getHeightSize(50),
+        fontFamily: "ClashDisplay-SemiBold",
+        // textAlign: "center",
+        marginTop: size.getHeightSize(8),
+        color: "#0A0B14",
     },
     subtitle: {
         fontSize: size.fontSize(14),
         fontFamily: "Satoshi-Regular",
-        textAlign: "center",
-        paddingTop: size.getHeightSize(8),
+        // textAlign: "center",
+        paddingTop: size.getHeightSize(1),
     },
 
     pinContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingVertical: size.getHeightSize(32),
+        paddingVertical: size.getHeightSize(24),
         gap: size.getWidthSize(8),
     },
 
@@ -209,20 +230,20 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
         justifyContent: "space-between",
-        paddingHorizontal: size.getWidthSize(0),
+        paddingHorizontal: size.getWidthSize(12),
     },
 
     keypadButton: {
         width: "30%",
-        height: size.getHeightSize(70),
+        height: size.getHeightSize(80),
         justifyContent: "center",
         alignItems: "center",
     },
+
     keypadText: {
         fontSize: size.fontSize(20),
         fontFamily: "ClashDisplay-SemiBold",
     },
-
     firstPinBox: {
         borderTopLeftRadius: 16,
         borderBottomLeftRadius: 16,
@@ -250,6 +271,12 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 16,
     },
+    user: {
+        alignSelf: "center",
+        width: size.getWidthSize(72),
+        height: size.getWidthSize(72),
+        marginTop: size.getHeightSize(24),
+    },
 
     pageButton: {
         height: size.getHeightSize(56),
@@ -263,9 +290,17 @@ const styles = StyleSheet.create({
 
     pageButtonText: {
         fontFamily: "Satoshi-Bold",
-        fontSize: size.fontSize(14),
+        fontSize: size.fontSize(18),
         lineHeight: size.getHeightSize(24),
         color: "#ffffff",
+    },
+
+    goBackText: {
+        fontFamily: "Satoshi-Regular",
+        textAlign: "center",
+        paddingBottom: size.getHeightSize(12),
+        color: "rgba(0, 0, 0, 0.8)",
+        fontSize: size.fontSize(16),
     },
 });
 

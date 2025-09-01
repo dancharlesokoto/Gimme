@@ -82,31 +82,6 @@ const DATA: DataType = {
                 "Convert funds from your other wallets to your USD wallet",
             link: "/screens/(fund)/Convert?currency=usd",
         },
-        {
-            icon: (
-                <Svg
-                    // xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    style={{
-                        width: size.getWidthSize(15),
-                        height: size.getHeightSize(15),
-                    }}
-                    strokeWidth="1.8"
-                    stroke="#2D9F70"
-                >
-                    <Path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m19.5 4.5-15 15m0 0h11.25m-11.25 0V8.25"
-                    />
-                </Svg>
-            ),
-            title: "Request payment",
-            description:
-                "Request payment from other users to fund your USD wallet",
-            link: "/screens/(fund)/Convert",
-        },
     ],
     ngn: [
         {

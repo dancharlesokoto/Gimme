@@ -9,3 +9,21 @@ export const getCryptoWallet = async () => {
         throw new Error(errorMessage);
     }
 };
+
+export const sendUsdc = async (
+    amount: string,
+    address: string,
+    pin: string,
+    isBiometrics = false
+) => {
+    try {
+        const { data } = await axiosInstance.post(
+            "/crypto-wallet/send-transaction",
+            { amount, address, pin, isBiometrics }
+        );
+        return data;
+    } catch (error: any) {
+        const errorMessage = error.response?.data?.message || error.message;
+        throw new Error(errorMessage);
+    }
+};

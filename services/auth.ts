@@ -54,7 +54,7 @@ export const loginUser = async ({ uid, pin }: { uid: string; pin: string }) => {
             pin,
         });
         useUserStore.getState().setUser(request.data);
-        useUserStore.getState().setIsStale(false);
+        useUserStore.getState().setLastStale(Date.now());
         return request.data;
     } catch (error: any) {
         const errorMessage = error.response?.data?.message || error.message;

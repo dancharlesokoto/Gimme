@@ -64,6 +64,8 @@ export const withdrawFiat = async ({
     accountName,
     bankName,
     accountNumber,
+    isBiometrics,
+    pin,
 }: {
     amount: string;
     remark?: string;
@@ -71,6 +73,8 @@ export const withdrawFiat = async ({
     accountName: string;
     bankName: string;
     accountNumber: string;
+    isBiometrics?: boolean;
+    pin?: string;
 }) => {
     try {
         const { data } = await axiosInstance.post(
@@ -82,6 +86,8 @@ export const withdrawFiat = async ({
                 accountName,
                 bankName,
                 accountNumber,
+                isBiometrics,
+                pin,
             }
         );
         return data;

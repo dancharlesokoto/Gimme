@@ -1,58 +1,54 @@
-import { AppState } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useEffect, useRef, useState, useCallback } from "react";
 import { useUserStore } from "@/store/userStore";
+import { router } from "expo-router";
+import { useRef, useEffect, useState } from "react";
+import { View, Text, AppState } from "react-native";
 
-const INACTIVITY_LIMIT = 20 * 1000; // 5 minutes
-const LAST_ACTIVE_KEY = "lastActiveTime";
+export default function useSessionTimeout() {
+    ///State to check if the session is stale
+    const [iStale, setIStale] = useState(false);
 
-export function useSessionTimeout(onTimeout: () => void) {
-    const [appState, setAppState] = useState(AppState.currentState);
+    const appState = useRef(AppState.currentState);
+    const lastStale = useUserStore((state) => state.lastStale);
 
-    // Save last active time to storage
-    const updateLastActive = useCallback(async () => {
-        await AsyncStorage.setItem(LAST_ACTIVE_KEY, Date.now().toString());
-    }, []);
-
-    // Check if session is stale
-    const checkTimeout = useCallback(async () => {
-        const lastActive = await AsyncStorage.getItem(LAST_ACTIVE_KEY);
-        if (lastActive) {
-            const diff = Date.now() - parseInt(lastActive, 10);
-            if (diff > INACTIVITY_LIMIT) {
-                onTimeout();
-            }
-        }
-        // Always update last active on resume
-        await updateLastActive();
-    }, [onTimeout, updateLastActive]);
+    const INACTIVITY_LIMIT = 1000 * 60 * 20;
 
     useEffect(() => {
-        // On mount, set last active
-        updateLastActive();
-
-        // Listen for app state changes
         const subscription = AppState.addEventListener(
             "change",
             (nextAppState) => {
                 if (
-                    (appState === "inactive" || appState === "background") &&
-                    nextAppState === "active"
+                    appState.current === "active" &&
+                    nextAppState.match(/inactive|background/)
                 ) {
-                    checkTimeout();
-                } else if (
-                    nextAppState === "inactive" ||
-                    nextAppState === "background"
-                ) {
-                    updateLastActive();
+                    useUserStore.getState().setLastStale(Date.now());
                 }
-                setAppState(nextAppState);
+
+                if (nextAppState === "active") {
+                    if (Date.now() - lastStale >= INACTIVITY_LIMIT) {
+                        setIStale(true);
+                        router.replace("/onboarding/ReEnterPin");
+                    } else {
+                        setIStale(false);
+                    }
+                }
+
+                appState.current = nextAppState;
             }
         );
 
-        return () => subscription.remove();
-    }, [appState, checkTimeout, updateLastActive]);
+        return () => {
+            subscription.remove();
+        };
+    }, []);
 
-    // Call this on any user activity (touch, scroll, etc.)
-    return { updateLastActive };
+    useEffect(() => {
+        if (lastStale !== null && Date.now() - lastStale >= INACTIVITY_LIMIT) {
+            setIStale(true);
+        } else {
+            setIStale(false);
+        }
+    }, [lastStale]);
+    return {
+        isStale: iStale,
+    };
 }

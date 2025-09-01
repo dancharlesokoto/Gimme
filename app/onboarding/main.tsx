@@ -5,8 +5,6 @@ import CustomSafeArea from "@/shared/CustomSafeArea";
 import { size } from "@/config/size";
 import { useRouter } from "expo-router";
 import { Colors } from "@/constants/Colors";
-import { Button, TouchableRipple } from "react-native-paper";
-import Ripple from "react-native-material-ripple";
 import CustomRippleButton from "@/components/CustomRippleButton";
 
 const OnboardingScreen = () => {
@@ -71,7 +69,7 @@ const OnboardingScreen = () => {
                                 style={{
                                     color: "#ffffff",
                                     fontSize: size.fontSize(18),
-                                    fontFamily: "ClashDisplay-Medium",
+                                    fontFamily: "Satoshi-Medium",
                                 }}
                             >
                                 Create account

@@ -8,18 +8,15 @@ export default function PrimaryOptions() {
     return (
         <View
             style={{
-                paddingBottom: size.getHeightSize(24),
                 flexDirection: "row",
                 justifyContent: "space-between",
                 marginHorizontal: size.getWidthSize(24),
+                gap: size.getWidthSize(24),
             }}
         >
             <Pressable
                 onPress={() => router.push("/screens/(send)/Send")}
-                style={[
-                    styles.featureCard,
-                    { marginRight: size.getWidthSize(12), flex: 1 },
-                ]}
+                style={[styles.featureCard]}
             >
                 <View
                     style={{
@@ -64,10 +61,7 @@ export default function PrimaryOptions() {
             </Pressable>
             <Pressable
                 onPress={() => router.push("/screens/(fund)/Convert")}
-                style={[
-                    styles.featureCard,
-                    { marginLeft: size.getWidthSize(12), flex: 1 },
-                ]}
+                style={[styles.featureCard]}
             >
                 <View
                     style={{
@@ -116,8 +110,9 @@ export default function PrimaryOptions() {
 
 const styles = StyleSheet.create({
     featureCard: {
+        flex: 1,
         backgroundColor: "#F7F7F7",
-        borderRadius: 15,
+        borderRadius: size.getWidthSize(18),
         paddingVertical: size.getHeightSize(12),
         paddingHorizontal: size.getWidthSize(12),
         width: size.getWidthSize(160.5),

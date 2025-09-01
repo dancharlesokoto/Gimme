@@ -1,8 +1,15 @@
 import { View, Text } from "react-native";
-import React from "react";
-import { Stack } from "expo-router";
+import React, { useEffect } from "react";
+import { Redirect, Stack } from "expo-router";
+import { useUserStore } from "@/store/userStore";
+import useSessionTimeout from "@/hooks/useSessionTimeout";
 
 export default function ScreensLayout() {
+    const { isStale } = useSessionTimeout();
+
+    if (isStale) {
+        return <Redirect href="/onboarding/ReEnterPin" />;
+    }
     return (
         <Stack>
             <Stack.Screen
@@ -17,10 +24,10 @@ export default function ScreensLayout() {
                 name="(market)"
                 options={{ headerShown: false, animation: "ios_from_right" }}
             />
-            <Stack.Screen
+            {/* <Stack.Screen
                 name="(p2p)"
                 options={{ headerShown: false, animation: "ios_from_right" }}
-            />
+            /> */}
             <Stack.Screen
                 name="(send)"
                 options={{ headerShown: false, animation: "ios_from_right" }}
@@ -39,6 +46,11 @@ export default function ScreensLayout() {
             />
             <Stack.Screen
                 name="Notifications"
+                options={{ headerShown: false, animation: "ios_from_right" }}
+            />
+
+            <Stack.Screen
+                name="QrScanner"
                 options={{ headerShown: false, animation: "ios_from_right" }}
             />
         </Stack>

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     View,
     Text,
@@ -15,10 +15,11 @@ import { toast } from "sonner-native";
 import GenericHeader from "@/components/GenericHeader";
 import ReEnterPinField from "@/components/Onboarding/ReEnterPinField";
 import CustomRippleButton from "@/components/CustomRippleButton";
+import { Image } from "expo-image";
+import User from "@/assets/images/user.png";
 
 const SetPin = () => {
     const [pin, setPin] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
     const [userId, setUserId] = useState(
         useGlobalSearchParams().userId as string
     );
@@ -29,20 +30,10 @@ const SetPin = () => {
     }, []);
 
     const handleDelete = () => {
-        setPin((prevPin) => {
-            let newPin = prevPin;
-            const index = newPin.lastIndexOf("");
-
-            if (index === -1) {
-                newPin = newPin.slice(0, -1);
-            } else {
-                newPin =
-                    newPin.substring(0, index - 1) +
-                    "" +
-                    newPin.substring(index);
-            }
-            return newPin;
-        });
+        if (pin.length == 0) {
+            return;
+        }
+        setPin((prevPin) => prevPin.slice(0, -1));
     };
 
     const handleNext = async () => {
@@ -58,16 +49,21 @@ const SetPin = () => {
         );
     };
 
+    useEffect(() => {
+        if (pin.length === 4) {
+            handleNext();
+        }
+    }, [pin]);
     return (
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
             <View style={styles.container}>
                 <View>
-                    <GenericHeader title="" />
+                    <GenericHeader title="" showBackButton={false} />
                     <View style={{ alignItems: "center" }}>
-                        <Text style={styles.title}>Set up your Pin</Text>
+                        <Image source={User} style={styles.user} />
+                        <Text style={styles.title}>Set pin</Text>
                         <Text style={styles.subtitle}>
-                            This pin will be used to login and complete
-                            transactions
+                            Enter a pin below to continue
                         </Text>
 
                         <View style={styles.pinContainer}>
@@ -78,61 +74,74 @@ const SetPin = () => {
                             />
                             {/* <PinInput
                             code={pin}
-                            protectedField={true}
                             onChange={setPin}
+                            protectedField={true}
                         /> */}
                         </View>
                     </View>
                 </View>
-                <View>
+                <View style={{ flex: 1, justifyContent: "center" }}>
                     <View style={styles.keypadContainer}>
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, null, 0, ""].map(
-                            (value, index) =>
-                                value === null ? (
-                                    <TouchableOpacity
-                                        key={index}
-                                        style={styles.keypadButton}
-                                        onPress={handleDelete}
-                                    >
-                                        <Cancel />
-                                    </TouchableOpacity>
-                                ) : value === "" ? (
-                                    <TouchableOpacity
-                                        key={index}
-                                        disabled={true}
-                                        style={[
-                                            styles.keypadButton,
-                                            { opacity: 0.4 },
-                                        ]}
-                                        onPress={() => {}}
-                                    >
-                                        <Finger />
-                                    </TouchableOpacity>
-                                ) : (
-                                    <TouchableOpacity
-                                        key={index}
-                                        style={styles.keypadButton}
-                                        onPress={() => handlePress(value)}
-                                    >
-                                        <Text style={styles.keypadText}>
-                                            {value}
-                                        </Text>
-                                    </TouchableOpacity>
-                                )
+                            (value, index) => {
+                                if (value === null) {
+                                    return (
+                                        <TouchableOpacity
+                                            key={index}
+                                            style={styles.keypadButton}
+                                            onPress={handleDelete}
+                                        >
+                                            <Cancel />
+                                        </TouchableOpacity>
+                                    );
+                                } else if (value === "") {
+                                    return (
+                                        <View
+                                            key={index}
+                                            style={[
+                                                styles.keypadButton,
+                                                { opacity: 0.4 },
+                                            ]}
+                                        >
+                                            <Finger />
+                                        </View>
+                                    );
+                                } else {
+                                    return (
+                                        <TouchableOpacity
+                                            key={index}
+                                            style={styles.keypadButton}
+                                            onPress={() => handlePress(value)}
+                                        >
+                                            <Text style={styles.keypadText}>
+                                                {value}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                }
+                            }
                         )}
                     </View>
-                    <CustomRippleButton
-                        onPress={handleNext}
-                        contentContainerStyle={styles.pageButton}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text style={styles.pageButtonText}>Continue</Text>
-                        )}
-                    </CustomRippleButton>
                 </View>
+
+                {/* <GenericButton
+                    text="Continue"
+                    onPress={handleNext}
+                    isLoading={isLoading}
+                /> */}
+                <TouchableOpacity onPress={() => router.back()}>
+                    <Text style={styles.goBackText}>
+                        Something went wrong?{" "}
+                        <Text
+                            style={{
+                                textDecorationLine: "underline",
+                                fontFamily: "Satoshi-Bold",
+                            }}
+                        >
+                            Go back
+                        </Text>
+                    </Text>
+                </TouchableOpacity>
             </View>
         </CustomSafeArea>
     );
@@ -141,6 +150,8 @@ const SetPin = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        gap: size.getHeightSize(24),
+        paddingBottom: size.getHeightSize(48),
         paddingHorizontal: size.getWidthSize(24),
         justifyContent: "space-between",
     },
@@ -150,21 +161,22 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: size.fontSize(20),
-        fontFamily: "Satoshi-Bold",
-        textAlign: "center",
-        marginTop: size.getHeightSize(50),
+        fontFamily: "ClashDisplay-SemiBold",
+        // textAlign: "center",
+        marginTop: size.getHeightSize(8),
+        color: "#0A0B14",
     },
     subtitle: {
         fontSize: size.fontSize(14),
         fontFamily: "Satoshi-Regular",
-        textAlign: "center",
-        paddingTop: size.getHeightSize(8),
+        // textAlign: "center",
+        paddingTop: size.getHeightSize(1),
     },
 
     pinContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingVertical: size.getHeightSize(32),
+        paddingVertical: size.getHeightSize(24),
         gap: size.getWidthSize(8),
     },
 
@@ -181,12 +193,12 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
         justifyContent: "space-between",
-        paddingHorizontal: size.getWidthSize(0),
+        paddingHorizontal: size.getWidthSize(12),
     },
 
     keypadButton: {
         width: "30%",
-        height: size.getHeightSize(70),
+        height: size.getHeightSize(80),
         justifyContent: "center",
         alignItems: "center",
     },
@@ -222,6 +234,12 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 16,
     },
+    user: {
+        alignSelf: "center",
+        width: size.getWidthSize(72),
+        height: size.getWidthSize(72),
+        marginTop: size.getHeightSize(24),
+    },
 
     pageButton: {
         height: size.getHeightSize(56),
@@ -235,9 +253,17 @@ const styles = StyleSheet.create({
 
     pageButtonText: {
         fontFamily: "Satoshi-Bold",
-        fontSize: size.fontSize(14),
+        fontSize: size.fontSize(18),
         lineHeight: size.getHeightSize(24),
         color: "#ffffff",
+    },
+
+    goBackText: {
+        fontFamily: "Satoshi-Regular",
+        textAlign: "center",
+        paddingBottom: size.getHeightSize(12),
+        color: "rgba(0, 0, 0, 0.8)",
+        fontSize: size.fontSize(16),
     },
 });
 

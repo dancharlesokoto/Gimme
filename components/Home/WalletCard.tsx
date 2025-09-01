@@ -49,11 +49,12 @@ const WalletCard = React.memo(
                     <CurrencyDisplay _currency={currency} />
                     <Pressable
                         style={{
-                            paddingVertical: size.getHeightSize(6),
-                            paddingHorizontal: size.getWidthSize(6),
-                            backgroundColor: "#E2E3E9",
-                            borderRadius: 100,
+                            width: size.getWidthSize(40),
+                            height: size.getHeightSize(40),
+                            alignItems: "center",
                             justifyContent: "center",
+                            backgroundColor: "#E2E3E9",
+                            borderRadius: size.getWidthSize(50),
                         }}
                         onPress={handleSwitch}
                     >
@@ -169,8 +170,13 @@ const WalletCard = React.memo(
                                     <Text
                                         style={{
                                             fontFamily: "Satoshi-Bold",
-                                            lineHeight: size.getHeightSize(42),
-                                            fontSize: size.fontSize(38),
+                                            marginVertical:
+                                                size.getHeightSize(4),
+                                            lineHeight: size.fontSize(36),
+                                            color: "#010101",
+                                            fontSize: size.fontSize(36),
+                                            letterSpacing:
+                                                -size.getWidthSize(0.54),
                                         }}
                                     >
                                         {amount == "0"
@@ -187,17 +193,11 @@ const WalletCard = React.memo(
                                 style={{
                                     fontFamily: "Satoshi-Medium",
                                     fontSize: size.fontSize(12),
+                                    lineHeight: size.fontSize(12),
                                     paddingBottom: size.getHeightSize(24),
                                 }}
                             >
-                                <Text
-                                    style={{
-                                        fontFamily: "ClashDisplay-Medium",
-                                        color: "#868898",
-                                    }}
-                                >
-                                    ~GM
-                                </Text>{" "}
+                                ~GM{" "}
                                 {!amount ? (
                                     <ContentLoader
                                         style={{
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#F6F6FA",
         paddingVertical: size.getHeightSize(12),
         paddingHorizontal: size.getWidthSize(13.5),
-        borderRadius: size.getWidthSize(16),
+        borderRadius: size.getWidthSize(24),
         borderWidth: 1,
         borderColor: "#F6F6FA",
         marginTop: size.getHeightSize(30),

@@ -43,10 +43,9 @@ const Profile = React.memo(() => {
     } = useQuery({
         queryKey: ["getUser", userId],
         queryFn: async () => await fetchUser(userId),
-        refetchOnWindowFocus: true,
         refetchOnMount: true,
         refetchOnReconnect: true,
-        retryOnMount: true,
+        retry: 1,
     });
 
     useFocusEffect(

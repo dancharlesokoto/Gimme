@@ -1,15 +1,15 @@
 import { size } from "@/config/size";
-import React from "react";
-import { StyleSheet, Text, TextInput } from "react-native";
+import React, { useCallback } from "react";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import {
     CodeField,
-    Cursor,
+    RenderCellOptions,
     useClearByFocusCell,
 } from "react-native-confirmation-code-field";
 
 interface PinInput {
     code: string;
-    onChange: (value: string) => void;
+    onChange?: (value: string) => void;
     editable?: boolean;
 }
 const CELL_COUNT = 4;
@@ -22,40 +22,53 @@ const ReEnterPinField: React.FC<PinInput> = React.memo(
             setValue: () => {},
         });
 
+        const handleRenderCell = useCallback(
+            (options: RenderCellOptions) => {
+                return (
+                    <CellItem key={options.index} {...options} code={code} />
+                );
+            },
+            [code]
+        );
+
         return (
-            <CodeField
-                {...props}
-                editable={editable}
-                value={code}
-                onChangeText={(value) => onChange(value)}
-                cellCount={CELL_COUNT}
-                rootStyle={styles.codeFieldRoot}
-                keyboardType="number-pad"
-                InputComponent={TextInput}
-                testID="my-code-input"
-                renderCell={({ index, symbol, isFocused }) => (
-                    <Text
-                        key={index}
-                        style={[
-                            styles.cell,
-                            isFocused && styles.focusCell,
-                            {
-                                borderTopLeftRadius: index === 0 ? 12 : 0,
-                                borderBottomLeftRadius: index === 0 ? 12 : 0,
-                                borderTopRightRadius:
-                                    index === CELL_COUNT - 1 ? 12 : 0,
-                                borderBottomRightRadius:
-                                    index === CELL_COUNT - 1 ? 12 : 0,
-                            },
-                        ]}
-                        // onLayout={getCellOnLayoutHandler(index)}
-                    >
-                        {symbol && "·"}
-                    </Text>
-                )}
-            />
+            <View>
+                <CodeField
+                    {...props}
+                    editable={editable}
+                    value={code}
+                    onChangeText={(value) => onChange && onChange(value)}
+                    cellCount={CELL_COUNT}
+                    rootStyle={styles.codeFieldRoot}
+                    keyboardType="number-pad"
+                    InputComponent={TextInput}
+                    testID="my-code-input"
+                    renderCell={handleRenderCell}
+                />
+            </View>
         );
     }
+);
+
+const CellItem = React.memo(
+    ({ index, symbol, isFocused, code }: RenderCellOptions | any) => (
+        <Text
+            key={index}
+            style={[
+                styles.cell,
+                (isFocused || code.length > index) && styles.focusCell,
+                {
+                    borderTopLeftRadius: index === 0 ? 12 : 0,
+                    borderBottomLeftRadius: index === 0 ? 12 : 0,
+                    borderTopRightRadius: index === CELL_COUNT - 1 ? 12 : 0,
+                    borderBottomRightRadius: index === CELL_COUNT - 1 ? 12 : 0,
+                },
+            ]}
+            // onLayout={getCellOnLayoutHandler(index)}
+        >
+            {symbol && "·"}
+        </Text>
+    )
 );
 
 const styles = StyleSheet.create({
@@ -82,7 +95,8 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     focusCell: {
-        borderColor: "#0A0B14",
+        borderColor: "#3366FF",
+        backgroundColor: "rgba(51, 102, 255, 0.1)",
     },
 });
 

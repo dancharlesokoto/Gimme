@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
     View,
     Text,
@@ -26,42 +26,19 @@ const EnterPin = () => {
     // const [displayedPin, setDisplayedPin] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [uid, setUid] = useState(useGlobalSearchParams().uid as string);
-    const [isBiometricSupported, setIsBiometricSupported] = useState(false);
-
-    useEffect(() => {
-        (async () => {
-            const hasHardware = await LocalAuthentication.hasHardwareAsync();
-            const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-            console.log(hasHardware);
-            if (hasHardware) {
-                console.log(hasHardware);
-            }
-            setIsBiometricSupported(hasHardware);
-        })();
-    }, []);
 
     const handlePress = (value: any) => {
         pin.length < 4 && setPin((prevPin) => prevPin + value);
     };
 
     const handleDelete = () => {
-        setPin((prevPin) => {
-            let newPin = prevPin;
-            const index = newPin.lastIndexOf("");
-
-            if (index === -1) {
-                newPin = newPin.slice(0, -1);
-            } else {
-                newPin =
-                    newPin.substring(0, index - 1) +
-                    "" +
-                    newPin.substring(index);
-            }
-            return newPin;
-        });
+        if (pin.length == 0) {
+            return;
+        }
+        setPin((prevPin) => prevPin.slice(0, -1));
     };
 
-    const handleNext = async () => {
+    const handleNext = useCallback(async () => {
         if (pin.length !== 4) {
             toast.error("Please enter a four-digit pin", {
                 duration: 2000,
@@ -82,44 +59,26 @@ const EnterPin = () => {
             });
             router.push("/");
         } catch (error: any) {
+            setPin("");
             toast.error(error.message, {
                 duration: 2000,
                 dismissible: true,
             });
         } finally {
+            await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(true);
+                }, 500);
+            });
             setIsLoading(false);
         }
-    };
+    }, [pin, uid]);
 
     useEffect(() => {
         if (pin.length === 4) {
             handleNext();
         }
     }, [pin]);
-
-    const authenticateBiometrics = async () => {
-        if (isBiometricSupported) {
-            const result = await LocalAuthentication.authenticateAsync({
-                promptMessage: "Authenticate with Face ID or Touch ID",
-                fallbackLabel: "Enter PIN",
-                cancelLabel: "Cancel",
-                disableDeviceFallback: false,
-                requireConfirmation: true,
-            });
-
-            if (result.success) {
-                await handleNext();
-            } else {
-                console.log(
-                    "Authentication failed",
-                    "Please try again or enter your PIN.",
-                    result.error
-                );
-            }
-        } else {
-            console.log("Biometrics not available", "Please enter your PIN.");
-        }
-    };
 
     return (
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">

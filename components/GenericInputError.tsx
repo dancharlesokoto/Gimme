@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     errorContainer: {
         flexDirection: "row",
         alignItems: "center",
-        marginBottom: size.getHeightSize(16),
+        marginVertical: size.getHeightSize(4),
     },
 
     error: {

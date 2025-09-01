@@ -18,12 +18,12 @@ type DataItem = {
     profileIMage: any;
 };
 
-export default function QuickPayments({ data: passedData }: { data: Data[] }) {
+export default function QuickPayments({ data: passedData }: { data?: Data[] }) {
     const { user } = useUserStore();
     const userId = user?.userId;
     const [data, setData] = useState<Data[]>(passedData ?? []);
 
-    const { data: fetchedData } = useQuery({
+    const { data: fetchedData, isLoading } = useQuery({
         refetchOnMount: true,
         refetchOnWindowFocus: true,
         refetchOnReconnect: true,
@@ -41,7 +41,7 @@ export default function QuickPayments({ data: passedData }: { data: Data[] }) {
         fetchedData && setData(fetchedData);
     }, [fetchedData]);
 
-    if (!data && !fetchedData) {
+    if (data?.length === 0) {
         return;
     }
     return (
@@ -73,7 +73,11 @@ export default function QuickPayments({ data: passedData }: { data: Data[] }) {
                                 name={item.receiver?.fullName}
                             />
                         )}
-                        <Text style={styles.name}>
+                        <Text
+                            ellipsizeMode="tail"
+                            numberOfLines={1}
+                            style={styles.name}
+                        >
                             {item.receiver?.fullName}
                         </Text>
                     </Pressable>
@@ -89,7 +93,6 @@ export default function QuickPayments({ data: passedData }: { data: Data[] }) {
 const styles = StyleSheet.create({
     container: {
         paddingLeft: size.getWidthSize(24),
-        paddingBottom: size.getHeightSize(24),
     },
     title: {
         fontSize: size.fontSize(14),
@@ -109,6 +112,7 @@ const styles = StyleSheet.create({
         borderRadius: 100,
     },
     name: {
+        width: size.getWidthSize(72),
         marginTop: size.getHeightSize(4),
         fontSize: size.fontSize(11),
         color: "#8E8E93",

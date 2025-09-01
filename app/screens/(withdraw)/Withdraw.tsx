@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { size } from "@/config/size";
 import CustomSafeArea from "@/shared/CustomSafeArea";
@@ -54,7 +54,7 @@ const DATA: DataType = {
             ),
             title: "Withdraw to crypto",
             description: "Send your USD balance as stablecoin to a USDC wallet",
-            link: "/screens/(fund)/FundWithCrypto",
+            link: "/screens/(withdraw)/GetCrypto",
         },
         {
             icon: (
@@ -157,7 +157,7 @@ const DATA: DataType = {
                     />
                 </Svg>
             ),
-            title: "Get airtime & data bundle",
+            title: "Mobile topup",
             description: "Top up your airtime and data",
             link: "/screens/(withdraw)/GetAirtime",
         },

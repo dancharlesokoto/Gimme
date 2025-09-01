@@ -6,7 +6,6 @@ import {
     StyleSheet,
     ScrollView,
     RefreshControl,
-    Image,
     TouchableOpacity,
 } from "react-native";
 import CustomSafeArea from "@/shared/CustomSafeArea";
@@ -14,7 +13,11 @@ import { size } from "@/config/size";
 import Promotion from "@/components/Promotion";
 import QuickPayments from "@/components/QuickPayments";
 import { router, useFocusEffect } from "expo-router";
-import { fetchUser, getBankAccount } from "@/services/user";
+import {
+    fetchUser,
+    getBankAccount,
+    getWithdrawalBankAccounts,
+} from "@/services/user";
 import { useUserStore } from "@/store/userStore";
 import { useQuery } from "@tanstack/react-query";
 import PrimaryOptions from "@/components/Home/PrimaryOptions";
@@ -22,11 +25,12 @@ import Todos from "@/components/Home/Todos";
 import RewardsCTA from "@/components/Home/RewardsCTA";
 import QrIcon from "@/assets/svg/qrIcon.svg";
 import NotificationsIcon from "@/assets/svg/notificationsIcon.svg";
-import RewardsIcon from "@/assets/svg/rewardsIcon.svg";
+
 import Transactions from "@/components/Home/Transactions";
 import WalletCarousel from "@/components/Home/WalletCarousel";
 import { IMAGE_URL } from "@/services/api";
-import Svg, { Path } from "react-native-svg";
+import AvatarInitials from "@/components/AvatarInitials";
+import { Image } from "expo-image";
 
 const HomeScreen = React.memo(() => {
     const [screenRefreshing, setScreenRefreshing] = useState(false);
@@ -45,6 +49,7 @@ const HomeScreen = React.memo(() => {
         refetchOnMount: true,
         refetchOnReconnect: true,
         retryOnMount: true,
+        refetchInterval: 1000 * 60 * 5,
         retry: true,
     });
 
@@ -64,10 +69,20 @@ const HomeScreen = React.memo(() => {
     };
 
     //Preloading this data to cache and to avoid long times
-    const dva_prefetch = useQuery({
+    useQuery({
         retry: true,
         queryKey: ["getBankAccount", userId],
         queryFn: getBankAccount,
+    });
+
+    //preloading this data to cache and to avoid long times
+    useQuery({
+        refetchOnMount: true,
+        refetchOnWindowFocus: true,
+        refetchOnReconnect: true,
+        retry: true,
+        queryKey: ["withdrawalBanks", userId],
+        queryFn: () => getWithdrawalBankAccounts(),
     });
 
     return (
@@ -87,88 +102,121 @@ const HomeScreen = React.memo(() => {
                         }}
                     >
                         <TouchableOpacity
-                            style={{ display: "none" }}
                             hitSlop={size.getWidthSize(20)}
                             onPress={() => router.push(`/(tabs)/profile`)}
                         >
                             {isLoading || isError ? (
-                                <Image
-                                    source={require("@/assets/images/user.png")}
-                                    alt=""
+                                <AvatarInitials
+                                    name=""
                                     style={{
-                                        width: size.getWidthSize(40),
-                                        borderWidth: 1,
-                                        borderColor: "#E2E3E9",
-                                        height: size.getHeightSize(40),
-                                        borderRadius: size.getWidthSize(1000),
+                                        width: size.getWidthSize(45),
+                                        height: size.getHeightSize(45),
+                                    }}
+                                />
+                            ) : userData.profileImage == "default.png" ? (
+                                <AvatarInitials
+                                    name={userData.fullName}
+                                    textStyle={{
+                                        fontSize: size.fontSize(12),
+                                    }}
+                                    style={{
+                                        width: size.getHeightSize(45),
+                                        height: size.getHeightSize(45),
                                     }}
                                 />
                             ) : (
-                                <Image
-                                    loadingIndicatorSource={require("@/assets/images/user.png")}
-                                    source={{
-                                        uri:
-                                            IMAGE_URL +
-                                            "/profile/" +
-                                            userData.profileImage,
-                                    }}
-                                    alt=""
+                                <View
                                     style={{
-                                        width: size.getWidthSize(40),
+                                        borderRadius: size.getWidthSize(30),
+                                        width: size.getWidthSize(45),
+                                        height: size.getHeightSize(45),
                                         borderWidth: 1,
-                                        borderColor: "#E2E3E9",
-                                        height: size.getHeightSize(40),
-                                        borderRadius: size.getWidthSize(1000),
+                                        borderColor: "#374BFB",
+                                        borderStyle: "dotted",
+                                        justifyContent: "center",
+                                        alignItems: "center",
                                     }}
-                                />
+                                >
+                                    <Image
+                                        contentFit="cover"
+                                        source={`${IMAGE_URL}/profile/${userData.profileImage}`}
+                                        style={{
+                                            borderRadius: size.getWidthSize(30),
+                                            width: size.getWidthSize(35),
+                                            height: size.getWidthSize(35),
+                                        }}
+                                    />
+                                </View>
                             )}
                         </TouchableOpacity>
 
-                        <Text style={styles.welcomeText}>Welcome back</Text>
+                        {!isLoading && !isError && (
+                            <View
+                                style={{
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <Text style={styles.welcomeText}>
+                                    Welcome back,
+                                </Text>
+
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    <Text style={[styles.welcomeName]}>
+                                        {userData.fullName.split(" ")[0]}{" "}
+                                    </Text>
+                                    <Text
+                                        style={{ fontSize: size.fontSize(12) }}
+                                    ></Text>
+                                </View>
+                            </View>
+                        )}
                     </View>
                     <View
                         style={{
                             flexDirection: "row",
-                            gap: size.getWidthSize(8),
+                            gap: size.getWidthSize(12),
                             alignItems: "center",
                         }}
                     >
                         <Pressable
-                            hitSlop={20}
-                            onPress={() =>
-                                router.push("/screens/(earn)/Rewards")
-                            }
+                            hitSlop={5}
+                            onPress={() => router.push("/screens/QrScanner")}
                         >
-                            <Svg
-                                // xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth="1"
-                                stroke="#525466"
-                                width={size.getWidthSize(30)}
+                            <QrIcon
+                                strokeWidth={1.2}
+                                color={"#010101"}
+                                width={size.getWidthSize(32)}
                                 height={size.getHeightSize(30)}
-                            >
-                                <Path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z"
-                                />
-                                <Path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75v-.75ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z"
-                                />
-                            </Svg>
+                            />
                         </Pressable>
                         <Pressable
-                            hitSlop={20}
+                            hitSlop={5}
+                            style={{
+                                position: "relative",
+                            }}
                             onPress={() =>
                                 router.push("/screens/Notifications")
                             }
                         >
                             <NotificationsIcon
-                                width={size.getWidthSize(40)}
-                                height={size.getHeightSize(40)}
+                                width={size.getWidthSize(35)}
+                                height={size.getHeightSize(35)}
+                            />
+                            <View
+                                style={{
+                                    position: "absolute",
+                                    top: size.getHeightSize(0),
+                                    right: size.getWidthSize(2),
+                                    width: size.getWidthSize(8),
+                                    height: size.getHeightSize(8),
+                                    borderRadius: size.getWidthSize(10),
+                                    backgroundColor: "#374BFB",
+                                }}
                             />
                         </Pressable>
                     </View>
@@ -181,23 +229,26 @@ const HomeScreen = React.memo(() => {
                             onRefresh={handleScreenRefresh}
                         />
                     }
+                    contentContainerStyle={{
+                        gap: size.getHeightSize(24),
+                    }}
                     showsVerticalScrollIndicator={false}
                     overScrollMode="always"
                 >
                     <WalletCarousel
                         userData={userData}
                         isError={isError}
-                        isLoading={isLoading}
+                        isLoading={!userData}
                     />
 
                     <Todos />
+
+                    <PrimaryOptions />
                     <QuickPayments
                         data={
                             isLoading || isError ? [] : userData.quickPayments
                         }
                     />
-                    <PrimaryOptions />
-
                     <View
                         style={{
                             borderRadius: size.getWidthSize(16),
@@ -227,16 +278,23 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         gap: size.getWidthSize(12),
         alignItems: "center",
-        paddingTop: size.getHeightSize(36),
-        paddingBottom: size.getHeightSize(3),
+        paddingTop: size.getHeightSize(24),
+        paddingBottom: size.getHeightSize(12),
         paddingHorizontal: size.getWidthSize(24),
     },
 
     welcomeText: {
-        flex: 1,
-        fontSize: size.fontSize(16),
-        fontFamily: "Satoshi-Bold",
-        color: "rgba(0, 0, 0, 0.8)",
+        lineHeight: size.fontSize(20),
+        fontSize: size.fontSize(12),
+        fontFamily: "Satoshi-Medium",
+        color: "rgba(0, 0, 0, 0.6)",
+    },
+
+    welcomeName: {
+        lineHeight: size.fontSize(17),
+        fontSize: size.fontSize(17),
+        fontFamily: "ClashDisplay-Medium",
+        color: "rgba(0, 0, 0, 1)",
     },
 
     iconButton: {

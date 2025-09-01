@@ -40,8 +40,8 @@ export default function RootLayout() {
         <>
             <GestureHandlerRootView>
                 <PaperProvider>
-                    <BottomSheetModalProvider>
-                        <QueryClientProvider client={queryClient}>
+                    <QueryClientProvider client={queryClient}>
+                        <BottomSheetModalProvider>
                             <Stack>
                                 <Stack.Screen
                                     name="(tabs)"
@@ -66,9 +66,10 @@ export default function RootLayout() {
                                 />
                                 <Stack.Screen name="+not-found" />
                             </Stack>
-                            <StatusBar style="dark" hidden />
-                        </QueryClientProvider>
-                    </BottomSheetModalProvider>
+                        </BottomSheetModalProvider>
+
+                        <StatusBar style="dark" hidden />
+                    </QueryClientProvider>
                     <Toaster
                         theme="dark"
                         autoWiggleOnUpdate="never"

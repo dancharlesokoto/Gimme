@@ -57,12 +57,14 @@ export default CurrencyDisplay;
 const styles = StyleSheet.create({
     pickContainer: {
         gap: size.getHeightSize(0),
+        height: size.getHeightSize(40),
         flexDirection: "row",
+        alignItems: "center",
         justifyContent: "space-between",
         backgroundColor: "#E2E3E9",
         paddingHorizontal: size.getWidthSize(8),
         paddingRight: size.getWidthSize(12),
-        paddingVertical: size.getHeightSize(8),
+        paddingVertical: size.getHeightSize(4),
         borderRadius: size.getWidthSize(100),
         // width: size.getWidthSize(86),
     },

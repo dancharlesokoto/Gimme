@@ -1,4 +1,10 @@
-import { Text, StyleSheet, ActivityIndicator } from "react-native";
+import {
+    Text,
+    StyleSheet,
+    ActivityIndicator,
+    StyleProp,
+    ViewStyle,
+} from "react-native";
 import React from "react";
 import { size } from "@/config/size";
 import CustomRippleButton from "./CustomRippleButton";
@@ -11,6 +17,8 @@ type ButtonProps = {
     isLoading?: boolean;
     textColor?: string;
     buttonColor?: string;
+    active?: boolean;
+    style?: StyleProp<ViewStyle>;
 };
 
 export default function GenericButton({
@@ -21,6 +29,8 @@ export default function GenericButton({
     isLoading,
     textColor,
     buttonColor,
+    style,
+    active,
 }: ButtonProps) {
     return (
         <CustomRippleButton
@@ -28,6 +38,8 @@ export default function GenericButton({
             contentContainerStyle={[
                 styles.pageButton,
                 buttonColor && { backgroundColor: buttonColor },
+                active === false && { backgroundColor: "#E2E3E9" },
+                style,
             ]}
             disabled={disabled}
         >
@@ -39,6 +51,7 @@ export default function GenericButton({
                         style={[
                             styles.pageButtonText,
                             textColor && { color: textColor },
+                            active === false && { color: "#525466" },
                         ]}
                     >
                         {text && text}
@@ -54,7 +67,6 @@ const styles = StyleSheet.create({
     pageButton: {
         height: size.getHeightSize(56),
         borderRadius: size.getWidthSize(16),
-        marginTop: size.getHeightSize(24),
         padding: size.getWidthSize(16),
         backgroundColor: "#374BFB",
         justifyContent: "center",

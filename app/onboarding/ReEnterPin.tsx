@@ -7,12 +7,13 @@ import Cancel from "@/assets/svg/cancel.svg";
 import Finger from "@/assets/svg/finger.svg";
 import User from "@/assets/images/user.png";
 import { router } from "expo-router";
-import { loginUser } from "@/services/auth";
+import { loginUser, logoutUser } from "@/services/auth";
 import { toast } from "sonner-native";
 import ReEnterPinField from "@/components/Onboarding/ReEnterPinField";
 import GenericHeader from "@/components/GenericHeader";
 import { useUserStore } from "@/store/userStore";
 import LoadingBottomSheet from "@/components/Onboarding/LoadingBottomSheet";
+import AvatarInitials from "@/components/AvatarInitials";
 
 const ReEnterPin = () => {
     ///....................................
@@ -56,7 +57,7 @@ const ReEnterPin = () => {
         }
         try {
             setIsLoading(true);
-            const res = await loginUser({
+            await loginUser({
                 uid: user.email,
                 pin: pin,
             });
@@ -68,11 +69,22 @@ const ReEnterPin = () => {
             router.replace("/");
         } catch (error: any) {
             setPin("");
-            toast.error("An error occurred while logging in", {
+            await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(true);
+                }, 1000);
+            });
+            setIsLoading(false);
+            toast.error("An error occurred, try again", {
                 duration: 2000,
                 dismissible: true,
             });
         } finally {
+            await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(true);
+                }, 1000);
+            });
             setIsLoading(false);
         }
     };
@@ -94,7 +106,7 @@ const ReEnterPin = () => {
             });
 
             if (result.success) {
-                useUserStore.getState().setIsStale(false);
+                useUserStore.getState().setLastStale(Date.now());
                 router.replace("/");
             } else {
                 console.log(
@@ -114,7 +126,7 @@ const ReEnterPin = () => {
                 <View>
                     <GenericHeader title="" showBackButton={false} />
                     <View style={{ alignItems: "center" }}>
-                        <Image source={User} style={styles.user} />
+                        <AvatarInitials name={user.name} style={styles.user} />
                         <Text style={styles.title}>
                             Welcome Back, {user.name.split(" ")[0]}
                         </Text>
@@ -183,7 +195,7 @@ const ReEnterPin = () => {
                     onPress={handleNext}
                     isLoading={isLoading}
                 /> */}
-                <TouchableOpacity onPress={() => router.back()}>
+                <TouchableOpacity onPress={() => logoutUser()}>
                     <Text style={styles.goBackText}>
                         Not you?{" "}
                         <Text
@@ -192,7 +204,7 @@ const ReEnterPin = () => {
                                 fontFamily: "Satoshi-Bold",
                             }}
                         >
-                            Go back
+                            Log out
                         </Text>
                     </Text>
                 </TouchableOpacity>

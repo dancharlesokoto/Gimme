@@ -33,9 +33,12 @@ type ListBanksBottomSheetProps = {
 
 const SearchBar = React.memo(({ onChangeValue }: any) => {
     const [query, setQuery] = useState("");
-    useEffect(() => {
-        onChangeValue(query);
-    }, [query]);
+
+    const handleChangeValue = useCallback((value: string) => {
+        setQuery(value);
+        onChangeValue && onChangeValue(value);
+    }, []);
+
     return (
         <View style={styles.inputContainer}>
             <Svg
@@ -59,7 +62,7 @@ const SearchBar = React.memo(({ onChangeValue }: any) => {
 
             <TextInput
                 style={styles.input}
-                onChangeText={setQuery}
+                onChangeText={handleChangeValue}
                 value={query}
                 placeholder="Search bank"
             />
@@ -74,11 +77,19 @@ const ListBanksBottomSheet = React.memo(
         const bottomSheetModalRef = useRef<BottomSheetModal>(null);
         const [query, setQuery] = useState("");
         const [displayData, setDisplayData] = useState<any[]>(banks);
+        const [isReady, setIsReady] = useState(false);
 
+        useEffect(() => {
+            const timeout = setTimeout(() => setIsReady(true), 100);
+            return () => clearTimeout(timeout);
+        }, []);
         ///.......................
+        const openModal = () => {
+            bottomSheetModalRef.current?.present();
+        };
         useEffect(() => {
             if (isOpen) {
-                bottomSheetModalRef.current?.present();
+                openModal();
             } else {
                 bottomSheetModalRef.current?.close();
             }
@@ -170,57 +181,60 @@ const ListBanksBottomSheet = React.memo(
                         }}
                     >
                         <SearchBar value={query} onChangeValue={setQuery} />
-                        <BottomSheetFlatList
-                            nestedScrollEnabled={true}
-                            data={displayData}
-                            keyExtractor={(item, i) => i.toString()}
-                            scrollEnabled={true}
-                            showsVerticalScrollIndicator={false}
-                            style={{
-                                flex: 1,
-                            }}
-                            contentContainerStyle={{
-                                gap: size.getWidthSize(12),
-                            }}
-                            renderItem={({ item }: { item: any }) => (
-                                <TouchableOpacity
-                                    hitSlop={size.getWidthSize(20)}
-                                    onPress={() =>
-                                        onPress &&
-                                        onPress({
-                                            name: item.name,
-                                            code: item.code,
-                                        })
-                                    }
-                                    style={{
-                                        height: size.getHeightSize(40),
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        gap: size.getWidthSize(16),
-                                    }}
-                                >
-                                    <Image
-                                        source={item.logo}
-                                        placeholder={{ blurhash }}
-                                        contentFit="cover"
+                        {isReady && (
+                            <BottomSheetFlatList
+                                nestedScrollEnabled={true}
+                                data={displayData}
+                                keyExtractor={(item, i) => i.toString()}
+                                scrollEnabled={true}
+                                showsVerticalScrollIndicator={false}
+                                style={{
+                                    flex: 1,
+                                }}
+                                contentContainerStyle={{
+                                    gap: size.getWidthSize(12),
+                                }}
+                                renderItem={({ item }: { item: any }) => (
+                                    <TouchableOpacity
+                                        hitSlop={size.getWidthSize(20)}
+                                        onPress={() =>
+                                            onPress &&
+                                            onPress({
+                                                name: item.name,
+                                                code: item.code,
+                                            })
+                                        }
                                         style={{
-                                            width: size.getWidthSize(20),
-                                            height: size.getHeightSize(20),
-                                            borderRadius: size.getWidthSize(5),
-                                        }}
-                                    />
-
-                                    <Text
-                                        style={{
-                                            fontFamily: "Satoshi-Bold",
-                                            color: "#525252",
+                                            height: size.getHeightSize(40),
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            gap: size.getWidthSize(16),
                                         }}
                                     >
-                                        {item.name}
-                                    </Text>
-                                </TouchableOpacity>
-                            )}
-                        />
+                                        <Image
+                                            source={item.logo}
+                                            placeholder={{ blurhash }}
+                                            contentFit="cover"
+                                            style={{
+                                                width: size.getWidthSize(20),
+                                                height: size.getHeightSize(20),
+                                                borderRadius:
+                                                    size.getWidthSize(5),
+                                            }}
+                                        />
+
+                                        <Text
+                                            style={{
+                                                fontFamily: "Satoshi-Bold",
+                                                color: "#525252",
+                                            }}
+                                        >
+                                            {item.name}
+                                        </Text>
+                                    </TouchableOpacity>
+                                )}
+                            />
+                        )}
                     </BottomSheetView>
                 )}
             </BottomSheetModal>

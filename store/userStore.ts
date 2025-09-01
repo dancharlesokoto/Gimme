@@ -14,8 +14,8 @@ interface UserStore {
         token: string;
         isVerified: boolean;
     };
-    isStale: boolean;
-    setIsStale: (value: boolean) => void;
+    lastStale: any;
+    setLastStale: (lastStale: any) => void;
     setUser: (user: UserStore["user"]) => void;
     resetUser: () => void;
 }
@@ -34,8 +34,8 @@ export const useUserStore = create(
                 token: "",
                 isVerified: false,
             },
-            isStale: true,
-            setIsStale: (value) => set({ isStale: value }),
+            lastStale: null,
+            setLastStale: (value) => set({ lastStale: value }),
             setUser: (user) => set({ user }),
             resetUser: () =>
                 set({
@@ -50,7 +50,7 @@ export const useUserStore = create(
                         token: "",
                         isVerified: false,
                     },
-                    isStale: true,
+                    lastStale: null,
                 }),
         }),
         {

@@ -106,6 +106,9 @@ export default function SendToUsers() {
                             )}
 
                             <GenericButton
+                                style={{
+                                    marginVertical: size.getHeightSize(12),
+                                }}
                                 onPress={handleNext}
                                 text="Proceed"
                                 disabled={isLoading}

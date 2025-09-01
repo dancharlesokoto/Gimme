@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Carousel, {
     ICarouselInstance,
     Pagination,
@@ -21,6 +21,9 @@ const WalletCarousel = React.memo(
         const [currentIndex, setCurrentIndex] = useState(0);
 
         //...
+        const handleSnapToItem = useCallback((index: number) => {
+            setCurrentIndex(index);
+        }, []);
         const CAROUSEL_DATA = useMemo(() => {
             return isLoading || isError
                 ? [{}, {}, {}]
@@ -33,16 +36,19 @@ const WalletCarousel = React.memo(
 
         const ref = React.useRef<ICarouselInstance>(null);
 
-        const onPressPagination = (index: number) => {
-            ref.current?.scrollTo({
-                /**
-                 * Calculate the difference between the current index and the target index
-                 * to ensure that the carousel scrolls to the nearest index
-                 */
-                count: index - progress.value,
-                animated: true,
-            });
-        };
+        const onPressPagination = useCallback(
+            (index: number) => {
+                ref.current?.scrollTo({
+                    /**
+                     * Calculate the difference between the current index and the target index
+                     * to ensure that the carousel scrolls to the nearest index
+                     */
+                    count: index - progress.value,
+                    animated: true,
+                });
+            },
+            [progress, ref]
+        );
 
         return (
             <View
@@ -70,10 +76,8 @@ const WalletCarousel = React.memo(
                         parallaxScrollingScale: 0.98,
                         parallaxScrollingOffset: size.getWidthSize(50),
                     }}
+                    onSnapToItem={handleSnapToItem}
                     onProgressChange={progress}
-                    onSnapToItem={(index: number) => {
-                        setCurrentIndex(index);
-                    }}
                     renderItem={({ item, index }: any) => {
                         return (
                             <>
@@ -92,19 +96,20 @@ const WalletCarousel = React.memo(
                     progress={progress}
                     data={CAROUSEL_DATA as any}
                     dotStyle={{
-                        width: size.getWidthSize(7),
-                        height: size.getWidthSize(7),
+                        width: size.getWidthSize(5),
+                        height: size.getWidthSize(5),
                         borderRadius: 100,
-                        backgroundColor: "#E2E3E9",
+                        backgroundColor: "#e2e3e9",
                     }}
                     activeDotStyle={{
                         width: size.getWidthSize(25),
                         overflow: "hidden",
-                        backgroundColor: "#262626",
+                        backgroundColor: "#010101",
                     }}
                     containerStyle={[
                         {
                             gap: 5,
+                            marginTop: size.getHeightSize(4),
                         },
                     ]}
                     horizontal

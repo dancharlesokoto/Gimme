@@ -14,16 +14,18 @@ import { Path, Svg } from "react-native-svg";
 import GenericHeader from "@/components/GenericHeader";
 import { useUserStore } from "@/store/userStore";
 import GenericButton from "@/components/GenericButton";
-import ListBanksBottomSheet from "@/components/Fund/ListBanksBottomSheet";
+import ListBanksBottomSheet from "@/components/Withdraw/ListBanksBottomSheet";
 import { axiosInstance } from "@/services/api";
-import { formatCurrency } from "@/lib/currency";
-import { withdrawFiat } from "@/services/gimme-wallet";
 import { toast } from "sonner-native";
+import { useQuery } from "@tanstack/react-query";
+import { fetchUser } from "@/services/user";
+import Recipients from "@/components/Withdraw/Recipients";
+import { router } from "expo-router";
+import GenericInputError from "@/components/GenericInputError";
 
 const GetCash = () => {
-    const [isloading, setIsloading] = useState(false);
-    const [amount, setAmount] = useState<any | string>(null);
-    const [newAmount, setNewAmount] = useState<any | string>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [accountNumberError, setAccountNumberError] = useState(false);
     const [accountNumber, setAccountNumber] = useState("");
     const [selectedBank, setSelectedBank] = useState<any>(null);
     const [bankDetails, setBankDetails] = useState<any>(null);
@@ -34,23 +36,41 @@ const GetCash = () => {
     ///....................................
     const { user } = useUserStore();
     const { userId } = user;
+    const { data: userData } = useQuery({
+        queryKey: ["getUser", userId],
+        queryFn: async () => await fetchUser(userId),
+        refetchOnWindowFocus: true,
+        refetchOnMount: true,
+        refetchOnReconnect: true,
+        retryOnMount: true,
+        retry: true,
+    });
     ///....................................
     const handleNext = async () => {
+        if (!userData) {
+            return;
+        }
+        if (!bankDetails) {
+            setAccountNumberError(true);
+            return;
+        }
         try {
-            setIsloading(true);
-            const { data } = await withdrawFiat({
-                amount: (+newAmount * 100).toString(),
-                remark: "test",
-                bankCode: selectedBank.code,
-                accountName: bankDetails.account_name,
-                bankName: selectedBank.code,
-                accountNumber: bankDetails.account_number,
-            });
-            console.log(data);
+            setIsLoading(true);
+            router.push(
+                `/screens/(withdraw)/BankAmount?data=${JSON.stringify({
+                    sender: userData,
+                    recipient: {
+                        accountNumber: bankDetails.account_number,
+                        accountName: bankDetails.account_name,
+                        bankName: selectedBank.name,
+                        bankCode: selectedBank.code,
+                    },
+                })}`
+            );
         } catch (error) {
             console.log(error);
         } finally {
-            setIsloading(false);
+            setIsLoading(false);
         }
     };
     ///....................................
@@ -74,23 +94,17 @@ const GetCash = () => {
         }
     }, [accountNumber, selectedBank]);
 
-    useEffect(() => {
-        if (!amount) return;
-        const _amount =
-            amount <= 2500
-                ? +amount + +amount * 0.03
-                : +amount + +amount * 0.03 + 100;
-        setNewAmount(_amount);
-    }, [amount]);
     ///....................................
     useEffect(() => {
+        if (accountNumber) {
+            setAccountNumberError(false);
+        }
         if (accountNumber.length === 10 && selectedBank) {
             resolveAccountNumber();
         } else {
             setBankDetails(null);
         }
     }, [accountNumber, selectedBank]);
-    ///....................................
 
     return (
         <CustomSafeArea topColor="#ffffff" bgColor="#ffffff">
@@ -118,6 +132,9 @@ const GetCash = () => {
                                 styles.inputContainer,
                                 focusedInput == 1 &&
                                     styles.focusedInputContainer,
+                                accountNumberError && {
+                                    borderColor: "#FAA0A0",
+                                },
                             ]}
                         >
                             <Svg
@@ -130,7 +147,7 @@ const GetCash = () => {
                                 }}
                                 strokeWidth="1.8"
                                 stroke={
-                                    focusedInput == 1 ? "#3366FF" : "#e2e3e9"
+                                    focusedInput == 1 ? "#3366FF" : "#8A8A8F"
                                 }
                                 // class="size-6"
                             >
@@ -152,64 +169,65 @@ const GetCash = () => {
                                 placeholder="e.g 123456789"
                             />
                         </View>
+                        {accountNumberError && (
+                            <GenericInputError text="Check account details and try again" />
+                        )}
                     </View>
                 </View>
 
                 <View>
-                    <View>
-                        <Text style={styles.label}>Choose bank</Text>
-                        <TouchableOpacity
-                            style={styles.inputContainer}
-                            onPress={() => setIsBankOptionsOpen(true)}
+                    <Text style={styles.label}>Choose bank</Text>
+                    <TouchableOpacity
+                        style={styles.inputContainer}
+                        onPress={() => setIsBankOptionsOpen(true)}
+                    >
+                        <Svg
+                            // xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            style={{
+                                width: size.getWidthSize(20),
+                                height: size.getHeightSize(20),
+                            }}
+                            strokeWidth="1.8"
+                            stroke="#8A8A8F"
+                            // class="size-6"
                         >
-                            <Svg
-                                // xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                style={{
-                                    width: size.getWidthSize(20),
-                                    height: size.getHeightSize(20),
-                                }}
-                                strokeWidth="1.8"
-                                stroke="#e2e3e9"
-                                // class="size-6"
-                            >
-                                <Path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
-                                />
-                            </Svg>
-                            <Text
-                                style={[
-                                    styles.convertText,
-                                    { flex: 1, color: "#000" },
-                                ]}
-                            >
-                                {selectedBank
-                                    ? selectedBank.name
-                                    : "--Select bank--"}
-                            </Text>
-                            <Svg
-                                // xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.5"
-                                style={{
-                                    width: size.getWidthSize(20),
-                                    height: size.getHeightSize(20),
-                                }}
-                                stroke="#525466"
-                                // class="size-6"
-                            >
-                                <Path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                                />
-                            </Svg>
-                        </TouchableOpacity>
-                    </View>
+                            <Path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
+                            />
+                        </Svg>
+                        <Text
+                            style={[
+                                styles.convertText,
+                                { flex: 1, color: "#000" },
+                            ]}
+                        >
+                            {selectedBank
+                                ? selectedBank.name
+                                : "--Select bank--"}
+                        </Text>
+                        <Svg
+                            // xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            style={{
+                                width: size.getWidthSize(20),
+                                height: size.getHeightSize(20),
+                            }}
+                            stroke="#525466"
+                            // class="size-6"
+                        >
+                            <Path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                            />
+                        </Svg>
+                    </TouchableOpacity>
                 </View>
 
                 {isBankDetailsLoading ? (
@@ -234,7 +252,7 @@ const GetCash = () => {
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 strokeWidth="1.5"
-                                stroke="green"
+                                stroke="#3366FF"
                                 style={{
                                     width: size.getWidthSize(20),
                                     height: size.getHeightSize(20),
@@ -253,76 +271,7 @@ const GetCash = () => {
                     )
                 )}
 
-                <View>
-                    <View>
-                        <Text style={styles.label}>Amount</Text>
-                        <View
-                            style={[
-                                styles.inputContainer,
-                                focusedInput == 2 &&
-                                    styles.focusedInputContainer,
-                            ]}
-                        >
-                            <TextInput
-                                onFocus={() => setFocusedInput(2)}
-                                onBlur={() => setFocusedInput(0)}
-                                style={[styles.input]}
-                                keyboardType="phone-pad"
-                                value={amount}
-                                onChangeText={setAmount}
-                                // value={phoneNumber}
-                                // onChangeText={setPhoneNumber}
-                                placeholder="1,000 - 99,999"
-                            />
-                        </View>
-                    </View>
-                </View>
-
-                <View
-                    style={{
-                        paddingVertical: size.getHeightSize(24),
-                        paddingHorizontal: size.getWidthSize(24),
-                        backgroundColor: "#F6F6FA",
-                        borderRadius: size.getHeightSize(16),
-                    }}
-                >
-                    <View
-                        style={{
-                            justifyContent: "space-between",
-                            flexDirection: "row",
-                        }}
-                    >
-                        <Text style={styles.convertText}>Today’s rate</Text>
-                        <Text style={styles.convertAmount}>NGN 1 = NGN 1</Text>
-                    </View>
-                    <View
-                        style={{
-                            justifyContent: "space-between",
-                            flexDirection: "row",
-                            marginTop: size.getHeightSize(12),
-                        }}
-                    >
-                        <Text style={styles.convertText}>Transaction fee</Text>
-                        <Text style={styles.convertAmount}>
-                            3% {amount && amount > 2500 ? "+ NGN 100" : ""}
-                        </Text>
-                    </View>
-                    <View style={styles.line} />
-                    <View
-                        style={{
-                            justifyContent: "space-between",
-                            flexDirection: "row",
-                        }}
-                    >
-                        <Text style={styles.convertText}>Total</Text>
-                        <Text style={styles.convertAmount}>
-                            {formatCurrency({
-                                value: newAmount * 100,
-                                currency: "ngn",
-                            })}
-                        </Text>
-                    </View>
-                </View>
+                <Recipients />
 
                 <View
                     style={{
@@ -334,12 +283,8 @@ const GetCash = () => {
                     <GenericButton
                         onPress={handleNext}
                         text="Continue"
-                        isLoading={isloading}
-                        textColor={bankDetails && amount ? "#fff" : "#525466"}
-                        buttonColor={
-                            bankDetails && amount ? "#3366FF" : "#E2E3E9"
-                        }
-                        disabled={!bankDetails || !amount}
+                        isLoading={isLoading}
+                        disabled={isLoading}
                     />
                 </View>
             </ScrollView>
@@ -393,7 +338,7 @@ const styles = StyleSheet.create({
     label: {
         fontSize: size.fontSize(14),
         fontFamily: "Satoshi-Medium",
-        lineHeight: size.getHeightSize(20),
+        lineHeight: size.getHeightSize(25),
         color: "#0A0B14",
     },
 
@@ -452,27 +397,6 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: "#CDCED5",
         marginVertical: size.getHeightSize(12),
-    },
-    modalOverlay: {
-        flex: 1,
-        justifyContent: "flex-end",
-        paddingBottom: size.getHeightSize(35),
-        paddingHorizontal: size.getWidthSize(21),
-        alignItems: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-    },
-    modalContent: {
-        backgroundColor: "white",
-        borderRadius: size.getWidthSize(16),
-        paddingHorizontal: size.getWidthSize(24),
-        paddingVertical: size.getHeightSize(24),
-        width: "100%",
-    },
-
-    modalHead: {
-        fontSize: size.fontSize(18),
-        fontFamily: "Satoshi-Bold",
-        lineHeight: size.getWidthSize(24),
     },
 });
 

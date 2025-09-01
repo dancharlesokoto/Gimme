@@ -1,11 +1,18 @@
-import { View, Text, StyleSheet } from "react-native";
+import {
+    View,
+    Text,
+    StyleSheet,
+    StyleProp,
+    ViewStyle,
+    TextStyle,
+} from "react-native";
 import React, { useState } from "react";
 import { size } from "@/config/size";
 
 type AvatarInitialsProps = {
     name: string;
-    style?: any;
-    textStyle?: any;
+    style?: StyleProp<ViewStyle>;
+    textStyle?: StyleProp<TextStyle>;
 };
 
 export default function AvatarInitials({
@@ -13,13 +20,17 @@ export default function AvatarInitials({
     style,
     textStyle,
 }: AvatarInitialsProps) {
-    const _firstName = name.split(" ")[0];
-    const _lastName = name.split(" ")[1];
     return (
         <View style={[styles.container, style]}>
             <Text style={[styles.text, textStyle]}>
-                {_firstName.charAt(0)}
-                {_lastName.charAt(0)}
+                {name.split(" ").map((item, index) => (
+                    <Text
+                        key={index}
+                        style={[styles.text, textStyle && textStyle]}
+                    >
+                        {item.charAt(0)}
+                    </Text>
+                ))}
             </Text>
         </View>
     );
@@ -30,13 +41,15 @@ const styles = StyleSheet.create({
         width: size.getWidthSize(40),
         height: size.getHeightSize(40),
         borderRadius: size.getWidthSize(1000),
-        backgroundColor: "#E2E3E9",
+        backgroundColor: "#F6F6FA",
+        borderWidth: 0.5,
+        borderColor: "#e2e3e9",
         justifyContent: "center",
         alignItems: "center",
     },
 
     text: {
-        fontSize: size.fontSize(20),
+        fontSize: size.fontSize(16),
         fontFamily: "Satoshi-Bold",
         color: "#0A0B14",
     },

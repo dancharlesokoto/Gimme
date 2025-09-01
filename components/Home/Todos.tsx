@@ -10,7 +10,7 @@ export default function Todos() {
         <View
             style={{
                 gap: size.getHeightSize(8),
-                padding: size.getWidthSize(24),
+                paddingHorizontal: size.getWidthSize(24),
             }}
         >
             <Text
