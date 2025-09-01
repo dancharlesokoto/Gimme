@@ -1,4 +1,48 @@
-# Welcome to your Expo app 👋
+<img src="https://clkrnsibzehgydythtxq.supabase.co/storage/v1/object/public/gimme/global/icon.png" alt="Alt text" width="400"/>
+
+
+
+# Gimme Inc [Mobile App].
+
+Gimme is a blockchain-based decentralised market place for seamless microtransaction payments piloting in the 168+ university campuses in Nigeria with an average of 20k students and 1k+ merchants making and accepting at least 3 transactions daily.
+
+Whether you're stuck in the city or hanging out with pals and need to pay bills; or you live in a really remote area of the continent and require banking services; We hope that no matter what you're trying to do, Gimme has come to help.
+
+
+## Features
+
+- Secure authorization & authentication
+- User wallet creation & balance tracking
+- Fiat and crypto transactions
+- Asset conversion (NGN -> USD & USD -> NGN)
+- Airtime and data purchase 
+- B2C platform for merchants
+- Android & IOS cross platform compatibility.
+
+
+## Tech Stack
+
+**Client:** React Native, Expo, Tanstack Query & Zustand 
+
+**Server:** Node & NestJS
+
+**Blockchain:** A Blockchain layer with stablecoin issuance
+
+**Auth:** JWT & Refresh tokens
+
+### 3rd Party Services
+
+- Zustand
+- Tanstack Query
+- React Native Reanimated
+- Material Design
+
+
+
+
+## Architecture
+
+![Logo](https://clkrnsibzehgydythtxq.supabase.co/storage/v1/object/public/gimme/global/arc-1.png)## Project setup [React Native with Expo]
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
@@ -41,10 +85,12 @@ To learn more about developing your project with Expo, look at the following res
 
 - [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
 - [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Environment Variables
 
-## Join the community
+To run this project, you will need to add the following environment variables to your .env file
 
-Join our community of developers creating universal apps.
+`PAYSTACK_PUBLIC_KEY`
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+`GIMME_API_KEY`
+
+
