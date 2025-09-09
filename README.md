@@ -19,16 +19,16 @@ With Gimme you finally do everything you want:
 - B2C platform for merchants
 - Android & IOS cross platform compatibility.
 - Fund easily using card, bank transfer and stablecoins
-- Receive payments instantly in local currencies and Stellar stablecoins (USDC/USDT) via QR codes and NFC tap.
-- Swap prepaid airtime and Data bundle for USD backed Gimme Payment Coupons GM on the Stellar Blockchain
-- Send & withdraw funds seamlessly to bank accounts or cash out through our partners PayBis on the Stellar Blockchain
+- Receive payments instantly in local currencies and stablecoins (USDC/USDT) via QR codes and NFC tap.
+- Swap prepaid airtime and Data bundle for USD backed Gimme Payment Coupons GM on the Blockchain
+- Send & withdraw funds seamlessly to bank accounts or cash out through our partners PayBis, Yellowcard on the Blockchain
 - Swap between currencies (NGN, GHS, KES, USD, EUR, GBP) with near-zero fees, leveraging Stellar’s low-cost blockchain.
 - Share an expense with friends
 - Send or collect stable coins for a gift
 - Request cash from your friends
 - Make a swift transfer to people you care about or pay rural vendors who don't even have a bank account.
 - Access Micro-credit for Micro-Transactions
-- Pay bills such as utilities and airtime directly from the Azawire wallet using stablecoin or fiat balances.
+- Pay bills such as utilities and airtime directly from the app wallet using stablecoin or fiat balances.
 - Request and manage physical and virtual debit cards linked to stablecoin or fiat balances for online and in-store payments.
 - USD and EURO virtual accounts
 - The platform is accessible via a dedicated Mobile App, WhatsApp, and USSD, offering broad accessibility, especially in regions with low internet.
