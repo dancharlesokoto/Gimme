@@ -4,13 +4,13 @@
 
 # Gimme Inc [Mobile App].
 
-Gimme is a blockchain-based decentralised market place for seamless microtransaction payments piloting in the 168+ university campuses in Nigeria with an average of 20k students and 1k+ merchants making and accepting at least 3 transactions daily.
-
 Whether you're stuck in the city or hanging out with pals and need to pay bills; or you live in a really remote area of the continent and require banking services; We hope that no matter what you're trying to do, Gimme has come to help.
+Gimme is a blockchain-based decentralised market place for seamless microtransaction payments piloting in the 168+ university campuses in Nigeria with an average of 50k students and 1k+ merchants making and accepting at least 3 transactions daily.
+
 
 
 ## Features
-
+With Gimme you finally do everything you want:
 - Secure authorization & authentication
 - User wallet creation & balance tracking
 - Fiat and crypto transactions
@@ -18,6 +18,22 @@ Whether you're stuck in the city or hanging out with pals and need to pay bills;
 - Airtime and data purchase 
 - B2C platform for merchants
 - Android & IOS cross platform compatibility.
+- Fund easily using card, bank transfer and stablecoins
+- Receive payments instantly in local currencies and Stellar stablecoins (USDC/USDT) via QR codes and NFC tap.
+- Swap prepaid airtime and Data bundle for USD backed Gimme Payment Coupons GM on the Stellar Blockchain
+- Send & withdraw funds seamlessly to bank accounts or cash out through our partners PayBis on the Stellar Blockchain
+- Swap between currencies (NGN, GHS, KES, USD, EUR, GBP) with near-zero fees, leveraging Stellar’s low-cost blockchain.
+- Share an expense with friends
+- Send or collect stable coins for a gift
+- Request cash from your friends
+- Make a swift transfer to people you care about or pay rural vendors who don't even have a bank account.
+- Access Micro-credit for Micro-Transactions
+- Pay bills such as utilities and airtime directly from the Azawire wallet using stablecoin or fiat balances.
+- Request and manage physical and virtual debit cards linked to stablecoin or fiat balances for online and in-store payments.
+- USD and EURO virtual accounts
+- The platform is accessible via a dedicated Mobile App, WhatsApp, and USSD, offering broad accessibility, especially in regions with low internet.
+
+Impact: Enables users & businesses to make and accept seamless micropayments, borderless and swift payments at lower cost (Low transaction cost is good for micro payments) as against traditional rails, improving financial access for underserved communities.
 
 
 ## Tech Stack
